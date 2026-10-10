@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - Navika</title>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <a href="pengaturan.html">
+                <img src="./asset/back-profile.svg" alt="Kembali">
+                Kembali
+            </a>
+        </nav>
+        <h1>Edit profile</h1>
+        <p>Lengkapi profilmu agar rekomendasi peluang lebih akurat.</p>
+    </header>
+
+    <main>
+        <form action="pengaturan.html" method="get">
+            
+            <p>
+                <label for="nama"><strong>Nama</strong></label><br>
+                <img src="./asset/nama-editprofile.svg" alt="">
+                <input type="text" id="nama" name="nama" value="Fajar Batagor" size="30" required>
+            </p>
+
+            <p>
+                <label for="universitas"><strong>Universitas</strong></label><br>
+                <img src="./asset/univ-editprofile.svg" alt="">
+                <input type="text" id="universitas" name="universitas" value="Universitas Sultan Ageng Tirtayasa" size="30" required>
+            </p>
+
+            <p>
+                <label for="jurusan"><strong>Jurusan</strong></label><br>
+                <img src="./asset/jurusan-editprofile.svg" alt="">
+                <select id="jurusan" name="jurusan" required>
+                    <option value="" disabled selected>Pilih Jurusan</option>
+                    <option value="Informatika">Informatika</option>
+                    <option value="Mesin">Mesin</option>
+                    <option value="Kimia">Kimia</option>
+                    <option value="Ilmu Komunikasi">Ilmu Komunikasi</option>
+                    <option value="Sistem Informasi">Sistem Informasi</option>
+                    <option value="Teknik Elektro">Teknik Elektro</option>
+                    <option value="Lainnya">Lainnya</option>
+                </select>
+            </p>
+
+            <p>
+                <label for="semester"><strong>Semester</strong></label><br>
+                <img src="./asset/semester-editprofile.svg" alt="">
+                <select id="semester" name="semester" required>
+                    <option value="" disabled selected>Semester</option>
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                    <option value="3">Semester 3</option>
+                    <option value="4">Semester 4</option>
+                    <option value="5">Semester 5</option>
+                    <option value="6">Semester 6</option>
+                    <option value="7">Semester 7</option>
+                    <option value="8">Semester 8</option>
+                </select>
+            </p>
+
+            <p>
+                <label for="ipk"><strong>IPK</strong></label><br>
+                <img src="./asset/ipk-editprofile.svg" alt="">
+                <input type="number" id="ipk" name="ipk" step="0.01" value="3.86" required>
+            </p>
+
+            <p>
+                <label for="minat"><strong>Minat / Bidang</strong></label><br>
+                <img src="./asset/minat-editprofile.svg" alt="">
+                <select id="minat" name="minat" required>
+                    <option value="" disabled selected>Minat / Bidang</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Cybersecurity">Cybersecurity</option>
+                    <option value="Backend">Backend & Database Architecture</option>
+                    <option value="Mobile App">Mobile App Development</option>
+                    <option value="UI/UX Design">UI/UX Design</option>
+                    <option value="Data Science">Data Science & Machine Learning</option>
+                    <option value="Lainnya">Lainnya</option>
+                </select>
+            </p>
+
+            <p>
+                <button type="submit">Simpan Profil</button>
+            </p>
+
+        </form>
+    </main>
+
+</body>
+</html>

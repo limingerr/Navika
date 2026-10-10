@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalender</title>
+</head>
+
+<body>
+    <header class="header-kalender">
+        <table cellpadding="12" cellspacing="0" width="100%">
+            <tr>
+                <td width="35">
+                    <a href="dashboard.html" aria-label="Kembali">
+                        <img src="asset/previous.png" alt="Kembali" width="24">
+                    </a>
+                </td>
+                <td>
+                    <h1>Kalender</h1>
+                </td>
+                <td align="center" width="35">
+                    <a href="pencarian.html" aria-label="Cari">
+                        <img src="asset/search.jpg" alt="Cari" width="28">
+                    </a>
+                </td>
+                <td align="center" width="35">
+                    <a href="pengaturan.html" aria-label="Filter kalender">
+                        <img src="asset/settings.jpg" alt="Filter" width="28">
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </header>
+
+    <main>
+        <section class="kalender-bulanan" aria-labelledby="bulan-kalender">
+            <table cellpadding="10" cellspacing="0" width="100%">
+                <caption>
+                    <h2 id="bulan-kalender">
+                        <a href="kalender.html" aria-label="Bulan sebelumnya">‹</a>
+                        &nbsp; Oktober, 2026 &nbsp;
+                        <a href="kalender.html" aria-label="Bulan berikutnya">›</a>
+                    </h2>
+                </caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Min</th>
+                        <th scope="col">Sen</th>
+                        <th scope="col">Sel</th>
+                        <th scope="col">Rab</th>
+                        <th scope="col">Kam</th>
+                        <th scope="col">Jum</th>
+                        <th scope="col">Sab</th>
+                    </tr>
+                </thead>
+                <tbody align="center">
+                    <tr>
+                        <td>28</td>
+                        <td>29</td>
+                        <td>30</td>
+                        <td>1</td>
+                        <td>2</td>
+                        <td>3</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>6</td>
+                        <td>7</td>
+                        <td>8</td>
+                        <td>9</td>
+                        <td>10</td>
+                        <td>11</td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td><a href="#agenda-hari-ini" aria-label="Tanggal 13 Oktober">13</a></td>
+                        <td>14</td>
+                        <td>15</td>
+                        <td>16</td>
+                        <td>17</td>
+                        <td>18</td>
+                    </tr>
+                    <tr>
+                        <td>19</td>
+                        <td>20</td>
+                        <td>21</td>
+                        <td>22</td>
+                        <td>23</td>
+                        <td>24</td>
+                        <td>25</td>
+                    </tr>
+                    <tr>
+                        <td>26</td>
+                        <td>27</td>
+                        <td>28</td>
+                        <td>29</td>
+                        <td>30</td>
+                        <td>31</td>
+                        <td>1</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="kategori-kalender" aria-label="Filter agenda">
+            <p>
+                <a href="kalender.html">Beasiswa</a>
+                &nbsp;
+                <a href="kalender.html">Deadline</a>
+                &nbsp;
+                <a href="kalender.html">Bootcamp</a>
+                &nbsp;
+                <a href="kalender.html">Semua</a>
+                &nbsp;
+                <a href="kalender.html">Magang</a>
+            </p>
+        </section>
+
+        <section id="agenda-hari-ini" aria-labelledby="judul-agenda">
+            <h2 align="center" id="judul-agenda">Agenda Hari Ini</h2>
+
+            <article>
+                <table cellpadding="12" cellspacing="0" width="100%" border="1">
+                    <tr>
+                        <td>
+                            <p>
+                                <b>✧ REKOMENDASI</b>
+                                &nbsp;<b>Bootcamp</b>
+                                &nbsp;<img src="asset/clock.svg" alt="" width="14" height="14"> 1 Hari
+                            </p>
+                            <h2>AI-Enhanced Full Stack Developer</h2>
+                            <p>▦ PT Hacktivate Teknologi Indonesia</p>
+                            <p>Kesempatan untuk mengembangkan keterampilan AI dan full stack developer.</p>
+                            <p><a href="cekDetail_aiEnhanced.html"><b>Cek Detail &rarr;</b></a></p>
+                        </td>
+                    </tr>
+                </table>
+            </article>
+
+            <br>
+
+            <article>
+                <table cellpadding="12" cellspacing="0" width="100%" border="1">
+                    <tr>
+                        <td>
+                            <p>
+                                <b>✧ REKOMENDASI</b>
+                                &nbsp;<b>Beasiswa</b>
+                                &nbsp;<img src="asset/clock.svg" alt="" width="14" height="14"> 1 Hari
+                            </p>
+                            <h2>Djarum Beasiswa Plus</h2>
+                            <p>▦ Djarum Foundation</p>
+                            <p>Program beasiswa untuk mahasiswa yang ingin mengembangkan potensi diri.</p>
+                            <p><a href="cekDetailDjarum.html"><b>Cek Detail &rarr;</b></a></p>
+                        </td>
+                    </tr>
+                </table>
+            </article>
+            <br>
+            <article>
+                <table cellpadding="12" cellspacing="0" width="100%" border="1">
+                    <tr>
+                        <td>
+                            <p>
+                                <b>✧ REKOMENDASI</b>
+                                &nbsp;<b>Beasiswa</b>
+                                &nbsp; <img src="asset/clock.svg" alt="" width="14" height="14"> 1 Hari
+                            </p>
+
+                            <h2>Beasiswa Bank Indonesia</h2>
+                            <p>▦ Bank Indonesia</p>
+                            <p>
+                                Kesempatan untuk mendapatkan beasiswa dari Bank Indonesia bagi mahasiswa berprestasi.
+                            </p>
+
+                            <p>
+                                ♡
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="cekDetailBeasiswaBI.html">
+                                    <b>Cek Detail &rarr;</b>
+                                </a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </article>
+
+            <br>
+            <article>
+                <table cellpadding="12" cellspacing="0" width="100%" border="1">
+                    <tr>
+                        <td>
+                            <p>
+                                <b>✧ REKOMENDASI</b>
+                                &nbsp;<b>Magang</b>
+                                &nbsp; <img src="asset/clock.svg" alt="" width="14" height="14"> 1 Hari
+                            </p>
+
+                            <h2>Magang Generasi Bertalenta</h2>
+                            <p>▦ BUMN</p>
+                            <p>
+                                Kesempatan untuk mengembangkan keterampilan dan pengalaman kerja di perusahaan BUMN.
+                            </p>
+
+                            <p>
+                                ♡
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="cekDetailMagangGenBer.html">
+                                    <b>Cek Detail &rarr;</b>
+                                </a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </article>
+        </section>
+    </main>
+
+    <footer align="center">
+        <nav aria-label="Navigasi utama">
+            <a href="dashboard.html"><img src="asset/home.svg" alt="" width="24" height="24"> Home</a>
+            &nbsp;&nbsp;
+            <a href="bookmark.html"><img src="asset/bookmark.svg" alt="" width="24" height="24"> Tersimpan</a>
+            &nbsp;&nbsp;
+            <a href="profile.html"><img src="asset/user.svg" alt="" width="24" height="24"> Profile</a>
+        </nav>
+    </footer>
+</body>
+
+</html>

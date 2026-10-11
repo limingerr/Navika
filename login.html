@@ -9,12 +9,17 @@
   <main>
     <section aria-labelledby="login-title">
       <header>
-        <div aria-label="Logo Navika">
+        <a href="index.html" aria-label="Navika - Beranda">
           <span>NAVIKA</span>
-        </div>
+        </a>
       </header>
 
-      <img src="asset/asset-ilustrasi-masuk.png" alt="Ilustrasi masuk ke akun Navika" width="300" height="220">
+      <img
+        src="asset/asset-ilustrasi-masuk.png"
+        alt="Ilustrasi masuk ke akun Navika"
+        width="300"
+        height="220"
+      >
 
       <div>
         <h1 id="login-title">Temukan peluang yang sesuai untukmu</h1>
@@ -23,22 +28,40 @@
 
       <form action="dashboard.html" method="get">
         <fieldset>
+          <legend>Informasi login</legend>
+
           <div>
             <label for="login-email">Email</label>
-            <input id="login-email" name="email" type="email" placeholder="nama@email.com" autocomplete="email" required>
+            <input
+              id="login-email"
+              name="email"
+              type="email"
+              placeholder="nama@email.com"
+              autocomplete="email"
+              required
+            >
           </div>
 
           <div>
             <label for="login-password">Kata Sandi</label>
-            <input id="login-password" name="password" type="password" placeholder="Masukkan kata sandi" autocomplete="current-password" required>
+            <input
+              id="login-password"
+              name="password"
+              type="password"
+              placeholder="Masukkan kata sandi"
+              autocomplete="current-password"
+              required
+            >
           </div>
 
           <div>
-            <label for="remember-me">
-              <input id="remember-me" name="remember" type="checkbox">
-              Ingat saya
-            </label>
-            <a href="register.html">Lupa kata sandi?</a>
+            <input
+              id="remember-me"
+              name="remember"
+              type="checkbox"
+            >
+            <label for="remember-me">Ingat saya</label>
+            <span>Lupa kata sandi?</span>
           </div>
 
           <button type="submit">Masuk</button>
@@ -46,12 +69,14 @@
       </form>
 
       <p>atau</p>
+
       <p>
-        <a href="login.html">
+        <button type="button">
           <img src="asset/google.png" alt="" width="18" height="18">
           Sign In with Google
-        </a>
+        </button>
       </p>
+
       <p>Belum punya akun? <a href="register.html">Daftar</a></p>
     </section>
   </main>

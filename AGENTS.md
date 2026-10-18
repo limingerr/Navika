@@ -1,24 +1,23 @@
 # AGENTS.md
 
-NAVIKA: a student opportunity finder (beasiswa / magang / bootcamp). The repo root holds the static HTML5 clickable prototype (22 pages, Indonesian UI, `lang="id"`) kept as the migration reference; the rewrite lives in `navika/` (Next.js). Keep copy and comments in Indonesian. `README.md` is a joke placeholder; the real spec is `PRD-NAVIKA.md` (also Indonesian).
+NAVIKA: a student opportunity finder (beasiswa / magang / bootcamp). The repo root contains the Next.js app and the static HTML5 clickable prototype (23 pages, Indonesian UI, `lang="id"`) kept as a migration reference. Keep copy and comments in Indonesian. The specification is `PRD-NAVIKA.md` (also Indonesian).
 
 ## Repo facts
 
-- Prototype (root, `*.html`): no package.json, no tests, no dev server, no build step. JavaScript is now allowed (owner decision); behavior lives in `script/` files, currently `script/dashboard.js` for month navigation and the date agenda on `dashboard.html` while the other 21 pages stay static. Open any `.html` directly in a browser to preview.
-- Prototype styling: only `dashboard.html` is styled, via `style/dashboard.css` — the prototype's only CSS file (Indonesian comments, Poppins, WCAG-adjusted colors). The other 21 pages render with browser defaults.
-- `dashboard.html` and `style/` hold uncommitted/untracked work: a hand-done semantic refactor that is the reference pattern for the rest (semantic landmarks, inline SVG instead of icon images, relative `asset/...` paths, hover feedback transitions only, no decorative animation). Check `git status` / `git diff` before touching it.
-- Layout refactor in progress: `kalender.html` and `lihatSemua.html` still use `<table>` for layout; the other 20 pages are plain semantic HTML5. Don't introduce inline styles, presentational attributes, or new layout tables — continue the semantic direction.
+- Prototype (root, `*.html`): JavaScript behavior lives in `script/dashboard.js` for month navigation and the date agenda on `dashboard.html`; the other 22 pages stay static. Open any `.html` directly in a browser to preview.
+- Prototype styling: only `dashboard.html` is styled, via `style/dashboard.css` (Indonesian comments, Poppins, WCAG-adjusted colors). The other 22 pages render with browser defaults.
+- `dashboard.html` and `style/dashboard.css` are the hand-done semantic reference pattern for the rest (semantic landmarks, inline SVG instead of icon images, relative `asset/...` paths, hover feedback transitions only, no decorative animation). Check `git status` / `git diff` before touching them.
+- Layout refactor in progress: `kalender.html` and `lihatSemua.html` still use `<table>` for layout; the other 21 pages are plain semantic HTML5. Don't introduce inline styles, presentational attributes, or new layout tables — continue the semantic direction.
 - Asset paths vary by page (`asset/...` vs `./asset/...`); keep the style of the file you edit. Only `lihatSemua.html` still uses root-absolute `/asset/...`, which breaks on `file://`.
 - Indentation is not uniform (2 spaces in some files, 4 in others); match the file you edit.
 - The 7 `detail-<slug>.html` pages are hand-copied versions of the same card structure, written near-minified (one tag per line, no indentation). Duplication is expected; there are no shared components, partials, or templates.
 
-## Next.js app (`navika/`)
+## Next.js app (repo root)
 
-- Fresh scaffold, only the default starter page: Next.js 16 App Router + React 19 + TypeScript + Tailwind CSS 4, managed with npm. The PRD §4.6 routes are not built yet.
-- Commands run from `navika/`: `npm run dev` (localhost:3000), `npm run build`, `npm run lint`.
-- `navika/AGENTS.md` is auto-written by Next 16 and requires reading `node_modules/next/dist/docs/` before writing code — this Next version's APIs and conventions differ from older ones. Follow it inside that folder.
-- Tailwind is the chosen styling; PRD §4.1 was updated to match (v1.3).
-- Never run `npm audit fix --force`: it would downgrade Next to v14. The 5 high findings are dev-only (ESLint chain).
+- Next.js 16 App Router + React 19 + JavaScript and plain CSS, managed with npm. Routes and layout live in `app/`, shared JavaScript modules in `script/`, and one scoped `style/app-*.css` file is imported by each page. There is no shared app CSS file; the prototype keeps `style/dashboard.css`.
+- Commands run from the repo root: `npm.cmd run dev` (localhost:3000), `npm.cmd test`, `npm.cmd run build`.
+- Read `node_modules/next/dist/docs/` before changing Next.js code; this version's APIs and conventions differ from older ones.
+- Do not add Tailwind or TypeScript.
 
 ## Reference material (inputs to the PRD, not app code)
 
@@ -32,7 +31,7 @@ NAVIKA: a student opportunity finder (beasiswa / magang / bootcamp). The repo ro
 
 ## Direction of the rewrite (from PRD-NAVIKA.md)
 
-- Stack: Next.js 16 + TypeScript, scaffolded in `navika/`. P0 scope: auth, profile, Finder, detail, Match, bookmark, tracker/calendar, catalog.
+- Stack: Next.js 16 + JavaScript + plain CSS at the repo root. P0 scope: auth, profile, Finder, detail, Match, bookmark, tracker/calendar, catalog.
 - Match must stay deterministic and explainable per dimension; the PRD explicitly rules out AI for the MVP.
 - PRD §4.6 step 1 has the page-to-route mapping; step 2 warns not to equate HTML file names with future business IDs.
 - `style/dashboard.css` tokens deliberately differ from the PRD §2.6 palette (darkened for WCAG AA contrast; stated in its comments). Don't "restore" the PRD hex values without review.
@@ -50,3 +49,13 @@ Only an explicit choice of antislop during or after selects a session mode. A re
 If the mode is unresolved, ask during/after and end the response; wait for the answer before any UI review, planning, or concept. For read-only tasks, put the active-mode notice only at the start of the final answer, never in progress messages. For editing tasks, announce before the first edit and omit it from the final answer.
 To update antislop later: replace the core and skill folders from the release matching it, or run `npx antislop-ai --update` if it was installed as skill folders.
 <!-- antislop:end -->
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

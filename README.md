@@ -1,10 +1,10 @@
 # NAVIKA
 
-NAVIKA adalah prototipe web untuk mencari informasi beasiswa, magang, dan bootcamp. Proyek ini masih fokus pada frontend, jadi belum memakai database atau sistem akun sungguhan.
+Demo pencarian beasiswa, magang, dan bootcamp untuk mahasiswa. Dibuat dengan Next.js, JavaScript, dan CSS.
 
-## Menjalankan proyek
+## Jalankan
 
-Pastikan Node.js sudah terpasang. Jalankan perintah berikut dari folder proyek:
+Jalankan dari folder proyek:
 
 ```powershell
 npm.cmd install
@@ -13,15 +13,15 @@ npm.cmd run dev
 
 Buka `http://localhost:3000` di browser.
 
-## Fitur yang sudah ada
+## Struktur
 
-- Halaman daftar dan masuk untuk mencoba alur aplikasi.
-- Dashboard, pencarian peluang, halaman detail, dan daftar peluang tersimpan.
-- Kalender untuk melihat tenggat contoh.
-- Profil dan pengaturan tema, bahasa, serta pengingat di dalam aplikasi.
+- `app/`: halaman aplikasi.
+- `script/`: interaksi dan data contoh.
+- `style/app-*.css`: CSS tiap halaman.
+- `*.html`: prototipe awal. `dashboard.html` memakai `style/dashboard.css`.
 
-Data profil, peluang tersimpan, dan pengaturan disimpan di `localStorage` browser. Form daftar dan masuk hanya untuk demo; tidak ada email verifikasi atau pemeriksaan kata sandi di server. Tanggal peluang juga masih contoh, bukan jadwal resmi penyelenggara.
+Profil, peluang tersimpan, dan pengaturan disimpan di browser. Form masuk dan daftar hanya simulasi; data peluang serta tenggatnya juga contoh.
 
-Aplikasi utama ada di folder `app/`. File HTML di akar repositori adalah versi awal, sedangkan gambar di `export/` dipakai sebagai referensi desain.
+## Periksa
 
-Untuk memeriksa proyek, jalankan `npm.cmd test`, `npm.cmd run typecheck`, dan `npm.cmd run build`.
+Jalankan `npm.cmd test` dan `npm.cmd run build`.

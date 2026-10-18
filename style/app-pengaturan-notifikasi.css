@@ -1,0 +1,460 @@
+body {
+  margin: 0;
+}
+
+.page-pengaturan-notifikasi {
+  min-height: 100vh;
+}
+
+.page-pengaturan-notifikasi {
+  --blue: #05a5d9;
+  --deep: #00699d;
+  --ink: #111827;
+  --muted: #58616e;
+  --soft: #f5f7f9;
+  --line: #e8edf1;
+  --shadow: 0 16px 28px rgba(13,33,53,.11);
+}
+
+.page-pengaturan-notifikasi, .page-pengaturan-notifikasi * {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.page-pengaturan-notifikasi {
+  margin: 0;
+  color: var(--ink);
+  background: #fff;
+  font-family: Arial,Helvetica,sans-serif;
+  line-height: 1.5;
+}
+
+.page-pengaturan-notifikasi button,
+.page-pengaturan-notifikasi input,
+.page-pengaturan-notifikasi select {
+  font: inherit;
+}
+
+.page-pengaturan-notifikasi button {
+  cursor: pointer;
+}
+
+.page-pengaturan-notifikasi a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-pengaturan-notifikasi img {
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.page-pengaturan-notifikasi h1,
+.page-pengaturan-notifikasi h2,
+.page-pengaturan-notifikasi h3,
+.page-pengaturan-notifikasi p {
+  margin-top: 0;
+}
+
+.page-pengaturan-notifikasi :focus-visible {
+  outline: 3px solid #0069ae;
+  outline-offset: 3px;
+}
+
+.page-pengaturan-notifikasi .demo-note {
+  display: inline-block;
+  width: fit-content;
+  margin: 8px 0 18px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #eaf7fe;
+  color: #075d85;
+  font-size: .83rem;
+  font-weight: 700;
+}
+
+.page-pengaturan-notifikasi .settings-page {
+  min-height: 100vh;
+  padding: 38px 16px 60px;
+  background: var(--page,#fff);
+}
+
+.page-pengaturan-notifikasi .settings-inner {
+  width: min(100%,760px);
+  margin: auto;
+}
+
+.page-pengaturan-notifikasi .settings-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  font-weight: 700;
+}
+
+.page-pengaturan-notifikasi .settings-back span {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  background: #b9dffe;
+  color: #00699d;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.page-pengaturan-notifikasi .settings-heading {
+  margin: 28px 0 26px;
+}
+
+.page-pengaturan-notifikasi .settings-heading h1 {
+  font-size: clamp(2.1rem,5vw,3rem);
+  line-height: 1.12;
+  letter-spacing: -.035em;
+  margin-bottom: 12px;
+}
+
+.page-pengaturan-notifikasi .settings-heading p {
+  font-size: clamp(1rem,2.7vw,1.3rem);
+  color: var(--muted);
+  margin: 0;
+}
+
+.page-pengaturan-notifikasi .settings-list {
+  overflow: hidden;
+  border: 1.5px solid #b9bec4;
+  border-radius: 26px;
+  background: var(--surface,#fff);
+}
+
+.page-pengaturan-notifikasi .settings-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 84px;
+  padding: 13px 17px;
+  border: 0;
+  border-bottom: 1px solid #d8dde2;
+  background: transparent;
+  text-align: left;
+  color: inherit;
+}
+
+.page-pengaturan-notifikasi .settings-row:last-child {
+  border-bottom: 0;
+}
+
+.page-pengaturan-notifikasi .settings-row:hover {
+  background: rgba(7,159,207,.07);
+}
+
+.page-pengaturan-notifikasi .settings-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 45px;
+  height: 45px;
+  border-radius: 14px;
+  background: #e5e7eb;
+  color: #006da7;
+  font-size: 1.5rem;
+}
+
+.page-pengaturan-notifikasi .settings-icon img {
+  width: 25px;
+  height: 25px;
+}
+
+.page-pengaturan-notifikasi .settings-row-copy {
+  display: block;
+  flex: 1;
+  min-width: 0;
+}
+
+.page-pengaturan-notifikasi .settings-row-copy strong,
+.page-pengaturan-notifikasi .settings-row-copy small {
+  display: block;
+}
+
+.page-pengaturan-notifikasi .settings-row-copy strong {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.page-pengaturan-notifikasi .settings-row-copy small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: .86rem;
+}
+
+.page-pengaturan-notifikasi .settings-section-label {
+  font-size: .91rem;
+  letter-spacing: .02em;
+  color: var(--muted);
+  margin: 34px 2px 15px;
+}
+
+.page-pengaturan-notifikasi .settings-choice {
+  cursor: pointer;
+}
+
+.page-pengaturan-notifikasi .settings-choice input[type=radio] {
+  width: 23px;
+  height: 23px;
+  accent-color: #006da7;
+  flex: none;
+}
+
+.page-pengaturan-notifikasi .settings-choice input[role=switch] {
+  appearance: none;
+  width: 49px;
+  height: 29px;
+  flex: none;
+  border-radius: 99px;
+  background: #cbd1d7;
+  position: relative;
+  transition: background .15s;
+}
+
+.page-pengaturan-notifikasi .settings-choice input[role=switch]:checked {
+  background: #006da7;
+}
+
+.page-pengaturan-notifikasi .settings-choice input[role=switch]:before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform .15s;
+}
+
+.page-pengaturan-notifikasi .settings-choice input[role=switch]:checked:before {
+  transform: translateX(20px);
+}
+
+.page-pengaturan-notifikasi .settings-hint {
+  margin: 22px 2px;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.page-pengaturan-notifikasi .settings-empty {
+  padding: 20px;
+  background: var(--soft);
+  border-radius: 15px;
+  color: var(--muted);
+}
+
+.page-pengaturan-notifikasi .reminder-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.page-pengaturan-notifikasi .reminder-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.page-pengaturan-notifikasi .reminder-list li:last-child {
+  border: 0;
+}
+
+.page-pengaturan-notifikasi .reminder-list a {
+  font-weight: 700;
+  color: var(--deep);
+}
+
+.page-pengaturan-notifikasi .reminder-list span {
+  text-align: right;
+  font-size: .9rem;
+  color: var(--muted);
+}
+
+:root[data-theme=dark] .page-pengaturan-notifikasi {
+  --page: #0c1823;
+  --surface: #162735;
+  --ink: #f5f8fa;
+  --muted: #b9c7d1;
+  --soft: #172936;
+  --line: #344958;
+  --blue: #087da8;
+  --deep: #8ed8f6;
+  --shadow: 0 16px 28px rgba(0,0,0,.28);
+}
+
+:root[data-theme=dark] .page-pengaturan-notifikasi {
+  background: var(--page);
+  color: var(--ink);
+}
+
+:root[data-theme=dark] .page-pengaturan-notifikasi .settings-icon {
+  background: #273b48;
+  color: var(--ink);
+}
+
+:root[data-theme=dark] .page-pengaturan-notifikasi .settings-list {
+  border-color: var(--line);
+}
+
+:root[data-theme=dark] .page-pengaturan-notifikasi .settings-row {
+  border-color: var(--line);
+}
+
+:root[data-theme=dark] .page-pengaturan-notifikasi .demo-note {
+  background: #19435a;
+  color: #b8e7fb;
+}
+
+:root[data-theme=dark] .page-pengaturan-notifikasi .settings-back span {
+  background: #1d5473;
+  color: #d8f3ff;
+}
+
+:root[data-theme=dark] .page-pengaturan-notifikasi .settings-icon img {
+  filter: brightness(0) invert(1);
+}
+
+@media (min-width:700px) {
+  .page-pengaturan-notifikasi .settings-page {
+    padding: 50px 26px 80px;
+  }
+
+  .page-pengaturan-notifikasi .settings-row {
+    min-height: 92px;
+    padding-inline: 24px;
+  }
+}
+
+.page-pengaturan-notifikasi {
+  --blue: #00a5e0;
+  --deep: #0065a3;
+  --ink: #1d242b;
+  --muted: #68737d;
+  --soft: #f4f7f9;
+  --line: #e5e7eb;
+  --page: #fff;
+  --surface: #fff;
+  --shadow: 0 12px 28px rgba(29, 36, 43, .12);
+  --gradient: linear-gradient(105deg, #00a5e0, #0065a3);
+}
+
+.page-pengaturan-notifikasi {
+  background: var(--page);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-pengaturan-notifikasi button,
+.page-pengaturan-notifikasi input,
+.page-pengaturan-notifikasi select {
+  font: inherit;
+}
+
+.page-pengaturan-notifikasi button,
+.page-pengaturan-notifikasi a,
+.page-pengaturan-notifikasi input,
+.page-pengaturan-notifikasi select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.page-pengaturan-notifikasi button:disabled {
+  cursor: not-allowed;
+}
+
+.page-pengaturan-notifikasi :focus-visible {
+  outline: 3px solid var(--deep);
+  outline-offset: 3px;
+}
+
+.page-pengaturan-notifikasi .demo-note {
+  background: #e7f5fc;
+  color: #075d85;
+}
+
+.page-pengaturan-notifikasi .settings-heading h1 {
+  font-weight: 800;
+}
+
+.page-pengaturan-notifikasi .settings-page {
+  background: var(--page);
+}
+
+.page-pengaturan-notifikasi .settings-back span {
+  background: #bbdefb;
+  color: var(--deep);
+}
+
+.page-pengaturan-notifikasi .settings-list {
+  background: var(--surface);
+}
+
+.page-pengaturan-notifikasi .settings-row {
+  min-height: 76px;
+}
+
+.page-pengaturan-notifikasi .settings-icon {
+  background: #e5e7eb;
+}
+
+.page-pengaturan-notifikasi .settings-choice .settings-icon {
+  width: 54px;
+  height: 42px;
+  background: transparent;
+}
+
+:root[data-theme=dark] .page-pengaturan-notifikasi {
+  --page: #0c1216;
+  --surface: #1d242b;
+  --ink: #f8fafc;
+  --muted: #85929e;
+  --soft: #1d242b;
+  --line: #5a6269;
+  --blue: #00a5e0;
+  --deep: #3faae8;
+  --gradient: linear-gradient(105deg, #00a5e0, #0065a3);
+}
+
+:root[data-theme=dark] .page-pengaturan-notifikasi .settings-list {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+:root[data-theme=dark] .page-pengaturan-notifikasi .settings-icon {
+  background: #29343b;
+}
+
+:root[data-theme=dark] .page-pengaturan-notifikasi .settings-choice .settings-icon {
+  background: transparent;
+}
+
+:root[data-theme=dark] .page-pengaturan-notifikasi .settings-icon img {
+  filter: brightness(0) invert(1);
+}
+
+:root[data-theme=dark] .page-pengaturan-notifikasi .settings-choice:has(input[name="theme"]) .settings-icon img {
+  filter: none;
+}
+
+@media (max-width: 699px) {
+  .page-pengaturan-notifikasi .settings-row {
+    padding-inline: 14px;
+  }
+}

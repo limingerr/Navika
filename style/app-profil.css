@@ -1,0 +1,664 @@
+body {
+  margin: 0;
+}
+
+.page-profil {
+  min-height: 100vh;
+}
+
+.page-profil {
+  --blue: #05a5d9;
+  --deep: #00699d;
+  --ink: #111827;
+  --muted: #58616e;
+  --soft: #f5f7f9;
+  --line: #e8edf1;
+  --shadow: 0 16px 28px rgba(13,33,53,.11);
+}
+
+.page-profil, .page-profil * {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.page-profil {
+  margin: 0;
+  color: var(--ink);
+  background: #fff;
+  font-family: Arial,Helvetica,sans-serif;
+  line-height: 1.5;
+}
+
+.page-profil button,
+.page-profil input,
+.page-profil select {
+  font: inherit;
+}
+
+.page-profil button {
+  cursor: pointer;
+}
+
+.page-profil a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-profil img {
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.page-profil h1,
+.page-profil h2,
+.page-profil h3,
+.page-profil p {
+  margin-top: 0;
+}
+
+.page-profil :focus-visible {
+  outline: 3px solid #0069ae;
+  outline-offset: 3px;
+}
+
+.page-profil .demo-note {
+  display: inline-block;
+  width: fit-content;
+  margin: 8px 0 18px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #eaf7fe;
+  color: #075d85;
+  font-size: .83rem;
+  font-weight: 700;
+}
+
+.page-profil .primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  padding: 12px 24px;
+  border: 0;
+  border-radius: 18px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.page-profil .primary-button {
+  background: linear-gradient(105deg,#049ed4,#00659b);
+  color: #fff;
+}
+
+.page-profil .primary-button:hover {
+  filter: brightness(.95);
+}
+
+.page-profil .app-shell {
+  min-height: 100vh;
+}
+
+.page-profil .app-content {
+  min-width: 0;
+  padding-bottom: 112px;
+}
+
+.page-profil .screen-main {
+  width: min(100% - 32px,1100px);
+  margin-inline: auto;
+}
+
+.page-profil .outline-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border: 0;
+  background: transparent;
+}
+
+.page-profil .main-nav {
+  position: fixed;
+  z-index: 20;
+  left: 16px;
+  right: 16px;
+  bottom: 14px;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 4px;
+  max-width: 700px;
+  margin-inline: auto;
+  padding: 8px;
+  background: rgba(255,255,255,.97);
+  border-radius: 28px;
+  box-shadow: 0 16px 36px rgba(0,0,0,.14);
+}
+
+.page-profil .main-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 62px;
+  border-radius: 19px;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.page-profil .main-nav a.active {
+  background: #b9dffe;
+  color: #00659b;
+}
+
+.page-profil .main-nav img {
+  width: 23px;
+  height: 23px;
+}
+
+.page-profil .profile-screen {
+  padding-top: 28px;
+}
+
+.page-profil .profile-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-profil .profile-heading p {
+  color: var(--deep);
+  font-size: .9rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.page-profil .profile-heading h1 {
+  font-size: 2.2rem;
+  margin: 0;
+}
+
+.page-profil .outline-icon {
+  border: 1px solid var(--line);
+  border-radius: 15px;
+}
+
+.page-profil .profile-hero {
+  text-align: center;
+  padding: 27px 15px 30px;
+  background: linear-gradient(110deg,#049dd3,#00659b);
+  color: #fff;
+  border-radius: 28px;
+}
+
+.page-profil .profile-avatar {
+  display: grid;
+  place-items: center;
+  width: 90px;
+  height: 90px;
+  margin: auto auto 18px;
+  border-radius: 28px;
+  background: #38baf0;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.page-profil .profile-hero h2 {
+  margin: 0;
+}
+
+.page-profil .profile-hero p {
+  margin: 2px 0 16px;
+  overflow-wrap: anywhere;
+}
+
+.page-profil .profile-hero span {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 4px 16px;
+  background: #fff;
+  color: #202833;
+  font-weight: 700;
+}
+
+.page-profil .subheading {
+  color: var(--muted);
+  font-size: 1.05rem;
+  margin: 28px 0 12px;
+}
+
+.page-profil .academic-list {
+  display: grid;
+  gap: 17px;
+  padding: 23px;
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.page-profil .academic-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 0;
+}
+
+.page-profil .academic-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  background: #b9dffe;
+}
+
+.page-profil .academic-item span,
+.page-profil .academic-item strong {
+  display: block;
+}
+
+.page-profil .academic-item span {
+  font-size: .9rem;
+}
+
+.page-profil .academic-item strong {
+  overflow-wrap: anywhere;
+}
+
+.page-profil .edit-profile-link {
+  width: 100%;
+  margin-top: 26px;
+}
+
+@media (min-width:700px) {
+  .page-profil .screen-main {
+    width: min(100% - 48px,1100px);
+  }
+
+  .page-profil .profile-screen {
+    max-width: 850px;
+  }
+
+  .page-profil .academic-list {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 28px;
+  }
+}
+
+@media (min-width:1000px) {
+  .page-profil .app-shell {
+    display: grid;
+    grid-template-columns: 210px minmax(0,1fr);
+  }
+
+  .page-profil .app-content {
+    grid-column: 2;
+    grid-row: 1;
+    padding-bottom: 50px;
+  }
+
+  .page-profil .main-nav {
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    height: 100vh;
+    max-width: none;
+    margin: 0;
+    padding: 32px 14px;
+    border-radius: 0;
+    border-right: 1px solid var(--line);
+    box-shadow: none;
+  }
+
+  .page-profil .main-nav:before {
+    content: "NAVIKA";
+    display: block;
+    padding: 10px 14px 34px;
+    color: var(--deep);
+    font-size: 1.5rem;
+    font-weight: 800;
+  }
+
+  .page-profil .main-nav a {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 0 16px;
+    font-size: 1rem;
+  }
+
+  .page-profil .main-nav img {
+    width: 25px;
+    height: 25px;
+  }
+
+  .page-profil .screen-main {
+    width: min(100% - 56px,1100px);
+  }
+
+  .page-profil .profile-screen {
+    max-width: 800px;
+  }
+}
+
+@media (max-width:380px) {
+  .page-profil .screen-main {
+    width: calc(100% - 24px);
+  }
+}
+
+:root[data-theme=dark] .page-profil {
+  --page: #0c1823;
+  --surface: #162735;
+  --ink: #f5f8fa;
+  --muted: #b9c7d1;
+  --soft: #172936;
+  --line: #344958;
+  --blue: #087da8;
+  --deep: #8ed8f6;
+  --shadow: 0 16px 28px rgba(0,0,0,.28);
+}
+
+:root[data-theme=dark] .page-profil {
+  background: var(--page);
+  color: var(--ink);
+}
+
+:root[data-theme=dark] .page-profil .main-nav,
+:root[data-theme=dark] .page-profil .academic-list {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+:root[data-theme=dark] .page-profil .academic-item {
+  color: var(--ink);
+}
+
+:root[data-theme=dark] .page-profil .demo-note {
+  background: #19435a;
+  color: #b8e7fb;
+}
+
+:root[data-theme=dark] .page-profil .main-nav a.active {
+  background: #194b67;
+  color: #d8f3ff;
+}
+
+:root[data-theme=dark] .page-profil .academic-icon {
+  background: #1d5473;
+  color: #d8f3ff;
+}
+
+:root[data-theme=dark] .page-profil .main-nav img,
+:root[data-theme=dark] .page-profil .outline-icon img {
+  filter: brightness(0) invert(1);
+}
+
+.page-profil {
+  --blue: #00a5e0;
+  --deep: #0065a3;
+  --ink: #1d242b;
+  --muted: #68737d;
+  --soft: #f4f7f9;
+  --line: #e5e7eb;
+  --page: #fff;
+  --surface: #fff;
+  --shadow: 0 12px 28px rgba(29, 36, 43, .12);
+  --gradient: linear-gradient(105deg, #00a5e0, #0065a3);
+}
+
+.page-profil {
+  background: var(--page);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-profil button,
+.page-profil input,
+.page-profil select {
+  font: inherit;
+}
+
+.page-profil button,
+.page-profil a,
+.page-profil input,
+.page-profil select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.page-profil button:disabled {
+  cursor: not-allowed;
+}
+
+.page-profil :focus-visible {
+  outline: 3px solid var(--deep);
+  outline-offset: 3px;
+}
+
+.page-profil .screen-main {
+  width: min(100% - 40px, 1100px);
+}
+
+.page-profil .demo-note {
+  background: #e7f5fc;
+  color: #075d85;
+}
+
+.page-profil .primary-button {
+  min-height: 54px;
+  border-radius: 17px;
+  font-weight: 700;
+  transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+}
+
+.page-profil .primary-button {
+  background: var(--gradient);
+  box-shadow: 0 10px 20px rgba(0, 101, 163, .18);
+}
+
+.page-profil .primary-button:hover {
+  transform: translateY(-2px);
+}
+
+.page-profil .app-content {
+  padding-bottom: calc(100px + env(safe-area-inset-bottom));
+}
+
+.page-profil .outline-icon {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.page-profil .main-nav {
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  max-width: 700px;
+  padding: 9px;
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: 0 14px 32px rgba(0,0,0,.15);
+}
+
+.page-profil .main-nav a {
+  min-height: 62px;
+  color: #1d242b;
+  transition: background .16s ease, color .16s ease;
+}
+
+.page-profil .main-nav a:hover {
+  background: #eef7fc;
+}
+
+.page-profil .main-nav a.active {
+  background: #bbdefb;
+  color: #0067a6;
+}
+
+.page-profil .nav-icon {
+  display: block;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  background: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.page-profil .nav-icon-home {
+  -webkit-mask-image: url("/asset/home%20copy.svg");
+  mask-image: url("/asset/home%20copy.svg");
+}
+
+.page-profil .nav-icon-bookmark {
+  -webkit-mask-image: url("/asset/tersimpan.svg");
+  mask-image: url("/asset/tersimpan.svg");
+}
+
+.page-profil .nav-icon-profile {
+  -webkit-mask-image: url("/asset/profile.svg");
+  mask-image: url("/asset/profile.svg");
+}
+
+.page-profil .action-icon {
+  display: block;
+  flex: none;
+}
+
+.page-profil .outline-icon {
+  color: var(--ink);
+}
+
+.page-profil .profile-heading h1 {
+  font-weight: 800;
+}
+
+.page-profil .profile-hero {
+  background: var(--gradient);
+}
+
+.page-profil .profile-avatar {
+  background: #38bdf8;
+}
+
+.page-profil .academic-list {
+  background: var(--surface);
+}
+
+.page-profil .academic-icon {
+  background: #bbdefb;
+}
+
+:root[data-theme=dark] .page-profil {
+  --page: #0c1216;
+  --surface: #1d242b;
+  --ink: #f8fafc;
+  --muted: #85929e;
+  --soft: #1d242b;
+  --line: #5a6269;
+  --blue: #00a5e0;
+  --deep: #3faae8;
+  --gradient: linear-gradient(105deg, #00a5e0, #0065a3);
+}
+
+:root[data-theme=dark] .page-profil .main-nav,
+:root[data-theme=dark] .page-profil .academic-list {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+:root[data-theme=dark] .page-profil .main-nav {
+  background: #1d242b;
+}
+
+:root[data-theme=dark] .page-profil .main-nav a {
+  color: #85929e;
+}
+
+:root[data-theme=dark] .page-profil .main-nav a:hover {
+  background: #26353d;
+}
+
+:root[data-theme=dark] .page-profil .main-nav a.active {
+  background: #123140;
+  color: #3faae8;
+}
+
+:root[data-theme=dark] .page-profil .profile-hero {
+  background: #00a5e0;
+}
+
+:root[data-theme=dark] .page-profil .profile-avatar {
+  background: #123140;
+}
+
+:root[data-theme=dark] .page-profil .profile-hero span {
+  background: #123140;
+  color: #fff;
+}
+
+:root[data-theme=dark] .page-profil .academic-icon {
+  background: #123140;
+}
+
+:root[data-theme=dark] .page-profil .academic-icon img {
+  filter: brightness(0) saturate(100%) invert(66%) sepia(38%) saturate(1238%) hue-rotate(160deg) brightness(95%) contrast(88%);
+}
+
+:root[data-theme=dark] .page-profil .outline-icon {
+  background: #1d242b;
+  border-color: #29343b;
+}
+
+@media (min-width: 1000px) {
+  .page-profil .main-nav {
+    bottom: auto;
+    border-radius: 0;
+    box-shadow: none;
+    border-right: 1px solid var(--line);
+  }
+
+  .page-profil .main-nav:before {
+    color: var(--deep);
+  }
+
+  .page-profil .app-content {
+    padding-bottom: 48px;
+  }
+}
+
+@media (max-width: 380px) {
+  .page-profil .screen-main {
+    width: calc(100% - 28px);
+  }
+
+  .page-profil .main-nav {
+    left: 8px;
+    right: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-profil .primary-button {
+    transition: none;
+  }
+}

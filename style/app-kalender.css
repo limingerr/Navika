@@ -219,6 +219,22 @@ html {
   background: #d366eb;
 }
 
+.page-kalender .badge-studi-independen {
+  background: #0284c7;
+}
+
+.page-kalender .badge-workshop {
+  background: #b45309;
+}
+
+.page-kalender .badge-seminar-webinar {
+  background: #4f46e5;
+}
+
+.page-kalender .badge-kompetisi {
+  background: #be123c;
+}
+
 .page-kalender .badge-time {
   background: #f32125;
   margin-left: auto;
@@ -581,6 +597,22 @@ html {
   background: #006da7;
 }
 
+.page-kalender .chip-studi-independen {
+  background: #0284c7;
+}
+
+.page-kalender .chip-workshop {
+  background: #b45309;
+}
+
+.page-kalender .chip-seminar-webinar {
+  background: #4f46e5;
+}
+
+.page-kalender .chip-kompetisi {
+  background: #be123c;
+}
+
 .page-kalender .calendar-day-dots {
   display: flex;
   align-items: center;
@@ -606,6 +638,22 @@ html {
 
 .page-kalender .dot-bootcamp {
   background: #d463ee;
+}
+
+.page-kalender .dot-studi-independen {
+  background: #0284c7;
+}
+
+.page-kalender .dot-workshop {
+  background: #b45309;
+}
+
+.page-kalender .dot-seminar-webinar {
+  background: #4f46e5;
+}
+
+.page-kalender .dot-kompetisi {
+  background: #be123c;
 }
 
 .page-kalender .calendar-day-dots {
@@ -826,15 +874,27 @@ html {
 
 .page-kalender .calendar-chips {
   margin-inline: -1px;
-  padding-block: 14px 16px;
-}
-
-.page-kalender .calendar-chips {
-  scrollbar-width: none;
+  padding-block: 10px 14px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 101, 155, 0.28) transparent;
 }
 
 .page-kalender .calendar-chips::-webkit-scrollbar {
-  display: none;
+  height: 6px;
+}
+
+.page-kalender .calendar-chips::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 999px;
+}
+
+.page-kalender .calendar-chips::-webkit-scrollbar-thumb {
+  background: rgba(0, 101, 155, 0.28);
+  border-radius: 999px;
+}
+
+.page-kalender .calendar-chips::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 101, 155, 0.55);
 }
 
 .page-kalender .calendar-chip {
@@ -875,7 +935,8 @@ html {
 }
 
 .page-kalender .chip-rekomendasi {
-  background: #0065a3;
+  background: linear-gradient(135deg, #0284c7, #005689);
+  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.35);
 }
 
 .page-kalender .opportunity-grid {

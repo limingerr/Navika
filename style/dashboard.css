@@ -1,84 +1,50 @@
 /* ============================================================
    NAVIKA - Dashboard
-   Acuan: PRD-NAVIKA.md bagian 2.6 (design system),
-   export/dashboard-light.png, dan dokumen revisi kalender/filter.
-   Satu kolom aplikasi, maks 440px. Seluruh teks memakai Poppins.
-   Warna mengikuti penuh token dokumen revisi; rasio kontras
-   ditulis di tiap token, termasuk nilai di bawah AA yang tetap
-   dipakai atas arahan pemilik.
-   Gerak: hover dipakai sebagai umpan balik dengan transisi
-   180-220 ms, tanpa animasi dekoratif atau gerakan berulang.
-   Semua hover dibatasi @media (hover: hover) dan dimatikan bila
-   pengguna memilih prefers-reduced-motion.
-   Strip kalender digeser per bulan oleh script/dashboard.js;
-   klik tanggal mengisi panel agenda di bawah strip. Batang geser
-   horizontal tetap disembunyikan seperti bagian lain.
+   Acuan: PRD-NAVIKA.md §2.6, export/dashboard-light.png.
+   Satu kolom, maks 440px. Font Poppins. Warna mengikuti token
+   dokumen revisi; rasio kontras dicatat per token, nilai di bawah
+   AA yang tetap dipakai atas arahan pemilik diberi catatan.
+   Gerak: hover sebagai umpan balik (180–220 ms), tanpa animasi
+   dekoratif. Semua hover dibatasi @media (hover: hover) dan
+   dimatikan bila pengguna memilih prefers-reduced-motion.
    ============================================================ */
 
 :root {
-  /* Token warna mengikuti dokumen revisi kalender/filter (perkiraan
-     visual dari Figma) dengan pengecualian yang dicatat per token.
-     Rasio kontras di atas latar pemakaiannya ditulis per token;
-     nilai di bawah AA yang tetap dipakai diberi catatan. */
-  --biru-utama: #00A6E0;
-  /* Warna utama NAVIKA (dokumen); belum terpakai di halaman ini */
-  --biru-kartu: #5AA4D8;
-  /* Background kartu peluang (dokumen); teks putih 2,7:1 */
-  --biru-aksi: #0067A6;
-  /* Aksen biru gelap (dokumen): badge REKOMENDASI + tautan; putih 6,0:1 */
-  --biru-aktif: #5AA4D8;
-  /* Background tanggal aktif (dokumen); teks putih 2,7:1 */
-  --biru-teks: #2F5F94;
-  /* teks/ikon menu aktif di atas --biru-lembut; 4,75:1 (dokumen #3769A5 hanya 4,06:1) */
-  --biru-lembut: #C7DDF8;
-  /* Background menu navigasi aktif (dokumen) */
-  --biru-muda: #EAF5FC;
-  /* hover tanggal nonaktif (dokumen) */
-  --hijau: #3E5145;
-  /* Beasiswa (dokumen); putih 8,5:1 */
-  --merah: #C33228;
-  /* Deadline (dokumen); putih 5,5:1 */
-  --pink: #D17AEF;
-  /* Bootcamp (dokumen); teks gelap 7,3:1 */
-  --oranye: #FF8A3D;
-  /* Magang (permintaan pemilik, menggantikan #EC914A dokumen); teks gelap 8,5:1 */
-  --pink-tua: #98004A;
-  /* hover ikon hati di atas --biru-kartu; 3,2:1 (--pink hanya 1,0:1) */
-  --ungu: #3217C9;
-  /* Disimpan/status (dokumen); putih 10,0:1 */
-  --hitam: #090909;
-  /* Teks utama (dokumen) */
-  --hitam-pekat: #080808;
-  /* chip Semua + titik indikator hitam (dokumen); putih 20,0:1 */
-  --abu: #D9D9D9;
-  /* chip Rekomendasi + avatar (dokumen); teks gelap 14,1:1 */
+  --biru-utama:  #00A6E0;
+  --biru-kartu:  #5AA4D8;  /* background kartu peluang; teks putih 2,7:1 */
+  --biru-aksi:   #0067A6;  /* badge REKOMENDASI + tautan; putih 6,0:1 */
+  --biru-aktif:  #5AA4D8;  /* tanggal aktif; teks putih 2,7:1 */
+  --biru-teks:   #2F5F94;  /* menu aktif di atas --biru-lembut; 4,75:1 */
+  --biru-lembut: #C7DDF8;  /* background menu navigasi aktif */
+  --biru-muda:   #EAF5FC;  /* hover tanggal nonaktif */
+  --hijau:       #3E5145;  /* Beasiswa; putih 8,5:1 */
+  --merah:       #C33228;  /* Deadline; putih 5,5:1 */
+  --pink:        #D17AEF;  /* Bootcamp; teks gelap 7,3:1 */
+  --oranye:      #FF8A3D;  /* Magang; teks gelap 8,5:1 */
+  --pink-tua:    #98004A;  /* hover ikon hati di atas --biru-kartu; 3,2:1 */
+  --ungu:        #3217C9;  /* Disimpan; putih 10,0:1 */
+  --hitam:       #090909;
+  --hitam-pekat: #080808;  /* chip Semua + titik hitam; putih 20,0:1 */
+  --abu:         #D9D9D9;  /* chip Rekomendasi + avatar; teks gelap 14,1:1 */
 
-  --teks: #090909;
-  --teks-redup: #5B6470;
-  /* teks sekunder digelapkan dari #85929E (3,2:1); 6,0:1 di atas putih */
-  --garis: #E5E7EB;
-  /* Border netral (dokumen) */
-  --garis-hari: #E5E7EB;
-  --gulir: #85929E;
-  /* warna thumb scrollbar; tidak terpakai selama batang geser disembunyikan */
-  --biru-hover: #00527F;
-  /* hover tautan/aksi biru; 8,4:1 di atas putih */
+  --teks:        #090909;
+  --teks-redup:  #5B6470;  /* 6,0:1 di atas putih */
+  --garis:       #E5E7EB;
+  --garis-hari:  #E5E7EB;
+  --biru-hover:  #00527F;  /* 8,4:1 di atas putih */
 
   --radius-kartu: 24px;
-  --radius-sel: 12px;
-
+  --radius-sel:   12px;
   --font: "Poppins", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 *,
 *::before,
-*::after {
-  box-sizing: border-box;
-}
+*::after { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: #FFFFFF;
+  background: #F0F4F8;
   color: var(--teks);
   font-family: var(--font);
   font-size: 16px;
@@ -86,23 +52,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Batang geser halaman disembunyikan atas permintaan pemilik;
-   halaman tetap bisa digulir seperti biasa. */
-html {
-  scrollbar-width: none;
-}
+html { scrollbar-width: none; }
+html::-webkit-scrollbar { display: none; }
 
-html::-webkit-scrollbar {
-  display: none;
-}
-
-/* Elemen form dan kontrol mewarisi Poppins tanpa terkecuali. */
-button,
-input,
-select,
-textarea {
-  font-family: inherit;
-}
+button, input, select, textarea { font-family: inherit; }
 
 a {
   color: inherit;
@@ -116,41 +69,36 @@ button:focus-visible {
   border-radius: 6px;
 }
 
-svg {
-  display: block;
-}
+svg { display: block; }
 
-/* Bingkai aplikasi: satu kolom di tengah pada layar lebar. */
+/* ---- Bingkai aplikasi ---- */
+
 .app {
   max-width: 440px;
   margin: 0 auto;
   min-height: 100vh;
   min-height: 100dvh;
-  background: #fff;
-  /* Ruang bawah untuk nav tetap: tinggi nav sekitar 78 px + margin
-     kartu terakhir 16 px + ruang aman; 132 px cukup agar konten
-     terakhir tidak tertutup. */
-  padding-bottom: 132px;
+  background: #F0F4F8;
+  padding-bottom: 120px;
 }
 
 @media (min-width: 481px) {
   .app {
-    box-shadow: 0 0 0 1px var(--garis), 0 12px 40px rgba(17, 24, 39, .07);
+    box-shadow: 0 0 0 1px var(--garis), 0 12px 40px rgba(17,24,39,.07);
   }
 }
 
-/* ---------------- Kepala ---------------- */
+/* ---- Kepala ---- */
 
 .kepala {
   display: flex;
   align-items: center;
   gap: 12px;
   margin: 16px 16px 0;
-  padding: 18px;
+  padding: 16px 18px;
   background: #fff;
   border-radius: var(--radius-kartu);
-  /* Elevasi dari mockup: kartu kepala melayang di atas latar. */
-  box-shadow: 0 6px 18px rgba(9, 9, 9, .07);
+  box-shadow: 0 4px 16px rgba(9,9,9,.07);
 }
 
 .avatar {
@@ -168,14 +116,14 @@ svg {
 
 .hai {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--teks-redup);
 }
 
 .nama {
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.2px;
   line-height: 1.2;
@@ -200,20 +148,17 @@ svg {
 }
 
 @media (hover: hover) {
-  .ikon-tombol:hover {
-    background: #F2F4F7;
-  }
+  .ikon-tombol:hover { background: #F2F4F7; }
 }
 
-/* ---------------- Kartu kalender ---------------- */
+/* ---- Kartu kalender ---- */
 
 .kartu-kalender {
-  margin: 20px 16px 0;
-  background: #F8FAFC;
+  margin: 16px 16px 0;
+  background: #fff;
   border-radius: var(--radius-kartu);
-  padding: 12px 12px 16px;
-  /* Elevasi dari mockup; tint latar #F8FAFC juga dari PNG. */
-  box-shadow: 0 6px 18px rgba(9, 9, 9, .06);
+  padding: 14px 14px 16px;
+  box-shadow: 0 4px 16px rgba(9,9,9,.07);
 }
 
 .nav-bulan {
@@ -227,7 +172,7 @@ svg {
   min-width: 0;
   margin: 0;
   text-align: center;
-  font-size: clamp(22px, 6.2vw, 26px);
+  font-size: clamp(18px, 5.5vw, 22px);
   font-weight: 800;
   letter-spacing: -0.3px;
   white-space: nowrap;
@@ -240,8 +185,6 @@ svg {
   place-items: center;
   width: 44px;
   height: 44px;
-  /* Berlaku untuk tautan kalender dan tombol bulan sekaligus;
-     properti berikut mereset tampilan bawaan tombol. */
   border: 0;
   padding: 0;
   background: none;
@@ -252,42 +195,35 @@ svg {
 }
 
 @media (hover: hover) {
-  .ikon-bulan:hover {
-    background: #F2F4F7;
-  }
+  .ikon-bulan:hover { background: #F2F4F7; }
 }
 
-/* Chip filter: tinggi visual 36px, area sentuh total 44px. */
+/* Chip filter */
 .chip-baris {
   display: flex;
-  gap: 8px;
-  margin: 10px 0 0;
-  padding: 4px 2px;
+  gap: 7px;
+  margin: 12px 0 0;
+  padding: 3px 1px;
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  /* Batang geser disembunyikan mengikuti mockup; geser tetap bisa. */
   scrollbar-width: none;
 }
 
-/* Batang geser horizontal disembunyikan atas permintaan pemilik;
-   geseran tetap jalan lewat usapan, trackpad, atau shift+scroll. */
 .chip-baris::-webkit-scrollbar,
 .strip-hari::-webkit-scrollbar,
-.meta-atas::-webkit-scrollbar {
-  display: none;
-}
+.meta-atas::-webkit-scrollbar { display: none; }
 
 .chip {
   flex: none;
   display: block;
-  padding: 5px 0;
+  padding: 4px 0;
 }
 
 .chip span {
   display: inline-block;
-  padding: 9px 14px;
+  padding: 7px 13px;
   border-radius: 10px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1.25;
   color: #fff;
@@ -295,53 +231,22 @@ svg {
   transition: filter 180ms ease;
 }
 
-/* Urutan chip dari dokumen: Beasiswa, Deadline, Bootcamp, Semua,
-   Disimpan, Magang, Rekomendasi. Teks chip putih seperti dokumen;
-   Bootcamp putih di atas --pink (2,7:1) atas permintaan pemilik,
-   Magang (8,5:1) dan Rekomendasi (14,1:1) tetap teks gelap. */
-.chip-beasiswa span {
-  background: var(--hijau);
-}
+.chip-beasiswa span  { background: var(--hijau); }
+.chip-deadline span  { background: var(--merah); }
+.chip-bootcamp span  { background: var(--pink); }
+.chip-semua span     { background: var(--hitam-pekat); }
+.chip-ekstra span    { background: var(--ungu); }
+.chip-magang span    { background: var(--oranye); color: var(--hitam); }
+.chip-rekomendasi span { background: var(--abu); color: var(--hitam); }
 
-.chip-deadline span {
-  background: var(--merah);
-}
-
-.chip-bootcamp span {
-  background: var(--pink);
-}
-
-.chip-semua span {
-  background: var(--hitam-pekat);
-}
-
-.chip-ekstra span {
-  background: var(--ungu);
-}
-
-.chip-magang span {
-  background: var(--oranye);
-  color: var(--hitam);
-}
-
-.chip-rekomendasi span {
-  background: var(--abu);
-  color: var(--hitam);
-}
-
-/* Hover tidak menyaingi warna kategori: chip terisi hanya
-   menggelap sedikit, tanggal memakai tint tipis. */
 @media (hover: hover) {
-  .chip:hover span {
-    filter: brightness(.96);
-  }
+  .chip:hover span { filter: brightness(.93); }
 
   .hari:hover {
     background: var(--biru-muda);
     border-color: var(--biru-lembut);
   }
 
-  /* Tanggal aktif tetap biru dengan teks putih saat di-hover. */
   .hari.terpilih:hover {
     background: var(--biru-aktif);
     border-color: var(--biru-aktif);
@@ -349,39 +254,31 @@ svg {
   }
 }
 
-/* Strip tanggal. Geseran ditahan di dalam strip agar tidak memicu
-   navigasi maju/mundur browser; batang gesernya disembunyikan tapi
-   strip tetap bisa digeser manual. Perpindahan bulan lewat tombol
-   ditangani script/dashboard.js dengan gulir halus. */
+/* Strip tanggal */
 .strip-hari {
   display: flex;
-  gap: 4px;
+  gap: 5px;
   margin: 12px 0 0;
   padding: 0 0 4px;
   list-style: none;
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  /* Sedikit ruang saat fokus keyboard menggulir ke sebuah tanggal. */
   scroll-padding-inline: 6px;
   scrollbar-width: none;
 }
 
-/* Penanda awal bulan pada strip: jarak ekstra sebelum tanggal 1. */
-.strip-hari .awal-bulan {
-  margin-left: 16px;
-}
+.strip-hari .awal-bulan { margin-left: 14px; }
 
 .hari {
   flex: none;
-  width: 48px;
-  min-height: 74px;
+  width: 50px;
+  min-height: 76px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
   padding: 12px 0 8px;
-  /* Tombol tanggal, bukan tautan: tampilan bawaan tombol direset. */
-  border: 1px solid var(--garis-hari);
+  border: 1.5px solid var(--garis-hari);
   border-radius: var(--radius-sel);
   background: #fff;
   color: var(--teks);
@@ -392,7 +289,7 @@ svg {
 }
 
 .hari .angka {
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 700;
   line-height: 1;
 }
@@ -408,7 +305,7 @@ svg {
   display: flex;
   gap: 3px;
   height: 6px;
-  margin-top: 5px;
+  margin-top: 6px;
 }
 
 .titik {
@@ -417,29 +314,12 @@ svg {
   border-radius: 50%;
 }
 
-.titik-hijau {
-  background: var(--hijau);
-}
-
-.titik-merah {
-  background: var(--merah);
-}
-
-.titik-pink {
-  background: var(--pink);
-}
-
-.titik-oranye {
-  background: var(--oranye);
-}
-
-.titik-ungu {
-  background: var(--ungu);
-}
-
-.titik-hitam {
-  background: var(--hitam-pekat);
-}
+.titik-hijau  { background: var(--hijau); }
+.titik-merah  { background: var(--merah); }
+.titik-pink   { background: var(--pink); }
+.titik-oranye { background: var(--oranye); }
+.titik-ungu   { background: var(--ungu); }
+.titik-hitam  { background: var(--hitam-pekat); }
 
 .hari.terpilih {
   background: var(--biru-aktif);
@@ -447,23 +327,15 @@ svg {
   color: #fff;
 }
 
-.hari.terpilih .nama-hari {
-  color: #fff;
-}
+.hari.terpilih .nama-hari { color: rgba(255,255,255,.85); }
+.hari.terpilih .titik     { background: rgba(255,255,255,.8); }
 
-/* ---------------- Agenda tanggal terpilih ---------------- */
-
-/* Area agenda di bawah strip, isinya dari script/dashboard.js.
-   Tanpa garis pemisah, jarak saja seperti mockup export/image.png;
-   baris memakai bahasa visual sel tanggal: kartu putih berbingkai
-   tipis di atas latar kartu kalender. */
-.agenda {
-  margin-top: 14px;
-}
+/* Panel agenda */
+.agenda { margin-top: 12px; }
 
 .agenda-daftar {
   display: grid;
-  gap: 8px;
+  gap: 7px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -474,13 +346,11 @@ svg {
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: #fff;
+  background: #F8FAFC;
   border: 1px solid var(--garis-hari);
   border-radius: var(--radius-sel);
 }
 
-/* Titik kategori agenda sedikit lebih besar dari titik strip supaya
-   seimbang dengan dua baris teks; warna memakai token yang sama. */
 .agenda-baris .titik {
   flex: none;
   width: 8px;
@@ -494,39 +364,38 @@ svg {
 }
 
 .agenda-judul {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .agenda-meta {
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--teks-redup);
   line-height: 1.35;
 }
 
-/* Tanggal tanpa agenda: pesan kosong yang jelas (PRD-NAVIKA.md). */
 .agenda-kosong {
   margin: 0;
-  padding: 2px 2px 0;
-  font-size: 13.5px;
+  padding: 4px 2px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--teks-redup);
 }
 
-/* ---------------- Rekomendasi ---------------- */
+/* ---- Rekomendasi ---- */
 
-.rekomendasi {
-  /* Ritme antar bagian 20 px, sama seperti jarak kepala ke kalender. */
-  padding: 20px 16px 8px;
-}
+.rekomendasi { padding: 20px 16px 8px; }
 
 .judul-bagian {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin: 0 2px 12px;
+  margin: 0 2px 14px;
 }
 
 .judul-bagian h2 {
@@ -543,45 +412,48 @@ svg {
   padding: 10px 2px;
   margin: -10px 0;
   color: var(--biru-aksi);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   transition: color 180ms ease;
 }
 
+@media (hover: hover) {
+  .lihat-semua:hover {
+    color: var(--biru-hover);
+    text-decoration: underline;
+  }
+}
+
+/* Kartu peluang */
 .kartu-peluang {
   background: var(--biru-kartu);
   color: #fff;
   border-radius: var(--radius-kartu);
   padding: 18px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   transition: transform 220ms ease, box-shadow 220ms ease;
 }
 
-/* Hover kartu: terangkat 4 px dengan shadow lebih tegas. Transform
-   tidak mengubah ukuran atau posisi layout, dan tidak berlaku di
-   layar sentuh. */
 @media (hover: hover) {
   .kartu-peluang:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 26px rgba(9, 9, 9, .18);
+    box-shadow: 0 12px 28px rgba(9,9,9,.2);
   }
 }
 
-.kartu-peluang :focus-visible {
-  outline-color: #fff;
-}
+.kartu-peluang :focus-visible { outline-color: #fff; }
+
+/* Pastikan heading di dalam kartu mewarisi warna putih */
+.kartu-peluang h3 { color: #fff; }
 
 .meta-atas {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
   gap: 6px;
-  /* Badge kategori (Magang, Bootcamp, dst) digeser horizontal, bukan turun baris. */
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
-  /* Ruang untuk bayangan badge supaya tidak terpotong kontainer gulir;
-     margin negatif menjaga jarak tetap sama. */
   padding: 6px 10px 12px;
   margin: -6px -10px -12px;
 }
@@ -590,12 +462,9 @@ svg {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 9px;
-  /* Sudut kecil, bukan pil penuh, atas permintaan pemilik. */
+  padding: 5px 10px;
   border-radius: 8px;
-  /* Bayangan disamakan dengan mockup dashboard-light: lebih lembut
-     dan sedikit lebih gelap, kesan pin mengambang di atas kartu. */
-  box-shadow: 0 4px 8px rgba(9, 9, 9, .3);
+  box-shadow: 0 3px 8px rgba(9,9,9,.25);
   font-size: 12px;
   font-weight: 700;
   line-height: 1;
@@ -604,48 +473,35 @@ svg {
 
 .badge-rekomendasi {
   background: var(--biru-aksi);
-  border: 1px solid rgba(255, 255, 255, .28);
+  border: 1px solid rgba(255,255,255,.28);
   font-size: 10.5px;
   letter-spacing: .4px;
 }
 
-/* Badge kategori memakai warna dan aturan teks chip filter: putih
-   di warna gelap; Bootcamp putih atas permintaan pemilik (2,7:1),
-   Magang tetap gelap (8,5:1). */
-.kat-beasiswa {
-  background: var(--hijau);
-}
+.kat-beasiswa { background: var(--hijau); color: #fff; }
+.kat-magang   { background: var(--oranye); color: #fff; }
+.kat-bootcamp { background: var(--pink); color: #fff; }
 
-.kat-magang {
-  background: var(--oranye);
-  color: var(--hitam);
-}
-
-.kat-bootcamp {
-  background: var(--pink);
-  color: #fff;
-}
-
-/* Lencana tenggat: badge isi transparan dilarang di atas biru
-   karena menurunkan kontras teks putih di bawah 4,5:1; jadi
-   versi "tenang" hanya memakai garis tepi. */
 .badge-tenggat {
   margin-left: auto;
-  border: 1.5px solid rgba(255, 255, 255, .75);
+  border: 1.5px solid rgba(255,255,255,.75);
   padding: 5px 9px;
+  box-shadow: none;
 }
 
 .badge-tenggat.mendesak {
   background: var(--merah);
   border-color: transparent;
+  box-shadow: 0 3px 8px rgba(195,50,40,.4);
 }
 
 .judul-peluang {
-  margin: 14px 0 4px;
-  font-size: 24px;
+  margin: 14px 0 5px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.2px;
   line-height: 1.25;
+  color: #fff;
 }
 
 .organisasi {
@@ -653,8 +509,9 @@ svg {
   align-items: center;
   gap: 6px;
   margin: 0;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 500;
+  color: rgba(255,255,255,.85);
 }
 
 .aksi-kartu {
@@ -675,68 +532,40 @@ svg {
   transition: color 200ms ease;
 }
 
-.simpan svg {
-  transition: transform 200ms ease;
+.simpan svg { transition: transform 200ms ease; }
+
+@media (hover: hover) {
+  .simpan:hover { color: var(--pink-tua); }
+  .simpan:hover svg { transform: scale(1.12); }
 }
 
 .tombol-detail {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 15px;
-  /* Bukan pil penuh, sudutnya ikut kecil seperti badge kartu. */
+  padding: 11px 16px;
   border-radius: var(--radius-sel);
   background: #fff;
   color: var(--hitam);
   font-size: 14px;
   font-weight: 700;
-  box-shadow: 0 4px 8px rgba(17, 24, 39, .22);
+  box-shadow: 0 4px 10px rgba(17,24,39,.2);
   transition: background-color 200ms ease, color 200ms ease;
 }
 
-.tombol-detail svg {
-  transition: transform 200ms ease;
-}
+.tombol-detail svg { transition: transform 200ms ease; }
 
 @media (hover: hover) {
-
-  /* Tombol detail: latar biru tua, teks putih, panah bergeser
-     sedikit ke kanan. Guratan panah ikut biru tua supaya tetap
-     terlihat di dalam bulatan putih. */
   .tombol-detail:hover {
     background: var(--biru-aksi);
     color: #fff;
   }
 
-  .tombol-detail:hover svg {
-    transform: translateX(3px);
-  }
-
-  .tombol-detail:hover svg path {
-    stroke: var(--biru-aksi);
-  }
-
-  /* Hati membesar sedikit dan berubah merah tua. --pink dari
-     dokumen hanya 1,0:1 di atas --biru-kartu (nyaris tak
-     terlihat), jadi dipakai --pink-tua yang 3,2:1. */
-  .simpan:hover {
-    color: var(--pink-tua);
-  }
-
-  .simpan:hover svg {
-    transform: scale(1.1);
-  }
-
-  .lihat-semua:hover {
-    color: var(--biru-hover);
-    text-decoration: underline;
-  }
+  .tombol-detail:hover svg { transform: translateX(3px); }
 }
 
-/* ---------------- Navigasi bawah ---------------- */
+/* ---- Navigasi bawah ---- */
 
-/* Navbar mengambang seperti mockup: semua sudut membulat, ada jarak
-   dari tepi layar, dan bayangan lembut. */
 .nav-bawah {
   position: fixed;
   bottom: calc(12px + env(safe-area-inset-bottom));
@@ -749,7 +578,7 @@ svg {
   padding: 10px 14px;
   background: #fff;
   border-radius: 24px;
-  box-shadow: 0 10px 26px rgba(17, 24, 39, .18), 0 2px 6px rgba(17, 24, 39, .08);
+  box-shadow: 0 10px 26px rgba(17,24,39,.18), 0 2px 6px rgba(17,24,39,.08);
 }
 
 .nav-item {
@@ -760,17 +589,14 @@ svg {
   gap: 3px;
   padding: 8px 4px;
   border-radius: 16px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  color: var(--teks);
+  color: var(--teks-redup);
   transition: background-color 180ms ease, color 180ms ease;
 }
 
-/* Umpan balik hover untuk tab yang tidak aktif, seperti ikon kepala. */
 @media (hover: hover) {
-  .nav-item:not(.aktif):hover {
-    background: #F2F4F7;
-  }
+  .nav-item:not(.aktif):hover { background: #F2F4F7; }
 }
 
 .nav-item.aktif {
@@ -778,10 +604,9 @@ svg {
   color: var(--biru-teks);
 }
 
-/* Pengguna yang membatasi gerak: transisi dan pergeseran hover
-   dimatikan, perubahan warna tetap terjadi. */
-@media (prefers-reduced-motion: reduce) {
+/* ---- Reduced motion ---- */
 
+@media (prefers-reduced-motion: reduce) {
   .kartu-peluang,
   .tombol-detail,
   .tombol-detail svg,
@@ -792,13 +617,9 @@ svg {
   .nav-item,
   .chip span,
   .hari,
-  .lihat-semua {
-    transition: none;
-  }
+  .lihat-semua { transition: none; }
 
   .kartu-peluang:hover,
   .tombol-detail:hover svg,
-  .simpan:hover svg {
-    transform: none;
-  }
+  .simpan:hover svg { transform: none; }
 }

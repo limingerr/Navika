@@ -1,0 +1,254 @@
+body {
+  margin: 0;
+}
+
+.page-pengaturan-tentang {
+  min-height: 100vh;
+}
+
+.page-pengaturan-tentang {
+  --blue: #05a5d9;
+  --deep: #00699d;
+  --ink: #111827;
+  --muted: #58616e;
+  --soft: #f5f7f9;
+  --line: #e8edf1;
+  --shadow: 0 16px 28px rgba(13,33,53,.11);
+}
+
+.page-pengaturan-tentang, .page-pengaturan-tentang * {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.page-pengaturan-tentang {
+  margin: 0;
+  color: var(--ink);
+  background: #fff;
+  font-family: Arial,Helvetica,sans-serif;
+  line-height: 1.5;
+}
+
+.page-pengaturan-tentang button,
+.page-pengaturan-tentang input,
+.page-pengaturan-tentang select {
+  font: inherit;
+}
+
+.page-pengaturan-tentang button {
+  cursor: pointer;
+}
+
+.page-pengaturan-tentang a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-pengaturan-tentang img {
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.page-pengaturan-tentang h1,
+.page-pengaturan-tentang h2,
+.page-pengaturan-tentang h3,
+.page-pengaturan-tentang p {
+  margin-top: 0;
+}
+
+.page-pengaturan-tentang :focus-visible {
+  outline: 3px solid #0069ae;
+  outline-offset: 3px;
+}
+
+.page-pengaturan-tentang .settings-page {
+  min-height: 100vh;
+  padding: 38px 16px 60px;
+  background: var(--page,#fff);
+}
+
+.page-pengaturan-tentang .settings-inner {
+  width: min(100%,760px);
+  margin: auto;
+}
+
+.page-pengaturan-tentang .settings-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  font-weight: 700;
+}
+
+.page-pengaturan-tentang .settings-back span {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  background: #b9dffe;
+  color: #00699d;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.page-pengaturan-tentang .settings-heading {
+  margin: 28px 0 26px;
+}
+
+.page-pengaturan-tentang .settings-heading h1 {
+  font-size: clamp(2.1rem,5vw,3rem);
+  line-height: 1.12;
+  letter-spacing: -.035em;
+  margin-bottom: 12px;
+}
+
+.page-pengaturan-tentang .settings-heading p {
+  font-size: clamp(1rem,2.7vw,1.3rem);
+  color: var(--muted);
+  margin: 0;
+}
+
+.page-pengaturan-tentang .settings-footer {
+  text-align: center;
+  margin: 55px 0 0;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.page-pengaturan-tentang .privacy-info {
+  padding: 22px;
+  border-radius: 22px;
+  background: var(--soft);
+  line-height: 1.65;
+}
+
+.page-pengaturan-tentang .privacy-info h2 {
+  font-size: 1.18rem;
+  margin: 0 0 7px;
+}
+
+.page-pengaturan-tentang .privacy-info h2:not(:first-child) {
+  margin-top: 20px;
+}
+
+.page-pengaturan-tentang .privacy-info p:last-child {
+  margin-bottom: 0;
+}
+
+.page-pengaturan-tentang .about-brand {
+  text-align: center;
+  margin: 35px 0;
+}
+
+.page-pengaturan-tentang .about-brand img {
+  width: 110px;
+  height: 110px;
+}
+
+.page-pengaturan-tentang .about-brand h2 {
+  font-size: 2rem;
+  margin: 12px 0 0;
+}
+
+.page-pengaturan-tentang .about-brand p {
+  color: var(--muted);
+}
+
+:root[data-theme=dark] .page-pengaturan-tentang {
+  --page: #0c1823;
+  --surface: #162735;
+  --ink: #f5f8fa;
+  --muted: #b9c7d1;
+  --soft: #172936;
+  --line: #344958;
+  --blue: #087da8;
+  --deep: #8ed8f6;
+  --shadow: 0 16px 28px rgba(0,0,0,.28);
+}
+
+:root[data-theme=dark] .page-pengaturan-tentang {
+  background: var(--page);
+  color: var(--ink);
+}
+
+:root[data-theme=dark] .page-pengaturan-tentang .settings-back span {
+  background: #1d5473;
+  color: #d8f3ff;
+}
+
+@media (min-width:700px) {
+  .page-pengaturan-tentang .settings-page {
+    padding: 50px 26px 80px;
+  }
+}
+
+.page-pengaturan-tentang {
+  --blue: #00a5e0;
+  --deep: #0065a3;
+  --ink: #1d242b;
+  --muted: #68737d;
+  --soft: #f4f7f9;
+  --line: #e5e7eb;
+  --page: #fff;
+  --surface: #fff;
+  --shadow: 0 12px 28px rgba(29, 36, 43, .12);
+  --gradient: linear-gradient(105deg, #00a5e0, #0065a3);
+}
+
+.page-pengaturan-tentang {
+  background: var(--page);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-pengaturan-tentang button,
+.page-pengaturan-tentang input,
+.page-pengaturan-tentang select {
+  font: inherit;
+}
+
+.page-pengaturan-tentang button,
+.page-pengaturan-tentang a,
+.page-pengaturan-tentang input,
+.page-pengaturan-tentang select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.page-pengaturan-tentang button:disabled {
+  cursor: not-allowed;
+}
+
+.page-pengaturan-tentang :focus-visible {
+  outline: 3px solid var(--deep);
+  outline-offset: 3px;
+}
+
+.page-pengaturan-tentang .settings-heading h1 {
+  font-weight: 800;
+}
+
+.page-pengaturan-tentang .settings-page {
+  background: var(--page);
+}
+
+.page-pengaturan-tentang .settings-back span {
+  background: #bbdefb;
+  color: var(--deep);
+}
+
+:root[data-theme=dark] .page-pengaturan-tentang {
+  --page: #0c1216;
+  --surface: #1d242b;
+  --ink: #f8fafc;
+  --muted: #85929e;
+  --soft: #1d242b;
+  --line: #5a6269;
+  --blue: #00a5e0;
+  --deep: #3faae8;
+  --gradient: linear-gradient(105deg, #00a5e0, #0065a3);
+}

@@ -1,0 +1,1263 @@
+body {
+  margin: 0;
+}
+
+.page-dashboard {
+  min-height: 100vh;
+}
+
+.page-dashboard {
+  --blue: #05a5d9;
+  --deep: #00699d;
+  --ink: #111827;
+  --muted: #58616e;
+  --soft: #f5f7f9;
+  --line: #e8edf1;
+  --shadow: 0 16px 28px rgba(13,33,53,.11);
+}
+
+.page-dashboard, .page-dashboard * {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.page-dashboard {
+  margin: 0;
+  color: var(--ink);
+  background: #fff;
+  font-family: Arial,Helvetica,sans-serif;
+  line-height: 1.5;
+}
+
+.page-dashboard button,
+.page-dashboard input,
+.page-dashboard select {
+  font: inherit;
+}
+
+.page-dashboard button {
+  cursor: pointer;
+}
+
+.page-dashboard a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-dashboard img {
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.page-dashboard h1,
+.page-dashboard h2,
+.page-dashboard h3,
+.page-dashboard p {
+  margin-top: 0;
+}
+
+.page-dashboard :focus-visible {
+  outline: 3px solid #0069ae;
+  outline-offset: 3px;
+}
+
+.page-dashboard .demo-note {
+  display: inline-block;
+  width: fit-content;
+  margin: 8px 0 18px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #eaf7fe;
+  color: #075d85;
+  font-size: .83rem;
+  font-weight: 700;
+}
+
+.page-dashboard .app-shell {
+  min-height: 100vh;
+}
+
+.page-dashboard .app-content {
+  min-width: 0;
+  padding-bottom: 112px;
+}
+
+.page-dashboard .screen-main {
+  width: min(100% - 32px,1100px);
+  margin-inline: auto;
+}
+
+.page-dashboard .top-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 94px;
+  padding: 18px max(16px,calc((100vw - 1100px)/2));
+  background: #f8fafb;
+  box-shadow: 0 4px 8px rgba(0,0,0,.12);
+  border-radius: 0 0 18px 18px;
+}
+
+.page-dashboard .top-header h1 {
+  margin: 0;
+  font-size: clamp(1.65rem,4vw,2.3rem);
+}
+
+.page-dashboard .top-header .icon-link {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border: 0;
+  background: transparent;
+}
+
+.page-dashboard .greeting {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  margin-right: auto;
+}
+
+.page-dashboard .greeting span {
+  font-size: .95rem;
+}
+
+.page-dashboard .greeting h1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-dashboard .avatar-small {
+  width: 50px;
+  height: 50px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  background: #d4d8dc;
+  border-radius: 16px;
+  font-weight: 700;
+  color: var(--deep);
+}
+
+.page-dashboard .main-nav {
+  position: fixed;
+  z-index: 20;
+  left: 16px;
+  right: 16px;
+  bottom: 14px;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 4px;
+  max-width: 700px;
+  margin-inline: auto;
+  padding: 8px;
+  background: rgba(255,255,255,.97);
+  border-radius: 28px;
+  box-shadow: 0 16px 36px rgba(0,0,0,.14);
+}
+
+.page-dashboard .main-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 62px;
+  border-radius: 19px;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.page-dashboard .main-nav a.active {
+  background: #b9dffe;
+  color: #00659b;
+}
+
+.page-dashboard .main-nav img {
+  width: 23px;
+  height: 23px;
+}
+
+.page-dashboard .date-panel {
+  margin-top: 18px;
+  padding: 18px 14px 20px;
+  border-radius: 26px;
+  background: var(--soft);
+  box-shadow: 0 6px 9px rgba(0,0,0,.12);
+}
+
+.page-dashboard .date-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.page-dashboard .date-panel-head h2 {
+  margin: 0;
+  font-size: clamp(1.4rem,3.2vw,2rem);
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.page-dashboard .date-panel-head button {
+  width: 40px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.page-dashboard .date-panel-head a {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+}
+
+.page-dashboard .date-strip {
+  display: grid;
+  grid-template-columns: repeat(7,minmax(0,1fr));
+  gap: 2px;
+}
+
+.page-dashboard .date-strip button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px 0;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.page-dashboard .date-strip button.selected {
+  background: var(--blue);
+  color: #fff;
+  box-shadow: 0 6px 8px rgba(0,0,0,.13);
+}
+
+.page-dashboard .date-strip strong {
+  font-size: 1.25rem;
+}
+
+.page-dashboard .date-strip span {
+  font-size: .75rem;
+}
+
+.page-dashboard .date-strip small {
+  color: #8b48d4;
+}
+
+.page-dashboard .date-agenda {
+  margin: 14px 4px 0;
+  color: #475569;
+  font-size: .88rem;
+}
+
+.page-dashboard .section-space {
+  margin-block: 40px;
+}
+
+.page-dashboard .section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.page-dashboard .section-heading h2 {
+  font-size: clamp(1.3rem,3vw,1.8rem);
+  margin: 0;
+}
+
+.page-dashboard .section-heading a {
+  color: var(--blue);
+  white-space: nowrap;
+}
+
+.page-dashboard .opportunity-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.page-dashboard .opportunity-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 218px;
+  padding: 22px;
+  border-radius: 28px;
+  background: var(--blue);
+  color: #fff;
+}
+
+.page-dashboard .card-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.page-dashboard .badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 3px 10px;
+  border-radius: 11px;
+  font-size: .77rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 5px 8px rgba(0,0,0,.13);
+}
+
+.page-dashboard .badge-blue {
+  background: #006ca9;
+}
+
+.page-dashboard .badge-beasiswa {
+  background: #355647;
+}
+
+.page-dashboard .badge-magang {
+  background: #ff8e3f;
+}
+
+.page-dashboard .badge-bootcamp {
+  background: #d366eb;
+}
+
+.page-dashboard .badge-time {
+  background: #f32125;
+  margin-left: auto;
+}
+
+.page-dashboard .opportunity-card h3 {
+  font-size: clamp(1.35rem,3.4vw,1.85rem);
+  line-height: 1.18;
+  margin: 22px 0 8px;
+}
+
+.page-dashboard .card-org {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #e8f7fd;
+  font-size: .92rem;
+  margin: 0;
+}
+
+.page-dashboard .card-org img {
+  filter: brightness(0) invert(1);
+}
+
+.page-dashboard .card-actions {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 25px;
+}
+
+.page-dashboard .heart-button {
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 2.4rem;
+  line-height: 1;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.page-dashboard .heart-button.saved {
+  color: #fff;
+}
+
+.page-dashboard .detail-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #fff;
+  color: #000;
+  font-weight: 700;
+  box-shadow: 0 5px 8px rgba(0,0,0,.16);
+  white-space: nowrap;
+}
+
+.page-dashboard .detail-pill span {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: #000;
+  color: #fff;
+}
+
+@media (min-width:700px) {
+  .page-dashboard .opportunity-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+
+  .page-dashboard .screen-main {
+    width: min(100% - 48px,1100px);
+  }
+
+  .page-dashboard .date-panel {
+    padding: 22px 28px;
+  }
+
+  .page-dashboard .date-strip {
+    gap: 8px;
+  }
+
+  .page-dashboard .date-strip button {
+    min-height: 88px;
+  }
+}
+
+@media (min-width:1000px) {
+  .page-dashboard .app-shell {
+    display: grid;
+    grid-template-columns: 210px minmax(0,1fr);
+  }
+
+  .page-dashboard .app-content {
+    grid-column: 2;
+    grid-row: 1;
+    padding-bottom: 50px;
+  }
+
+  .page-dashboard .main-nav {
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    height: 100vh;
+    max-width: none;
+    margin: 0;
+    padding: 32px 14px;
+    border-radius: 0;
+    border-right: 1px solid var(--line);
+    box-shadow: none;
+  }
+
+  .page-dashboard .main-nav:before {
+    content: "NAVIKA";
+    display: block;
+    padding: 10px 14px 34px;
+    color: var(--deep);
+    font-size: 1.5rem;
+    font-weight: 800;
+  }
+
+  .page-dashboard .main-nav a {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 0 16px;
+    font-size: 1rem;
+  }
+
+  .page-dashboard .main-nav img {
+    width: 25px;
+    height: 25px;
+  }
+
+  .page-dashboard .top-header {
+    padding-inline: max(28px,calc((100vw - 210px - 1100px)/2));
+  }
+
+  .page-dashboard .screen-main {
+    width: min(100% - 56px,1100px);
+  }
+
+  .page-dashboard .opportunity-grid {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+  }
+
+  .page-dashboard .date-strip strong {
+    font-size: 1.55rem;
+  }
+}
+
+@media (max-width:380px) {
+  .page-dashboard .screen-main {
+    width: calc(100% - 24px);
+  }
+
+  .page-dashboard .card-badges {
+    gap: 5px;
+  }
+
+  .page-dashboard .badge {
+    font-size: .69rem;
+    padding-inline: 7px;
+  }
+
+  .page-dashboard .opportunity-card {
+    padding: 18px;
+  }
+
+  .page-dashboard .top-header {
+    gap: 6px;
+  }
+}
+
+.page-dashboard .greeting>div:last-child {
+  min-width: 0;
+}
+
+.page-dashboard .calendar-chips {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 12px 0 16px;
+  scrollbar-width: thin;
+  scroll-snap-type: x proximity;
+}
+
+.page-dashboard .calendar-chip {
+  flex: none;
+  scroll-snap-align: start;
+  min-height: 42px;
+  padding: 5px 15px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  color: #fff;
+  font-size: .88rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 4px 7px rgba(0,0,0,.13);
+}
+
+.page-dashboard .calendar-chip.selected {
+  outline: 3px solid #0a689c;
+  outline-offset: 2px;
+}
+
+.page-dashboard .chip-beasiswa {
+  background: #355647;
+}
+
+.page-dashboard .chip-deadline {
+  background: #c71920;
+}
+
+.page-dashboard .chip-bootcamp {
+  background: #7d299f;
+}
+
+.page-dashboard .chip-semua {
+  background: #111;
+}
+
+.page-dashboard .chip-disimpan {
+  background: #215cb4;
+}
+
+.page-dashboard .chip-magang {
+  background: #a54c0c;
+}
+
+.page-dashboard .chip-rekomendasi {
+  background: #006da7;
+}
+
+.page-dashboard .date-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 10px;
+}
+
+.page-dashboard .date-dots i {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.page-dashboard .dot-beasiswa {
+  background: #355647;
+}
+
+.page-dashboard .dot-magang {
+  background: #f06430;
+}
+
+.page-dashboard .dot-bootcamp {
+  background: #d463ee;
+}
+
+.page-dashboard .date-agenda ul {
+  margin: 5px 0 0;
+  padding-left: 20px;
+}
+
+.page-dashboard .date-agenda a {
+  color: #00699d;
+  font-weight: 700;
+}
+
+.page-dashboard .calendar-disclaimer {
+  margin: 10px 4px 0;
+  color: var(--muted);
+  font-size: .86rem;
+}
+
+.page-dashboard .dashboard-reminder {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 11px 15px;
+  border-radius: 14px;
+  background: #c0e1f8;
+  color: #075d85;
+  font-weight: 700;
+  font-size: .9rem;
+}
+
+:root[data-theme=dark] .page-dashboard {
+  --page: #0c1823;
+  --surface: #162735;
+  --ink: #f5f8fa;
+  --muted: #b9c7d1;
+  --soft: #172936;
+  --line: #344958;
+  --blue: #087da8;
+  --deep: #8ed8f6;
+  --shadow: 0 16px 28px rgba(0,0,0,.28);
+}
+
+:root[data-theme=dark] .page-dashboard {
+  background: var(--page);
+  color: var(--ink);
+}
+
+:root[data-theme=dark] .page-dashboard .top-header,
+:root[data-theme=dark] .page-dashboard .main-nav,
+:root[data-theme=dark] .page-dashboard .date-strip button {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+:root[data-theme=dark] .page-dashboard .date-panel {
+  background: var(--soft);
+  color: var(--ink);
+}
+
+:root[data-theme=dark] .page-dashboard .date-strip button.selected {
+  background: #a9def4;
+  color: #0b2030;
+}
+
+:root[data-theme=dark] .page-dashboard .date-agenda {
+  color: var(--ink);
+}
+
+:root[data-theme=dark] .page-dashboard .detail-pill {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+:root[data-theme=dark] .page-dashboard .demo-note {
+  background: #19435a;
+  color: #b8e7fb;
+}
+
+:root[data-theme=dark] .page-dashboard .dashboard-reminder {
+  background: #184056;
+  color: #c4edff;
+}
+
+:root[data-theme=dark] .page-dashboard .opportunity-card {
+  background: #125776;
+}
+
+:root[data-theme=dark] .page-dashboard .main-nav a.active {
+  background: #194b67;
+  color: #d8f3ff;
+}
+
+:root[data-theme=dark] .page-dashboard .main-nav img,
+:root[data-theme=dark] .page-dashboard .icon-link img,
+:root[data-theme=dark] .page-dashboard .date-panel-head img {
+  filter: brightness(0) invert(1);
+}
+
+:root[data-theme=dark] .page-dashboard .calendar-chip.selected {
+  outline-color: #d6f2ff;
+}
+
+@media (min-width:700px) {
+  .page-dashboard .calendar-chips {
+    gap: 12px;
+  }
+}
+
+.page-dashboard {
+  --blue: #00a5e0;
+  --deep: #0065a3;
+  --ink: #1d242b;
+  --muted: #68737d;
+  --soft: #f4f7f9;
+  --line: #e5e7eb;
+  --page: #fff;
+  --surface: #fff;
+  --shadow: 0 12px 28px rgba(29, 36, 43, .12);
+  --gradient: linear-gradient(105deg, #00a5e0, #0065a3);
+}
+
+.page-dashboard {
+  background: var(--page);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-dashboard button,
+.page-dashboard input,
+.page-dashboard select {
+  font: inherit;
+}
+
+.page-dashboard button,
+.page-dashboard a,
+.page-dashboard input,
+.page-dashboard select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.page-dashboard button:disabled {
+  cursor: not-allowed;
+}
+
+.page-dashboard :focus-visible {
+  outline: 3px solid var(--deep);
+  outline-offset: 3px;
+}
+
+.page-dashboard .screen-main {
+  width: min(100% - 40px, 1100px);
+}
+
+.page-dashboard .demo-note {
+  background: #e7f5fc;
+  color: #075d85;
+}
+
+.page-dashboard .app-content {
+  padding-bottom: calc(100px + env(safe-area-inset-bottom));
+}
+
+.page-dashboard .top-header {
+  min-height: 104px;
+  padding: 20px max(20px, calc((100vw - 1100px)/2));
+  border-radius: 0 0 22px 22px;
+  background: var(--surface);
+  box-shadow: 0 5px 12px rgba(0,0,0,.14);
+}
+
+.page-dashboard .top-header h1 {
+  font-weight: 800;
+}
+
+.page-dashboard .avatar-small {
+  width: 54px;
+  height: 54px;
+  background: #d9d9d9;
+  border-radius: 17px;
+}
+
+.page-dashboard .top-header .icon-link {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.page-dashboard .main-nav {
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  max-width: 700px;
+  padding: 9px;
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: 0 14px 32px rgba(0,0,0,.15);
+}
+
+.page-dashboard .main-nav a {
+  min-height: 62px;
+  color: #1d242b;
+  transition: background .16s ease, color .16s ease;
+}
+
+.page-dashboard .main-nav a:hover {
+  background: #eef7fc;
+}
+
+.page-dashboard .main-nav a.active {
+  background: #bbdefb;
+  color: #0067a6;
+}
+
+.page-dashboard .nav-icon {
+  display: block;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  background: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.page-dashboard .nav-icon-home {
+  -webkit-mask-image: url("/asset/home%20copy.svg");
+  mask-image: url("/asset/home%20copy.svg");
+}
+
+.page-dashboard .nav-icon-bookmark {
+  -webkit-mask-image: url("/asset/tersimpan.svg");
+  mask-image: url("/asset/tersimpan.svg");
+}
+
+.page-dashboard .nav-icon-profile {
+  -webkit-mask-image: url("/asset/profile.svg");
+  mask-image: url("/asset/profile.svg");
+}
+
+.page-dashboard .action-icon {
+  display: block;
+  flex: none;
+}
+
+.page-dashboard .date-panel-head button {
+  color: var(--ink);
+}
+
+.page-dashboard .date-panel {
+  margin-top: 20px;
+  padding: 19px 12px 22px;
+  border-radius: 28px;
+  background: var(--soft);
+  box-shadow: 0 8px 11px rgba(0,0,0,.15);
+}
+
+.page-dashboard .date-panel-head {
+  display: grid;
+  grid-template-columns: 42px minmax(0,1fr) 38px 42px;
+}
+
+.page-dashboard .date-panel-head h2 {
+  font-size: clamp(1.25rem, 4.3vw, 2rem);
+  font-weight: 800;
+}
+
+.page-dashboard .calendar-chips {
+  margin-inline: -1px;
+  padding-block: 14px 16px;
+}
+
+.page-dashboard .calendar-chips {
+  scrollbar-width: none;
+}
+
+.page-dashboard .calendar-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.page-dashboard .calendar-chip {
+  min-height: 36px;
+  padding: 5px 13px;
+  border: 0;
+  border-radius: 9px;
+  box-shadow: none;
+}
+
+.page-dashboard .calendar-chip.selected {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.page-dashboard .chip-beasiswa {
+  background: #374f41;
+}
+
+.page-dashboard .chip-deadline {
+  background: #d71920;
+}
+
+.page-dashboard .chip-bootcamp {
+  background: #d566eb;
+}
+
+.page-dashboard .chip-semua {
+  background: #050505;
+}
+
+.page-dashboard .chip-disimpan {
+  background: #2511c2;
+}
+
+.page-dashboard .chip-magang {
+  background: #ff8e3f;
+}
+
+.page-dashboard .chip-rekomendasi {
+  background: #0065a3;
+}
+
+.page-dashboard .date-strip {
+  gap: 0;
+}
+
+.page-dashboard .date-strip button {
+  min-height: 76px;
+  border-radius: 0;
+  border-color: #e6e6e6;
+  color: #050505;
+}
+
+.page-dashboard .date-strip button:first-child {
+  border-radius: 18px 0 0 18px;
+}
+
+.page-dashboard .date-strip button:last-child {
+  border-radius: 0 18px 18px 0;
+}
+
+.page-dashboard .date-strip button.selected {
+  position: relative;
+  z-index: 1;
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+}
+
+.page-dashboard .date-strip button.selected .date-dots i {
+  box-shadow: 0 0 0 1px rgba(255,255,255,.15);
+}
+
+.page-dashboard .date-strip strong {
+  font-size: clamp(1.1rem, 3vw, 1.75rem);
+}
+
+.page-dashboard .date-agenda {
+  color: var(--muted);
+}
+
+.page-dashboard .date-agenda a {
+  color: var(--deep);
+}
+
+.page-dashboard .section-space {
+  margin-block: 36px;
+}
+
+.page-dashboard .section-heading a {
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.page-dashboard .opportunity-grid {
+  gap: 20px;
+}
+
+.page-dashboard .opportunity-card {
+  background: var(--blue);
+  border-radius: 30px;
+  box-shadow: none;
+}
+
+.page-dashboard .opportunity-card {
+  min-height: 285px;
+  padding: 23px;
+}
+
+.page-dashboard .card-badges {
+  gap: 7px;
+}
+
+.page-dashboard .badge {
+  border-radius: 10px;
+  box-shadow: 0 5px 7px rgba(0,0,0,.21);
+}
+
+.page-dashboard .badge-blue {
+  background: #0067a6;
+}
+
+.page-dashboard .badge-beasiswa {
+  background: #374f41;
+}
+
+.page-dashboard .badge-magang {
+  background: #ff8e3f;
+}
+
+.page-dashboard .badge-bootcamp {
+  background: #d566eb;
+}
+
+.page-dashboard .badge-time {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding-inline: 0;
+}
+
+.page-dashboard .badge-time-urgent {
+  background: #ff0105;
+  border: 2px solid #ff7a80;
+  padding: 1px 8px;
+  box-shadow: 0 5px 7px rgba(0,0,0,.21);
+}
+
+.page-dashboard .opportunity-card h3 {
+  margin-block: 21px 8px;
+  font-weight: 800;
+}
+
+.page-dashboard .card-org {
+  color: rgba(255,255,255,.85);
+}
+
+.page-dashboard .card-summary {
+  margin: 14px 0 0;
+  color: rgba(255,255,255,.92);
+  font-size: .94rem;
+  line-height: 1.5;
+}
+
+.page-dashboard .card-actions {
+  padding-top: 21px;
+}
+
+.page-dashboard .heart-button {
+  font-weight: 400;
+}
+
+.page-dashboard .detail-pill {
+  border-radius: 16px;
+  box-shadow: 0 5px 7px rgba(0,0,0,.23);
+}
+
+.page-dashboard .detail-pill span {
+  background: #000;
+}
+
+@media (min-width: 1000px) {
+  .page-dashboard .opportunity-card .card-badges {
+    gap: 5px;
+  }
+
+  .page-dashboard .opportunity-card .badge {
+    padding-inline: 8px;
+    font-size: .72rem;
+  }
+}
+
+:root[data-theme=dark] .page-dashboard {
+  --page: #0c1216;
+  --surface: #1d242b;
+  --ink: #f8fafc;
+  --muted: #85929e;
+  --soft: #1d242b;
+  --line: #5a6269;
+  --blue: #00a5e0;
+  --deep: #3faae8;
+  --gradient: linear-gradient(105deg, #00a5e0, #0065a3);
+}
+
+:root[data-theme=dark] .page-dashboard .top-header,
+:root[data-theme=dark] .page-dashboard .main-nav,
+:root[data-theme=dark] .page-dashboard .date-strip button {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+:root[data-theme=dark] .page-dashboard .date-panel {
+  background: var(--soft);
+  color: var(--ink);
+}
+
+:root[data-theme=dark] .page-dashboard .date-strip button {
+  background: #1a4960;
+  border-color: #24536b;
+  color: #fff;
+}
+
+:root[data-theme=dark] .page-dashboard .date-strip button.selected {
+  background: #fff;
+  color: #111;
+  border-color: #fff;
+}
+
+:root[data-theme=dark] .page-dashboard .opportunity-card {
+  background: #1a4960;
+}
+
+:root[data-theme=dark] .page-dashboard .main-nav {
+  background: #1d242b;
+}
+
+:root[data-theme=dark] .page-dashboard .main-nav a {
+  color: #85929e;
+}
+
+:root[data-theme=dark] .page-dashboard .main-nav a:hover {
+  background: #26353d;
+}
+
+:root[data-theme=dark] .page-dashboard .main-nav a.active {
+  background: #123140;
+  color: #3faae8;
+}
+
+:root[data-theme=dark] .page-dashboard .chip-beasiswa,
+:root[data-theme=dark] .page-dashboard .badge-beasiswa {
+  background: #1f8d5d;
+}
+
+:root[data-theme=dark] .page-dashboard .calendar-chip.selected {
+  outline-color: #fff;
+}
+
+:root[data-theme=dark] .page-dashboard .detail-pill {
+  color: #111;
+  background: #fff;
+}
+
+@media (min-width: 700px) {
+  .page-dashboard .date-strip button {
+    min-height: 88px;
+  }
+}
+
+@media (min-width: 1000px) {
+  .page-dashboard .main-nav {
+    bottom: auto;
+    border-radius: 0;
+    box-shadow: none;
+    border-right: 1px solid var(--line);
+  }
+
+  .page-dashboard .main-nav:before {
+    color: var(--deep);
+  }
+
+  .page-dashboard .app-content {
+    padding-bottom: 48px;
+  }
+
+  .page-dashboard .top-header {
+    padding-inline: max(28px, calc((100vw - 210px - 1100px)/2));
+  }
+}
+
+@media (max-width: 699px) {
+  .page-dashboard .top-header {
+    gap: 8px;
+  }
+
+  .page-dashboard .dashboard-header .greeting {
+    gap: 9px;
+  }
+
+  .page-dashboard .dashboard-header .greeting h1 {
+    font-size: clamp(1.25rem, 5vw, 2.3rem);
+  }
+
+  .page-dashboard .top-header .icon-link {
+    width: 40px;
+    min-width: 40px;
+  }
+
+  .page-dashboard .date-panel-head button {
+    width: 38px;
+  }
+
+  .page-dashboard .date-strip span {
+    font-size: .68rem;
+  }
+
+  .page-dashboard .opportunity-card {
+    min-height: 280px;
+  }
+}
+
+@media (max-width: 380px) {
+  .page-dashboard .screen-main {
+    width: calc(100% - 28px);
+  }
+
+  .page-dashboard .top-header {
+    padding-inline: 14px;
+  }
+
+  .page-dashboard .date-panel {
+    padding-inline: 8px;
+  }
+
+  .page-dashboard .date-panel-head {
+    grid-template-columns: 32px minmax(0,1fr) 34px 32px;
+  }
+
+  .page-dashboard .date-panel-head button,
+  .page-dashboard .date-panel-head a {
+    width: 32px;
+  }
+
+  .page-dashboard .date-strip strong {
+    font-size: 1.05rem;
+  }
+
+  .page-dashboard .card-badges {
+    gap: 5px;
+  }
+
+  .page-dashboard .badge {
+    padding-inline: 6px;
+    font-size: .67rem;
+  }
+
+  .page-dashboard .badge-time {
+    margin-left: auto;
+  }
+
+  .page-dashboard .main-nav {
+    left: 8px;
+    right: 8px;
+  }
+}

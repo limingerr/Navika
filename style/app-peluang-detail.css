@@ -1,0 +1,691 @@
+body {
+  margin: 0;
+}
+
+.page-peluang-detail {
+  min-height: 100vh;
+}
+
+.page-peluang-detail {
+  --blue: #05a5d9;
+  --deep: #00699d;
+  --ink: #111827;
+  --muted: #58616e;
+  --soft: #f5f7f9;
+  --line: #e8edf1;
+  --shadow: 0 16px 28px rgba(13,33,53,.11);
+}
+
+.page-peluang-detail, .page-peluang-detail * {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.page-peluang-detail {
+  margin: 0;
+  color: var(--ink);
+  background: #fff;
+  font-family: Arial,Helvetica,sans-serif;
+  line-height: 1.5;
+}
+
+.page-peluang-detail button,
+.page-peluang-detail input,
+.page-peluang-detail select {
+  font: inherit;
+}
+
+.page-peluang-detail button {
+  cursor: pointer;
+}
+
+.page-peluang-detail a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-peluang-detail img {
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.page-peluang-detail h1,
+.page-peluang-detail h2,
+.page-peluang-detail h3,
+.page-peluang-detail p {
+  margin-top: 0;
+}
+
+.page-peluang-detail :focus-visible {
+  outline: 3px solid #0069ae;
+  outline-offset: 3px;
+}
+
+.page-peluang-detail .demo-note {
+  display: inline-block;
+  width: fit-content;
+  margin: 8px 0 18px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #eaf7fe;
+  color: #075d85;
+  font-size: .83rem;
+  font-weight: 700;
+}
+
+.page-peluang-detail .primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  padding: 12px 24px;
+  border: 0;
+  border-radius: 18px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.page-peluang-detail .primary-button {
+  background: linear-gradient(105deg,#049ed4,#00659b);
+  color: #fff;
+}
+
+.page-peluang-detail .primary-button:hover {
+  filter: brightness(.95);
+}
+
+.page-peluang-detail .form-hint {
+  font-size: .9rem;
+  color: var(--muted);
+  margin: 12px 0 0;
+}
+
+.page-peluang-detail .app-shell {
+  min-height: 100vh;
+}
+
+.page-peluang-detail .app-content {
+  min-width: 0;
+  padding-bottom: 112px;
+}
+
+.page-peluang-detail .screen-main {
+  width: min(100% - 32px,1100px);
+  margin-inline: auto;
+}
+
+.page-peluang-detail .main-nav {
+  position: fixed;
+  z-index: 20;
+  left: 16px;
+  right: 16px;
+  bottom: 14px;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 4px;
+  max-width: 700px;
+  margin-inline: auto;
+  padding: 8px;
+  background: rgba(255,255,255,.97);
+  border-radius: 28px;
+  box-shadow: 0 16px 36px rgba(0,0,0,.14);
+}
+
+.page-peluang-detail .main-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 62px;
+  border-radius: 19px;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.page-peluang-detail .main-nav a.active {
+  background: #b9dffe;
+  color: #00659b;
+}
+
+.page-peluang-detail .main-nav img {
+  width: 23px;
+  height: 23px;
+}
+
+.page-peluang-detail .card-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.page-peluang-detail .badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 3px 10px;
+  border-radius: 11px;
+  font-size: .77rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 5px 8px rgba(0,0,0,.13);
+}
+
+.page-peluang-detail .badge-blue {
+  background: #006ca9;
+}
+
+.page-peluang-detail .badge-beasiswa {
+  background: #355647;
+}
+
+.page-peluang-detail .badge-time {
+  background: #f32125;
+  margin-left: auto;
+}
+
+.page-peluang-detail .card-org {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #e8f7fd;
+  font-size: .92rem;
+  margin: 0;
+}
+
+.page-peluang-detail .card-org img {
+  filter: brightness(0) invert(1);
+}
+
+.page-peluang-detail .detail-screen {
+  padding-top: 20px;
+}
+
+.page-peluang-detail .detail-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.page-peluang-detail .text-back,
+.page-peluang-detail .save-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.page-peluang-detail .text-back {
+  font-size: 1.6rem;
+}
+
+.page-peluang-detail .text-back span {
+  font-size: 1rem;
+}
+
+.page-peluang-detail .save-text span {
+  font-size: 2rem;
+  color: #f74a4a;
+  line-height: 1;
+}
+
+.page-peluang-detail .detail-hero {
+  padding: 26px 24px;
+  border-radius: 28px;
+  background: var(--blue);
+  color: #fff;
+}
+
+.page-peluang-detail .detail-hero h1 {
+  font-size: clamp(1.8rem,4vw,2.65rem);
+  line-height: 1.15;
+  margin: 30px 0 18px;
+}
+
+.page-peluang-detail .detail-hero>p:last-child {
+  margin: 24px 0 0;
+}
+
+.page-peluang-detail .detail-body {
+  margin: 18px 0 32px;
+  padding: 28px 22px;
+  border-radius: 28px;
+  background: #f7f7f7;
+  color: #344054;
+}
+
+.page-peluang-detail .detail-body h2 {
+  font-size: 1.35rem;
+  color: var(--ink);
+}
+
+.page-peluang-detail .detail-body h3 {
+  color: var(--ink);
+  margin: 24px 0 8px;
+}
+
+.page-peluang-detail .detail-body p,
+.page-peluang-detail .detail-body li {
+  line-height: 1.7;
+}
+
+.page-peluang-detail .detail-body ul {
+  padding-left: 24px;
+}
+
+.page-peluang-detail .detail-body li {
+  margin-bottom: 8px;
+}
+
+.page-peluang-detail .official-link {
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+@media (min-width:700px) {
+  .page-peluang-detail .screen-main {
+    width: min(100% - 48px,1100px);
+  }
+
+  .page-peluang-detail .detail-hero {
+    padding: 36px;
+  }
+
+  .page-peluang-detail .detail-body {
+    padding: 36px;
+  }
+}
+
+@media (min-width:1000px) {
+  .page-peluang-detail .app-shell {
+    display: grid;
+    grid-template-columns: 210px minmax(0,1fr);
+  }
+
+  .page-peluang-detail .app-content {
+    grid-column: 2;
+    grid-row: 1;
+    padding-bottom: 50px;
+  }
+
+  .page-peluang-detail .main-nav {
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    height: 100vh;
+    max-width: none;
+    margin: 0;
+    padding: 32px 14px;
+    border-radius: 0;
+    border-right: 1px solid var(--line);
+    box-shadow: none;
+  }
+
+  .page-peluang-detail .main-nav:before {
+    content: "NAVIKA";
+    display: block;
+    padding: 10px 14px 34px;
+    color: var(--deep);
+    font-size: 1.5rem;
+    font-weight: 800;
+  }
+
+  .page-peluang-detail .main-nav a {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 0 16px;
+    font-size: 1rem;
+  }
+
+  .page-peluang-detail .main-nav img {
+    width: 25px;
+    height: 25px;
+  }
+
+  .page-peluang-detail .screen-main {
+    width: min(100% - 56px,1100px);
+  }
+}
+
+@media (max-width:380px) {
+  .page-peluang-detail .screen-main {
+    width: calc(100% - 24px);
+  }
+
+  .page-peluang-detail .card-badges {
+    gap: 5px;
+  }
+
+  .page-peluang-detail .badge {
+    font-size: .69rem;
+    padding-inline: 7px;
+  }
+}
+
+:root[data-theme=dark] .page-peluang-detail {
+  --page: #0c1823;
+  --surface: #162735;
+  --ink: #f5f8fa;
+  --muted: #b9c7d1;
+  --soft: #172936;
+  --line: #344958;
+  --blue: #087da8;
+  --deep: #8ed8f6;
+  --shadow: 0 16px 28px rgba(0,0,0,.28);
+}
+
+:root[data-theme=dark] .page-peluang-detail {
+  background: var(--page);
+  color: var(--ink);
+}
+
+:root[data-theme=dark] .page-peluang-detail .main-nav {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+:root[data-theme=dark] .page-peluang-detail .detail-body {
+  background: var(--soft);
+  color: var(--ink);
+}
+
+:root[data-theme=dark] .page-peluang-detail .detail-body h2,
+:root[data-theme=dark] .page-peluang-detail .detail-body h3 {
+  color: var(--ink);
+}
+
+:root[data-theme=dark] .page-peluang-detail .demo-note {
+  background: #19435a;
+  color: #b8e7fb;
+}
+
+:root[data-theme=dark] .page-peluang-detail .detail-hero {
+  background: #125776;
+}
+
+:root[data-theme=dark] .page-peluang-detail .main-nav a.active {
+  background: #194b67;
+  color: #d8f3ff;
+}
+
+:root[data-theme=dark] .page-peluang-detail .main-nav img {
+  filter: brightness(0) invert(1);
+}
+
+.page-peluang-detail {
+  --blue: #00a5e0;
+  --deep: #0065a3;
+  --ink: #1d242b;
+  --muted: #68737d;
+  --soft: #f4f7f9;
+  --line: #e5e7eb;
+  --page: #fff;
+  --surface: #fff;
+  --shadow: 0 12px 28px rgba(29, 36, 43, .12);
+  --gradient: linear-gradient(105deg, #00a5e0, #0065a3);
+}
+
+.page-peluang-detail {
+  background: var(--page);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-peluang-detail button,
+.page-peluang-detail input,
+.page-peluang-detail select {
+  font: inherit;
+}
+
+.page-peluang-detail button,
+.page-peluang-detail a,
+.page-peluang-detail input,
+.page-peluang-detail select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.page-peluang-detail button:disabled {
+  cursor: not-allowed;
+}
+
+.page-peluang-detail :focus-visible {
+  outline: 3px solid var(--deep);
+  outline-offset: 3px;
+}
+
+.page-peluang-detail .screen-main {
+  width: min(100% - 40px, 1100px);
+}
+
+.page-peluang-detail .demo-note {
+  background: #e7f5fc;
+  color: #075d85;
+}
+
+.page-peluang-detail .primary-button {
+  min-height: 54px;
+  border-radius: 17px;
+  font-weight: 700;
+  transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+}
+
+.page-peluang-detail .primary-button {
+  background: var(--gradient);
+  box-shadow: 0 10px 20px rgba(0, 101, 163, .18);
+}
+
+.page-peluang-detail .primary-button:hover {
+  transform: translateY(-2px);
+}
+
+.page-peluang-detail .app-content {
+  padding-bottom: calc(100px + env(safe-area-inset-bottom));
+}
+
+.page-peluang-detail .main-nav {
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  max-width: 700px;
+  padding: 9px;
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: 0 14px 32px rgba(0,0,0,.15);
+}
+
+.page-peluang-detail .main-nav a {
+  min-height: 62px;
+  color: #1d242b;
+  transition: background .16s ease, color .16s ease;
+}
+
+.page-peluang-detail .main-nav a:hover {
+  background: #eef7fc;
+}
+
+.page-peluang-detail .main-nav a.active {
+  background: #bbdefb;
+  color: #0067a6;
+}
+
+.page-peluang-detail .nav-icon {
+  display: block;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  background: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.page-peluang-detail .nav-icon-home {
+  -webkit-mask-image: url("/asset/home%20copy.svg");
+  mask-image: url("/asset/home%20copy.svg");
+}
+
+.page-peluang-detail .nav-icon-bookmark {
+  -webkit-mask-image: url("/asset/tersimpan.svg");
+  mask-image: url("/asset/tersimpan.svg");
+}
+
+.page-peluang-detail .nav-icon-profile {
+  -webkit-mask-image: url("/asset/profile.svg");
+  mask-image: url("/asset/profile.svg");
+}
+
+.page-peluang-detail .detail-hero {
+  background: var(--blue);
+  border-radius: 30px;
+  box-shadow: none;
+}
+
+.page-peluang-detail .card-badges {
+  gap: 7px;
+}
+
+.page-peluang-detail .badge {
+  border-radius: 10px;
+  box-shadow: 0 5px 7px rgba(0,0,0,.21);
+}
+
+.page-peluang-detail .badge-blue {
+  background: #0067a6;
+}
+
+.page-peluang-detail .badge-beasiswa {
+  background: #374f41;
+}
+
+.page-peluang-detail .badge-time {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding-inline: 0;
+}
+
+.page-peluang-detail .card-org {
+  color: rgba(255,255,255,.85);
+}
+
+.page-peluang-detail .detail-body {
+  background: var(--soft);
+  color: var(--ink);
+}
+
+:root[data-theme=dark] .page-peluang-detail {
+  --page: #0c1216;
+  --surface: #1d242b;
+  --ink: #f8fafc;
+  --muted: #85929e;
+  --soft: #1d242b;
+  --line: #5a6269;
+  --blue: #00a5e0;
+  --deep: #3faae8;
+  --gradient: linear-gradient(105deg, #00a5e0, #0065a3);
+}
+
+:root[data-theme=dark] .page-peluang-detail .main-nav {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+:root[data-theme=dark] .page-peluang-detail .detail-body {
+  background: var(--soft);
+  color: var(--ink);
+}
+
+:root[data-theme=dark] .page-peluang-detail .detail-hero {
+  background: #1a4960;
+}
+
+:root[data-theme=dark] .page-peluang-detail .main-nav {
+  background: #1d242b;
+}
+
+:root[data-theme=dark] .page-peluang-detail .main-nav a {
+  color: #85929e;
+}
+
+:root[data-theme=dark] .page-peluang-detail .main-nav a:hover {
+  background: #26353d;
+}
+
+:root[data-theme=dark] .page-peluang-detail .main-nav a.active {
+  background: #123140;
+  color: #3faae8;
+}
+
+:root[data-theme=dark] .page-peluang-detail .badge-beasiswa {
+  background: #1f8d5d;
+}
+
+@media (min-width: 1000px) {
+  .page-peluang-detail .main-nav {
+    bottom: auto;
+    border-radius: 0;
+    box-shadow: none;
+    border-right: 1px solid var(--line);
+  }
+
+  .page-peluang-detail .main-nav:before {
+    color: var(--deep);
+  }
+
+  .page-peluang-detail .app-content {
+    padding-bottom: 48px;
+  }
+}
+
+@media (max-width: 380px) {
+  .page-peluang-detail .screen-main {
+    width: calc(100% - 28px);
+  }
+
+  .page-peluang-detail .card-badges {
+    gap: 5px;
+  }
+
+  .page-peluang-detail .badge {
+    padding-inline: 6px;
+    font-size: .67rem;
+  }
+
+  .page-peluang-detail .badge-time {
+    margin-left: auto;
+  }
+
+  .page-peluang-detail .main-nav {
+    left: 8px;
+    right: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-peluang-detail .primary-button {
+    transition: none;
+  }
+}

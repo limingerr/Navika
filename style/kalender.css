@@ -1,0 +1,535 @@
+/* ============================================================
+   NAVIKA - Kalender
+   Acuan: export/kalender-light.png (tema), export/kalender-light-2.png (layout).
+   Satu kolom aplikasi, maks 440px. Seluruh teks memakai Poppins.
+   Token warna diwarisi dari acuan dashboard; rasio kontras dicatat
+   per token. Gerak: hover sebagai umpan balik (180–220 ms), tanpa
+   animasi dekoratif. Semua hover dibatasi @media (hover: hover).
+   ============================================================ */
+
+:root {
+  --biru-utama:   #00A6E0;
+  --biru-kartu:   #5AA4D8;
+  --biru-aksi:    #0067A6;  /* putih 6,0:1 */
+  --biru-aktif:   #5AA4D8;  /* teks putih 2,7:1 */
+  --biru-teks:    #2F5F94;  /* 4,75:1 di atas --biru-lembut */
+  --biru-lembut:  #C7DDF8;
+  --biru-muda:    #EAF5FC;
+  --hijau:        #3E5145;  /* putih 8,5:1 */
+  --merah:        #C33228;  /* putih 5,5:1 */
+  --pink:         #D17AEF;
+  --oranye:       #FF8A3D;  /* teks gelap 8,5:1 */
+  --ungu:         #3217C9;  /* putih 10,0:1 */
+  --hitam:        #090909;
+  --hitam-pekat:  #080808;
+  --abu:          #D9D9D9;
+  --pink-tua:     #98004A;
+
+  --teks:         #090909;
+  --teks-redup:   #5B6470;  /* 6,0:1 di atas putih */
+  --garis:        #E5E7EB;
+  --biru-hover:   #00527F;  /* 8,4:1 di atas putih */
+
+  --radius-kartu: 24px;
+  --radius-sel:   12px;
+  --font: "Poppins", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #f0f4f8;
+  color: var(--teks);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+html { scrollbar-width: none; }
+html::-webkit-scrollbar { display: none; }
+
+button, input, select, textarea { font-family: inherit; }
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--biru-aksi);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+svg { display: block; }
+
+/* Bingkai aplikasi */
+.app {
+  max-width: 440px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #f0f4f8;
+  padding-bottom: 120px;
+}
+
+@media (min-width: 481px) {
+  .app {
+    box-shadow: 0 0 0 1px var(--garis), 0 12px 40px rgba(17,24,39,.07);
+  }
+}
+
+/* ---- Header ---- */
+
+.kepala {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 16px 12px;
+  background: #fff;
+}
+
+.ikon-tombol {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  color: var(--hitam);
+  transition: background-color 200ms ease;
+  flex: none;
+}
+
+@media (hover: hover) {
+  .ikon-tombol:hover { background: #F2F4F7; }
+}
+
+.judul-kepala {
+  flex: 1;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  text-align: center;
+}
+
+/* ---- Kartu kalender (putih, rounded) ---- */
+
+.kartu-kalender {
+  margin: 16px 16px 0;
+  background: #fff;
+  border-radius: var(--radius-kartu);
+  padding: 16px 16px 20px;
+  box-shadow: 0 4px 16px rgba(9,9,9,.07);
+}
+
+/* Navigasi bulan */
+.nav-bulan {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.judul-bulan {
+  flex: 1;
+  margin: 0;
+  text-align: center;
+  font-size: clamp(18px, 5vw, 22px);
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.ikon-bulan {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  padding: 0;
+  background: none;
+  border-radius: 10px;
+  color: var(--hitam);
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+
+@media (hover: hover) {
+  .ikon-bulan:hover { background: #F2F4F7; }
+}
+
+/* Grid kalender bulanan */
+.grid-kalender {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.grid-kalender thead th {
+  padding: 4px 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--teks-redup);
+  text-align: center;
+}
+
+.grid-kalender tbody td {
+  padding: 3px;
+  text-align: center;
+}
+
+.sel-hari {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  min-height: 52px;
+  padding: 7px 2px 5px;
+  border: 0;
+  background: none;
+  border-radius: 10px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--teks);
+  cursor: pointer;
+  transition: background-color 180ms ease;
+}
+
+.sel-hari.redup {
+  color: #C0C8D0;
+}
+
+.sel-hari.terpilih {
+  background: var(--biru-aktif);
+  color: #fff;
+}
+
+.sel-hari.hari-ini:not(.terpilih) {
+  background: var(--biru-muda);
+  color: var(--biru-aksi);
+  font-weight: 700;
+}
+
+@media (hover: hover) {
+  .sel-hari:not(.terpilih):hover {
+    background: var(--biru-muda);
+  }
+  .sel-hari.terpilih:hover {
+    background: var(--biru-aktif);
+  }
+}
+
+/* Titik indikator di bawah angka tanggal */
+.titik-baris {
+  display: flex;
+  gap: 2px;
+  height: 5px;
+}
+
+.titik {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.titik-hijau  { background: var(--hijau); }
+.titik-merah  { background: var(--merah); }
+.titik-pink   { background: var(--pink); }
+.titik-oranye { background: var(--oranye); }
+.titik-ungu   { background: var(--ungu); }
+.titik-hitam  { background: var(--hitam-pekat); }
+
+/* Terpilih: titik putih */
+.sel-hari.terpilih .titik { background: rgba(255,255,255,.8); }
+
+/* ---- Chip filter ---- */
+
+.chip-baris {
+  display: flex;
+  gap: 8px;
+  margin: 16px 16px 0;
+  padding: 2px 0 4px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.chip-baris::-webkit-scrollbar { display: none; }
+
+.chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  transition: filter 180ms ease;
+}
+
+.chip-beasiswa  { background: var(--hijau); }
+.chip-deadline  { background: var(--merah); }
+.chip-bootcamp  { background: var(--pink); }
+.chip-semua     { background: var(--hitam-pekat); }
+.chip-magang    { background: var(--oranye); color:#fff; }
+.chip-aktif     { outline: 2px solid var(--biru-aksi); outline-offset: 2px; }
+
+@media (hover: hover) {
+  .chip:hover { filter: brightness(.93); }
+}
+
+/* ---- Bagian agenda ---- */
+
+.bagian-agenda {
+  margin: 20px 0 0;
+}
+
+.judul-agenda {
+  margin: 0 0 12px;
+  padding: 0 16px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.1px;
+}
+
+/* Strip horizontal: scroll seperti kartu rekomendasi dashboard */
+.agenda-strip {
+  display: flex;
+  gap: 12px;
+  padding: 4px 16px 8px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+}
+
+.agenda-strip::-webkit-scrollbar { display: none; }
+
+/* ---- Kartu agenda — visual sama dengan .kartu-peluang di dashboard ---- */
+
+.kartu-agenda {
+  flex: none;
+  width: calc(min(100vw, 440px) - 32px);
+  background: var(--biru-kartu);
+  color: #fff;
+  border-radius: var(--radius-kartu);
+  padding: 18px;
+  scroll-snap-align: start;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+@media (hover: hover) {
+  .kartu-agenda:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 26px rgba(9,9,9,.18);
+  }
+}
+
+.kartu-agenda :focus-visible {
+  outline-color: #fff;
+}
+
+/* Pastikan heading di dalam kartu mewarisi warna putih */
+.kartu-agenda h3 { color: #fff; }
+
+/* Pesan kosong */
+.agenda-kosong {
+  margin: 0;
+  padding: 4px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--teks-redup);
+}
+
+.meta-atas {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  padding: 6px 10px 12px;
+  margin: -6px -10px -12px;
+}
+
+.meta-atas::-webkit-scrollbar { display: none; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(9,9,9,.3);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.badge-rekomendasi {
+  background: var(--biru-aksi);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.28);
+  font-size: 10.5px;
+  letter-spacing: .4px;
+}
+
+.kat-beasiswa { background: var(--hijau); color: #fff; }
+.kat-magang   { background: var(--oranye); color: #fff; }
+.kat-bootcamp { background: var(--pink); color: #fff; }
+
+/* Badge tenggat: bergaris tipis seperti di dashboard */
+.badge-tenggat {
+  margin-left: auto;
+  border: 1.5px solid rgba(255,255,255,.75);
+  padding: 5px 9px;
+  box-shadow: none;
+}
+
+.badge-tenggat.mendesak {
+  background: var(--merah);
+  border-color: transparent;
+}
+
+.judul-peluang {
+  margin: 14px 0 5px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  line-height: 1.25;
+  color: #fff;
+}
+
+.organisasi {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,.85);
+}
+
+.deskripsi {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: rgba(255,255,255,.8);
+  line-height: 1.5;
+}
+
+.aksi-kartu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.simpan {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -6px 0 -6px -10px;
+  border-radius: 12px;
+  color: #fff;
+  transition: color 200ms ease;
+}
+
+.simpan svg { transition: transform 200ms ease; }
+
+@media (hover: hover) {
+  .simpan:hover { color: var(--pink-tua); }
+  .simpan:hover svg { transform: scale(1.1); }
+}
+
+.tombol-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 15px;
+  border-radius: var(--radius-sel);
+  background: #fff;
+  color: var(--hitam);
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 4px 8px rgba(17,24,39,.22);
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.tombol-detail svg { transition: transform 200ms ease; }
+
+@media (hover: hover) {
+  .tombol-detail:hover {
+    background: var(--biru-aksi);
+    color: #fff;
+  }
+  .tombol-detail:hover svg { transform: translateX(3px); }
+}
+
+/* ---- Navigasi bawah ---- */
+
+.nav-bawah {
+  position: fixed;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 28px);
+  max-width: 412px;
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 10px 26px rgba(17,24,39,.18), 0 2px 6px rgba(17,24,39,.08);
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 4px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--teks);
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+@media (hover: hover) {
+  .nav-item:not(.aktif):hover { background: #F2F4F7; }
+}
+
+.nav-item.aktif {
+  background: var(--biru-lembut);
+  color: var(--biru-teks);
+}
+
+/* Kurangi gerak bagi yang memilih */
+@media (prefers-reduced-motion: reduce) {
+  .kartu-agenda,
+  .tombol-detail,
+  .tombol-detail svg,
+  .simpan,
+  .simpan svg,
+  .ikon-tombol,
+  .ikon-bulan,
+  .nav-item,
+  .chip,
+  .sel-hari { transition: none; }
+
+  .kartu-agenda:hover,
+  .tombol-detail:hover svg,
+  .simpan:hover svg { transform: none; }
+}

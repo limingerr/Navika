@@ -2,237 +2,131 @@
 <html lang="id">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalender</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalender – NAVIKA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style/kalender.css">
 </head>
 
 <body>
-    <header>
-        <table>
-            <tr>
-                <td>
-                    <a href="dashboard.html" aria-label="Kembali">
-                        <img src="asset/previous.png" alt="Kembali">
-                    </a>
-                </td>
-                <td>
-                    <h1>Kalender</h1>
-                </td>
-                <td>
-                    <a href="pencarian.html" aria-label="Cari">
-                        <img src="asset/search.jpg" alt="Cari">
-                    </a>
-                </td>
-                <td>
-                    <a href="pengaturan.html" aria-label="Filter kalender">
-                        <img src="asset/settings.jpg" alt="Filter">
-                    </a>
-                </td>
-            </tr>
-        </table>
+  <div class="app">
+
+    <header class="kepala">
+      <a href="dashboard.html" class="ikon-tombol" aria-label="Kembali ke dashboard">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m15 18-6-6 6-6"/>
+        </svg>
+      </a>
+      <h1 class="judul-kepala">Kalender</h1>
+      <a href="pencarian.html" class="ikon-tombol" aria-label="Cari">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="m20 20-3.8-3.8"/>
+        </svg>
+      </a>
     </header>
 
     <main>
-        <section class="kalender-bulanan" aria-labelledby="bulan-kalender">
-            <table>
-                <caption>
-                    <h2 id="bulan-kalender">
-                        <a href="kalender.html" aria-label="Bulan sebelumnya">‹</a>
-                        &nbsp; Oktober, 2026 &nbsp;
-                        <a href="kalender.html" aria-label="Bulan berikutnya">›</a>
-                    </h2>
-                </caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Min</th>
-                        <th scope="col">Sen</th>
-                        <th scope="col">Sel</th>
-                        <th scope="col">Rab</th>
-                        <th scope="col">Kam</th>
-                        <th scope="col">Jum</th>
-                        <th scope="col">Sab</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>28</td>
-                        <td>29</td>
-                        <td>30</td>
-                        <td>1</td>
-                        <td>2</td>
-                        <td>3</td>
-                        <td>4</td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>6</td>
-                        <td>7</td>
-                        <td>8</td>
-                        <td>9</td>
-                        <td>10</td>
-                        <td>11</td>
-                    </tr>
-                    <tr>
-                        <td>12</td>
-                        <td><a href="#agenda-hari-ini" aria-label="Tanggal 13 Oktober">13</a></td>
-                        <td>14</td>
-                        <td>15</td>
-                        <td>16</td>
-                        <td>17</td>
-                        <td>18</td>
-                    </tr>
-                    <tr>
-                        <td>19</td>
-                        <td>20</td>
-                        <td>21</td>
-                        <td>22</td>
-                        <td>23</td>
-                        <td>24</td>
-                        <td>25</td>
-                    </tr>
-                    <tr>
-                        <td>26</td>
-                        <td>27</td>
-                        <td>28</td>
-                        <td>29</td>
-                        <td>30</td>
-                        <td>31</td>
-                        <td>1</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
 
-        <section class="kategori-kalender" aria-label="Filter agenda">
-            <p>
-                <a href="kalender.html">Beasiswa</a>
-                &nbsp;
-                <a href="kalender.html">Deadline</a>
-                &nbsp;
-                <a href="kalender.html">Bootcamp</a>
-                &nbsp;
-                <a href="kalender.html">Semua</a>
-                &nbsp;
-                <a href="kalender.html">Magang</a>
-            </p>
-        </section>
+      <!-- Grid kalender bulanan -->
+      <section class="kartu-kalender" aria-labelledby="bulan-kalender">
+        <nav class="nav-bulan" aria-label="Navigasi bulan">
+          <button class="ikon-bulan" id="btn-prev" aria-label="Bulan sebelumnya">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m15 5-7 7 7 7"/>
+            </svg>
+          </button>
+          <h2 class="judul-bulan" id="bulan-kalender" aria-live="polite">Oktober, 2026</h2>
+          <button class="ikon-bulan" id="btn-next" aria-label="Bulan berikutnya">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m9 5 7 7-7 7"/>
+            </svg>
+          </button>
+        </nav>
 
-        <section id="agenda-hari-ini" aria-labelledby="judul-agenda">
-            <h2 id="judul-agenda">Agenda Hari Ini</h2>
+        <table class="grid-kalender" role="grid" aria-labelledby="bulan-kalender">
+          <thead>
+            <tr>
+              <th scope="col" abbr="Minggu">Min</th>
+              <th scope="col" abbr="Senin">Sen</th>
+              <th scope="col" abbr="Selasa">Sel</th>
+              <th scope="col" abbr="Rabu">Rab</th>
+              <th scope="col" abbr="Kamis">Kam</th>
+              <th scope="col" abbr="Jumat">Jum</th>
+              <th scope="col" abbr="Sabtu">Sab</th>
+            </tr>
+          </thead>
+          <tbody id="badan-kalender">
+            <!-- diisi script/kalender.js -->
+          </tbody>
+        </table>
+      </section>
 
-            <hr>
+      <!-- Chip filter kategori -->
+      <nav class="chip-baris" aria-label="Filter agenda">
+        <a href="#" class="chip chip-semua chip-aktif" aria-current="true">Semua</a>
+        <a href="#" class="chip chip-beasiswa">Beasiswa</a>
+        <a href="#" class="chip chip-magang">Magang</a>
+        <a href="#" class="chip chip-bootcamp">Bootcamp</a>
+        <a href="#" class="chip chip-deadline">Deadline</a>
+      </nav>
 
-            <article>
-                <table>
-                    <tr>
-                        <td>
-                            <p>
-                                <b>✧ REKOMENDASI</b>
-                                &nbsp;<b>Bootcamp</b>
-                                &nbsp;<img src="asset/clock.svg" alt=""> 1 Hari
-                            </p>
-                            <h2>AI-Enhanced Full Stack Developer</h2>
-                            <p>▦ PT Hacktivate Teknologi Indonesia</p>
-                            <p>Kesempatan untuk mengembangkan keterampilan AI dan full stack developer.</p>
-                            <p><a href="detail-hacktiv8.html"><b>Cek Detail &rarr;</b></a></p>
-                        </td>
-                    </tr>
-                </table>
-            </article>
+      <!-- Agenda tanggal terpilih -->
+      <section class="bagian-agenda" aria-labelledby="judul-agenda">
+        <h2 class="judul-agenda" id="judul-agenda">Agenda Hari Ini</h2>
+        <div id="isi-agenda" aria-live="polite">
+          <!-- diisi script/kalender.js — kartu di-scroll horizontal -->
+        </div>
+      </section>
 
-            <br>
-
-            <hr>
-
-            <article>
-                <table>
-                    <tr>
-                        <td>
-                            <p>
-                                <b>✧ REKOMENDASI</b>
-                                &nbsp;<b>Beasiswa</b>
-                                &nbsp;<img src="asset/clock.svg" alt=""> 1 Hari
-                            </p>
-                            <h2>Djarum Beasiswa Plus</h2>
-                            <p>▦ Djarum Foundation</p>
-                            <p>Program beasiswa untuk mahasiswa yang ingin mengembangkan potensi diri.</p>
-                            <p><a href="detail-djarum.html"><b>Cek Detail &rarr;</b></a></p>
-                        </td>
-                    </tr>
-                </table>
-            </article>
-            <br>
-            <hr>
-            <article>
-                <table>
-                    <tr>
-                        <td>
-                            <p>
-                                <b>✧ REKOMENDASI</b>
-                                &nbsp;<b>Beasiswa</b>
-                                &nbsp; <img src="asset/clock.svg" alt=""> 1 Hari
-                            </p>
-
-                            <h2>Beasiswa Bank Indonesia</h2>
-                            <p>▦ Bank Indonesia</p>
-                            <p>
-                                Kesempatan untuk mendapatkan beasiswa dari Bank Indonesia bagi mahasiswa berprestasi.
-                            </p>
-
-                            <p>
-                                ♡
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <a href="detail-beasiswa-bi.html">
-                                    <b>Cek Detail &rarr;</b>
-                                </a>
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </article>
-
-            <br>
-            <hr>
-            <article>
-                <table>
-                    <tr>
-                        <td>
-                            <p>
-                                <b>✧ REKOMENDASI</b>
-                                &nbsp;<b>Magang</b>
-                                &nbsp; <img src="asset/clock.svg" alt=""> 1 Hari
-                            </p>
-
-                            <h2>Magang Generasi Bertalenta</h2>
-                            <p>▦ BUMN</p>
-                            <p>
-                                Kesempatan untuk mengembangkan keterampilan dan pengalaman kerja di perusahaan BUMN.
-                            </p>
-
-                            <p>
-                                ♡
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <a href="detail-magenta.html">
-                                    <b>Cek Detail &rarr;</b>
-                                </a>
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </article>
-        </section>
     </main>
 
-    <footer>
-        <nav aria-label="Navigasi utama">
-            <a href="dashboard.html"><img src="asset/home.svg" alt=""> Home</a>
-            &nbsp;&nbsp;
-            <a href="bookmark.html"><img src="asset/bookmark.svg" alt=""> Tersimpan</a>
-            &nbsp;&nbsp;
-            <a href="profile.html"><img src="asset/user.svg" alt=""> Profile</a>
-        </nav>
-    </footer>
+    <nav class="nav-bawah" aria-label="Navigasi utama">
+      <a class="nav-item" href="dashboard.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m4 10.5 8-6.8 8 6.8"/>
+          <path d="M6 9.5V19a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V9.5"/>
+          <path d="M10.5 20v-4.5h3V20"/>
+        </svg>
+        Home
+      </a>
+      <a class="nav-item" href="lihatSemua.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="m20 20-3.8-3.8"/>
+        </svg>
+        Peluang
+      </a>
+      <a class="nav-item" href="bookmark.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M7 4.5h10a1 1 0 0 1 1 1V20l-6-4-6 4V5.5a1 1 0 0 1 1-1Z"/>
+        </svg>
+        Tersimpan
+      </a>
+      <a class="nav-item" href="profile.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.6"/>
+          <path d="M5.5 20c.8-3.2 3.4-5 6.5-5s5.7 1.8 6.5 5"/>
+        </svg>
+        Profil
+      </a>
+    </nav>
+
+  </div>
+
+  <script src="script/agenda-data.js"></script>
+  <script src="script/kalender.js"></script>
 </body>
 
 </html>

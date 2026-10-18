@@ -4,11 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Navika</title>
+  <title>Dashboard – NAVIKA</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style/dashboard.css">
 </head>
 
@@ -35,8 +34,7 @@
         <a class="ikon-tombol" href="lihatSemua.html" aria-label="Filter peluang">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" aria-hidden="true">
-            <path d="M3 8h18" />
-            <path d="M3 16h18" />
+            <path d="M3 8h18M3 16h18" />
             <circle cx="15" cy="8" r="2.5" fill="#fff" />
             <circle cx="9" cy="16" r="2.5" fill="#fff" />
           </svg>
@@ -55,13 +53,11 @@
             </svg>
           </button>
           <h2 class="judul-bulan" id="judul-bulan" aria-live="polite">Oktober, 2026</h2>
-          <a class="ikon-bulan" href="kalender.html" aria-label="Buka kalender">
+          <a class="ikon-bulan" href="kalender.html" aria-label="Buka kalender penuh">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <rect x="3" y="5" width="18" height="16" rx="3" />
-              <path d="M8 3v4M16 3v4" />
-              <path d="M3 10.5h18" />
-              <path d="M8 14.5h.01M12 14.5h.01M16 14.5h.01" />
+              <path d="M8 3v4M16 3v4M3 10.5h18" />
             </svg>
           </a>
           <button class="ikon-bulan" type="button" data-arah="1" aria-label="Bulan berikutnya">
@@ -82,136 +78,12 @@
           <a class="chip chip-rekomendasi" href="kalender.html"><span>Rekomendasi</span></a>
         </nav>
 
-        <!-- Tanpa JavaScript, daftar ini tetap menampilkan 12-25 Oktober
-             dan agenda contoh 13 Oktober; script/dashboard.js melebarkannya
-             jadi seluruh bulan dan mengisi panel agenda saat tanggal diklik. -->
         <ol class="strip-hari" aria-label="Tanggal kalender">
-          <li>
-            <button class="hari" type="button" data-tanggal="2026-10-12" aria-label="Senin, 12 Oktober">
-              <span class="angka">12</span>
-              <span class="nama-hari">Sen</span>
-              <span class="titik-baris" aria-hidden="true"><span class="titik titik-hijau"></span></span>
-            </button>
-          </li>
-          <li>
-            <button class="hari terpilih" type="button" data-tanggal="2026-10-13" aria-current="date"
-              aria-label="Selasa, 13 Oktober">
-              <span class="angka">13</span>
-              <span class="nama-hari">Sel</span>
-              <span class="titik-baris" aria-hidden="true"><span class="titik titik-merah"></span><span
-                  class="titik titik-hitam"></span></span>
-            </button>
-          </li>
-          <li>
-            <button class="hari" type="button" data-tanggal="2026-10-14" aria-label="Rabu, 14 Oktober">
-              <span class="angka">14</span>
-              <span class="nama-hari">Rab</span>
-              <span class="titik-baris" aria-hidden="true"><span class="titik titik-pink"></span></span>
-            </button>
-          </li>
-          <li>
-            <button class="hari" type="button" data-tanggal="2026-10-15" aria-label="Kamis, 15 Oktober">
-              <span class="angka">15</span>
-              <span class="nama-hari">Kam</span>
-              <span class="titik-baris" aria-hidden="true"><span class="titik titik-hijau"></span></span>
-            </button>
-          </li>
-          <li>
-            <button class="hari" type="button" data-tanggal="2026-10-16" aria-label="Jumat, 16 Oktober">
-              <span class="angka">16</span>
-              <span class="nama-hari">Jum</span>
-              <span class="titik-baris" aria-hidden="true"><span class="titik titik-ungu"></span></span>
-            </button>
-          </li>
-          <li>
-            <button class="hari" type="button" data-tanggal="2026-10-17" aria-label="Sabtu, 17 Oktober">
-              <span class="angka">17</span>
-              <span class="nama-hari">Sab</span>
-              <span class="titik-baris" aria-hidden="true"></span>
-            </button>
-          </li>
-          <li>
-            <button class="hari" type="button" data-tanggal="2026-10-18" aria-label="Minggu, 18 Oktober">
-              <span class="angka">18</span>
-              <span class="nama-hari">Min</span>
-              <span class="titik-baris" aria-hidden="true"><span class="titik titik-pink"></span></span>
-            </button>
-          </li>
-          <li>
-            <button class="hari" type="button" data-tanggal="2026-10-19" aria-label="Senin, 19 Oktober">
-              <span class="angka">19</span>
-              <span class="nama-hari">Sen</span>
-              <span class="titik-baris" aria-hidden="true"><span class="titik titik-ungu"></span><span
-                  class="titik titik-pink"></span></span>
-            </button>
-          </li>
-          <li>
-            <button class="hari" type="button" data-tanggal="2026-10-20" aria-label="Selasa, 20 Oktober">
-              <span class="angka">20</span>
-              <span class="nama-hari">Sel</span>
-              <span class="titik-baris" aria-hidden="true"><span class="titik titik-hitam"></span><span
-                  class="titik titik-ungu"></span></span>
-            </button>
-          </li>
-          <li>
-            <button class="hari" type="button" data-tanggal="2026-10-21" aria-label="Rabu, 21 Oktober">
-              <span class="angka">21</span>
-              <span class="nama-hari">Rab</span>
-              <span class="titik-baris" aria-hidden="true"><span class="titik titik-oranye"></span></span>
-            </button>
-          </li>
-          <li>
-            <button class="hari" type="button" data-tanggal="2026-10-22" aria-label="Kamis, 22 Oktober">
-              <span class="angka">22</span>
-              <span class="nama-hari">Kam</span>
-              <span class="titik-baris" aria-hidden="true"></span>
-            </button>
-          </li>
-          <li>
-            <button class="hari" type="button" data-tanggal="2026-10-23" aria-label="Jumat, 23 Oktober">
-              <span class="angka">23</span>
-              <span class="nama-hari">Jum</span>
-              <span class="titik-baris" aria-hidden="true"><span class="titik titik-oranye"></span><span
-                  class="titik titik-merah"></span><span class="titik titik-pink"></span></span>
-            </button>
-          </li>
-          <li>
-            <button class="hari" type="button" data-tanggal="2026-10-24" aria-label="Sabtu, 24 Oktober">
-              <span class="angka">24</span>
-              <span class="nama-hari">Sab</span>
-              <span class="titik-baris" aria-hidden="true"></span>
-            </button>
-          </li>
-          <li>
-            <button class="hari" type="button" data-tanggal="2026-10-25" aria-label="Minggu, 25 Oktober">
-              <span class="angka">25</span>
-              <span class="nama-hari">Min</span>
-              <span class="titik-baris" aria-hidden="true"><span class="titik titik-pink"></span></span>
-            </button>
-          </li>
+          <!-- diisi script/dashboard.js -->
         </ol>
 
-        <!-- Panel agenda tanggal terpilih (PRD-NAVIKA.md: tanggal tanpa
-             agenda menampilkan pesan kosong). Isian awal adalah agenda
-             contoh 13 Oktober; script/dashboard.js menggantinya saat
-             tanggal diklik. -->
         <div class="agenda" id="agenda-tanggal" aria-live="polite">
-          <ul class="agenda-daftar">
-            <li class="agenda-baris">
-              <span class="titik titik-merah" aria-hidden="true"></span>
-              <span class="agenda-teks">
-                <span class="agenda-judul">Magang Bakti BCA</span>
-                <span class="agenda-meta">Deadline &middot; Batas pendaftaran</span>
-              </span>
-            </li>
-            <li class="agenda-baris">
-              <span class="titik titik-hitam" aria-hidden="true"></span>
-              <span class="agenda-teks">
-                <span class="agenda-judul">Djarum Beasiswa Plus</span>
-                <span class="agenda-meta">Umum &middot; Pengumuman</span>
-              </span>
-            </li>
-          </ul>
+          <!-- diisi script/dashboard.js -->
         </div>
       </section>
 
@@ -230,50 +102,40 @@
         <article class="kartu-peluang">
           <div class="meta-atas">
             <span class="badge badge-rekomendasi">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path
-                  d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z" />
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z"/>
               </svg>
               REKOMENDASI
             </span>
             <span class="badge kat-beasiswa">Beasiswa</span>
             <span class="badge badge-tenggat">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7.5v4.5l3 2" />
+                stroke-linecap="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"/><path d="M12 7.5v4.5l3 2"/>
               </svg>
               10 Hari
             </span>
           </div>
-
           <h3 class="judul-peluang">Djarum Beasiswa Plus</h3>
-
           <p class="organisasi">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16" />
-              <path d="M15 9h4a1 1 0 0 1 1 1v11" />
-              <path d="M3 21h18" />
-              <path d="M8 8h3M8 12h3M8 16h3" />
+              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 9h4a1 1 0 0 1 1 1v11M3 21h18M8 8h3M8 12h3M8 16h3"/>
             </svg>
             Djarum Foundation
           </p>
-
           <div class="aksi-kartu">
             <a class="simpan" href="bookmark.html" aria-label="Simpan Djarum Beasiswa Plus">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path
-                  d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z" />
+                <path d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z"/>
               </svg>
             </a>
             <a class="tombol-detail" href="detail-djarum.html">
               Cek detail
               <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-                <circle cx="10" cy="10" r="10" fill="currentColor" />
-                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" />
+                <circle cx="10" cy="10" r="10" fill="currentColor"/>
+                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </a>
           </div>
@@ -282,50 +144,40 @@
         <article class="kartu-peluang">
           <div class="meta-atas">
             <span class="badge badge-rekomendasi">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path
-                  d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z" />
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z"/>
               </svg>
               REKOMENDASI
             </span>
             <span class="badge kat-magang">Magang</span>
             <span class="badge badge-tenggat mendesak">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7.5v4.5l3 2" />
+                stroke-linecap="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"/><path d="M12 7.5v4.5l3 2"/>
               </svg>
               3 Hari
             </span>
           </div>
-
           <h3 class="judul-peluang">Web Dev &amp; UI/UX</h3>
-
           <p class="organisasi">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16" />
-              <path d="M15 9h4a1 1 0 0 1 1 1v11" />
-              <path d="M3 21h18" />
-              <path d="M8 8h3M8 12h3M8 16h3" />
+              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 9h4a1 1 0 0 1 1 1v11M3 21h18M8 8h3M8 12h3M8 16h3"/>
             </svg>
             PT Vinix Seven Aurum
           </p>
-
           <div class="aksi-kartu">
             <a class="simpan" href="bookmark.html" aria-label="Simpan Web Dev &amp; UI/UX">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path
-                  d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z" />
+                <path d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z"/>
               </svg>
             </a>
             <a class="tombol-detail" href="detail-vinix7.html">
               Cek detail
               <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-                <circle cx="10" cy="10" r="10" fill="currentColor" />
-                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" />
+                <circle cx="10" cy="10" r="10" fill="currentColor"/>
+                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </a>
           </div>
@@ -334,50 +186,40 @@
         <article class="kartu-peluang">
           <div class="meta-atas">
             <span class="badge badge-rekomendasi">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path
-                  d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z" />
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z"/>
               </svg>
               REKOMENDASI
             </span>
             <span class="badge kat-beasiswa">Beasiswa</span>
             <span class="badge badge-tenggat">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7.5v4.5l3 2" />
+                stroke-linecap="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"/><path d="M12 7.5v4.5l3 2"/>
               </svg>
               10 Hari
             </span>
           </div>
-
           <h3 class="judul-peluang">Beasiswa Bank Indonesia</h3>
-
           <p class="organisasi">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16" />
-              <path d="M15 9h4a1 1 0 0 1 1 1v11" />
-              <path d="M3 21h18" />
-              <path d="M8 8h3M8 12h3M8 16h3" />
+              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 9h4a1 1 0 0 1 1 1v11M3 21h18M8 8h3M8 12h3M8 16h3"/>
             </svg>
             Bank Indonesia
           </p>
-
           <div class="aksi-kartu">
             <a class="simpan" href="bookmark.html" aria-label="Simpan Beasiswa Bank Indonesia">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path
-                  d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z" />
+                <path d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z"/>
               </svg>
             </a>
             <a class="tombol-detail" href="detail-beasiswa-bi.html">
               Cek detail
               <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-                <circle cx="10" cy="10" r="10" fill="currentColor" />
-                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" />
+                <circle cx="10" cy="10" r="10" fill="currentColor"/>
+                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </a>
           </div>
@@ -386,50 +228,40 @@
         <article class="kartu-peluang">
           <div class="meta-atas">
             <span class="badge badge-rekomendasi">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path
-                  d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z" />
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z"/>
               </svg>
               REKOMENDASI
             </span>
             <span class="badge kat-magang">Magang</span>
             <span class="badge badge-tenggat">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7.5v4.5l3 2" />
+                stroke-linecap="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"/><path d="M12 7.5v4.5l3 2"/>
               </svg>
               10 Hari
             </span>
           </div>
-
           <h3 class="judul-peluang">Magang Generasi Bertalenta</h3>
-
           <p class="organisasi">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16" />
-              <path d="M15 9h4a1 1 0 0 1 1 1v11" />
-              <path d="M3 21h18" />
-              <path d="M8 8h3M8 12h3M8 16h3" />
+              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 9h4a1 1 0 0 1 1 1v11M3 21h18M8 8h3M8 12h3M8 16h3"/>
             </svg>
             BUMN
           </p>
-
           <div class="aksi-kartu">
             <a class="simpan" href="bookmark.html" aria-label="Simpan Magang Generasi Bertalenta">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path
-                  d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z" />
+                <path d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z"/>
               </svg>
             </a>
             <a class="tombol-detail" href="detail-magenta.html">
               Cek detail
               <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-                <circle cx="10" cy="10" r="10" fill="currentColor" />
-                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" />
+                <circle cx="10" cy="10" r="10" fill="currentColor"/>
+                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </a>
           </div>
@@ -438,50 +270,40 @@
         <article class="kartu-peluang">
           <div class="meta-atas">
             <span class="badge badge-rekomendasi">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path
-                  d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z" />
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z"/>
               </svg>
               REKOMENDASI
             </span>
             <span class="badge kat-bootcamp">Bootcamp</span>
             <span class="badge badge-tenggat mendesak">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7.5v4.5l3 2" />
+                stroke-linecap="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"/><path d="M12 7.5v4.5l3 2"/>
               </svg>
               2 Hari
             </span>
           </div>
-
           <h3 class="judul-peluang">AI-Enhanced Full Stack Developer</h3>
-
           <p class="organisasi">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16" />
-              <path d="M15 9h4a1 1 0 0 1 1 1v11" />
-              <path d="M3 21h18" />
-              <path d="M8 8h3M8 12h3M8 16h3" />
+              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 9h4a1 1 0 0 1 1 1v11M3 21h18M8 8h3M8 12h3M8 16h3"/>
             </svg>
             PT Hacktivate Teknologi Indonesia
           </p>
-
           <div class="aksi-kartu">
             <a class="simpan" href="bookmark.html" aria-label="Simpan AI-Enhanced Full Stack Developer">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path
-                  d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z" />
+                <path d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z"/>
               </svg>
             </a>
             <a class="tombol-detail" href="detail-hacktiv8.html">
               Cek detail
               <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-                <circle cx="10" cy="10" r="10" fill="currentColor" />
-                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" />
+                <circle cx="10" cy="10" r="10" fill="currentColor"/>
+                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </a>
           </div>
@@ -490,50 +312,40 @@
         <article class="kartu-peluang">
           <div class="meta-atas">
             <span class="badge badge-rekomendasi">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path
-                  d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z" />
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z"/>
               </svg>
               REKOMENDASI
             </span>
             <span class="badge kat-beasiswa">Beasiswa</span>
             <span class="badge badge-tenggat">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7.5v4.5l3 2" />
+                stroke-linecap="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"/><path d="M12 7.5v4.5l3 2"/>
               </svg>
               10 Hari
             </span>
           </div>
-
           <h3 class="judul-peluang">Beasiswa KIP Kuliah</h3>
-
           <p class="organisasi">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16" />
-              <path d="M15 9h4a1 1 0 0 1 1 1v11" />
-              <path d="M3 21h18" />
-              <path d="M8 8h3M8 12h3M8 16h3" />
+              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 9h4a1 1 0 0 1 1 1v11M3 21h18M8 8h3M8 12h3M8 16h3"/>
             </svg>
             Kemendikbudristek RI
           </p>
-
           <div class="aksi-kartu">
             <a class="simpan" href="bookmark.html" aria-label="Simpan Beasiswa KIP Kuliah">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path
-                  d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z" />
+                <path d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z"/>
               </svg>
             </a>
             <a class="tombol-detail" href="detail-kip-kuliah.html">
               Cek detail
               <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-                <circle cx="10" cy="10" r="10" fill="currentColor" />
-                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" />
+                <circle cx="10" cy="10" r="10" fill="currentColor"/>
+                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </a>
           </div>
@@ -542,50 +354,40 @@
         <article class="kartu-peluang">
           <div class="meta-atas">
             <span class="badge badge-rekomendasi">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path
-                  d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z" />
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z"/>
               </svg>
               REKOMENDASI
             </span>
             <span class="badge kat-magang">Magang</span>
             <span class="badge badge-tenggat">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7.5v4.5l3 2" />
+                stroke-linecap="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"/><path d="M12 7.5v4.5l3 2"/>
               </svg>
               8 Hari
             </span>
           </div>
-
           <h3 class="judul-peluang">Magang Bakti BCA</h3>
-
           <p class="organisasi">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16" />
-              <path d="M15 9h4a1 1 0 0 1 1 1v11" />
-              <path d="M3 21h18" />
-              <path d="M8 8h3M8 12h3M8 16h3" />
+              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 9h4a1 1 0 0 1 1 1v11M3 21h18M8 8h3M8 12h3M8 16h3"/>
             </svg>
             PT Bank Central Asia Tbk
           </p>
-
           <div class="aksi-kartu">
             <a class="simpan" href="bookmark.html" aria-label="Simpan Magang Bakti BCA">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path
-                  d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z" />
+                <path d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z"/>
               </svg>
             </a>
             <a class="tombol-detail" href="detail-magang-bakti.html">
               Cek detail
               <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-                <circle cx="10" cy="10" r="10" fill="currentColor" />
-                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" />
+                <circle cx="10" cy="10" r="10" fill="currentColor"/>
+                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </a>
           </div>
@@ -594,56 +396,46 @@
         <article class="kartu-peluang">
           <div class="meta-atas">
             <span class="badge badge-rekomendasi">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path
-                  d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z" />
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5 4.7-.6 8.9-4.8 9.5-9.5Z"/>
               </svg>
               REKOMENDASI
             </span>
             <span class="badge kat-magang">Magang</span>
             <span class="badge badge-tenggat">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7.5v4.5l3 2" />
+                stroke-linecap="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"/><path d="M12 7.5v4.5l3 2"/>
               </svg>
               12 Hari
             </span>
           </div>
-
           <h3 class="judul-peluang">Magang Data Analyst</h3>
-
           <p class="organisasi">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16" />
-              <path d="M15 9h4a1 1 0 0 1 1 1v11" />
-              <path d="M3 21h18" />
-              <path d="M8 8h3M8 12h3M8 16h3" />
+              <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 9h4a1 1 0 0 1 1 1v11M3 21h18M8 8h3M8 12h3M8 16h3"/>
             </svg>
             PT Telkom Indonesia Tbk
           </p>
-
           <div class="aksi-kartu">
             <a class="simpan" href="bookmark.html" aria-label="Simpan Magang Data Analyst">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path
-                  d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z" />
+                <path d="M12 20.3C10 18.6 3.5 13.9 3.5 9.2a4.7 4.7 0 0 1 8.5-2.9 4.7 4.7 0 0 1 8.5 2.9c0 4.7-6.5 9.4-8.5 11.1Z"/>
               </svg>
             </a>
             <a class="tombol-detail" href="detail-magang-telkom.html">
               Cek detail
               <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-                <circle cx="10" cy="10" r="10" fill="currentColor" />
-                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" />
+                <circle cx="10" cy="10" r="10" fill="currentColor"/>
+                <path d="m8 5.8 4.2 4.2L8 14.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </a>
           </div>
         </article>
-      </section>
 
+      </section>
     </main>
 
     <nav class="nav-bawah" aria-label="Navigasi utama">
@@ -655,6 +447,14 @@
           <path d="M10.5 20v-4.5h3V20" />
         </svg>
         Home
+      </a>
+      <a class="nav-item" href="lihatSemua.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.8-3.8" />
+        </svg>
+        Peluang
       </a>
       <a class="nav-item" href="bookmark.html">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
@@ -675,8 +475,8 @@
 
   </div>
 
+  <script src="script/agenda-data.js"></script>
   <script src="script/dashboard.js" defer></script>
 
 </body>
-
 </html>

@@ -279,7 +279,8 @@ svg { display: block; }
 .chip-deadline  { background: var(--merah); }
 .chip-bootcamp  { background: var(--pink); }
 .chip-semua     { background: var(--hitam-pekat); }
-.chip-magang    { background: var(--oranye); color:#fff; }
+.chip-magang    { background: var(--oranye); color: #fff; }
+.chip-rekomendasi { background: var(--abu); color: #fff; }
 .chip-aktif     { outline: 2px solid var(--biru-aksi); outline-offset: 2px; }
 
 @media (hover: hover) {

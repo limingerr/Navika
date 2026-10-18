@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useApp, useTr } from "@/script/app-provider";
-import { categoryLabel, demoDeadline, formatDate } from "@/script/opportunities";
+import { categoryLabel, demoDeadline, formatDate, isOpportunityRecommended } from "@/script/opportunities";
 export function Icon({ name, size = 24, alt = "" }) {
     if (name === "search.svg")
         return <ActionIcon name="search" size={size}/>;
@@ -48,11 +48,14 @@ export function AppShell({ children, className = "" }) {
     return <div className={`app-shell ${className}`}><div className="app-content">{children}</div><MainNav /></div>;
 }
 export function OpportunityCard({ opportunity, displayCategory }) {
-    const { saved, toggleSaved, locale } = useApp();
+    const { profile, saved, toggleSaved, locale } = useApp();
     const tr = useTr();
     const isSaved = saved.includes(opportunity.id);
+    const isRecommended = isOpportunityRecommended(opportunity, profile?.major);
+    const catName = displayCategory ?? opportunity.category;
+    const catClass = catName.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-");
     return <article className="opportunity-card">
-    <div className="card-badges">{opportunity.recommended && <span className="badge badge-blue">✧ {tr("REKOMENDASI", "FEATURED")}</span>}<span className={`badge badge-${(displayCategory ?? opportunity.category).toLowerCase()}`}>{categoryLabel(displayCategory ?? opportunity.category, locale)}</span><span className={`badge badge-time ${opportunity.demoDays <= 3 ? "badge-time-urgent" : ""}`}>◷ {opportunity.demoDays} {tr("Hari", "Days")}</span></div>
+    <div className="card-badges">{isRecommended && <span className="badge badge-blue">✧ {tr("REKOMENDASI", "FEATURED")}</span>}<span className={`badge badge-${catClass}`}>{categoryLabel(catName, locale)}</span><span className={`badge badge-time ${opportunity.demoDays <= 3 ? "badge-time-urgent" : ""}`}>◷ {opportunity.demoDays} {tr("Hari", "Days")}</span></div>
     <h3>{opportunity.title}</h3><p className="card-org"><Icon name="enterprise.svg" size={20}/>{opportunity.organization}</p>
     <p className="card-summary">{locale === "en" ? opportunity.summaryEn : opportunity.summary}</p>
     <div className="card-actions"><button type="button" className={`heart-button ${isSaved ? "saved" : ""}`} onClick={() => toggleSaved(opportunity.id)} aria-label={`${isSaved ? tr("Hapus dari", "Remove from") : tr("Simpan ke", "Save to")} ${tr("Tersimpan", "Saved")}: ${opportunity.title}`} aria-pressed={isSaved}>{isSaved ? "♥" : "♡"}</button><Link className="detail-pill" href={`/peluang/${opportunity.id}`}>{tr("Cek detail", "View details")} <span aria-hidden="true">➜</span></Link></div>

@@ -338,6 +338,22 @@ html {
   background: #d366eb;
 }
 
+.page-dashboard .badge-studi-independen {
+  background: #0284c7;
+}
+
+.page-dashboard .badge-workshop {
+  background: #b45309;
+}
+
+.page-dashboard .badge-seminar-webinar {
+  background: #4f46e5;
+}
+
+.page-dashboard .badge-kompetisi {
+  background: #be123c;
+}
+
 .page-dashboard .badge-time {
   background: #f32125;
   margin-left: auto;
@@ -587,6 +603,22 @@ html {
   background: #006da7;
 }
 
+.page-dashboard .chip-studi-independen {
+  background: #0284c7;
+}
+
+.page-dashboard .chip-workshop {
+  background: #b45309;
+}
+
+.page-dashboard .chip-seminar-webinar {
+  background: #4f46e5;
+}
+
+.page-dashboard .chip-kompetisi {
+  background: #be123c;
+}
+
 .page-dashboard .date-dots {
   display: flex;
   align-items: center;
@@ -612,6 +644,22 @@ html {
 
 .page-dashboard .dot-bootcamp {
   background: #d463ee;
+}
+
+.page-dashboard .dot-studi-independen {
+  background: #0284c7;
+}
+
+.page-dashboard .dot-workshop {
+  background: #b45309;
+}
+
+.page-dashboard .dot-seminar-webinar {
+  background: #4f46e5;
+}
+
+.page-dashboard .dot-kompetisi {
+  background: #be123c;
 }
 
 .page-dashboard .date-agenda ul {
@@ -885,15 +933,27 @@ html {
 
 .page-dashboard .calendar-chips {
   margin-inline: -1px;
-  padding-block: 14px 16px;
-}
-
-.page-dashboard .calendar-chips {
-  scrollbar-width: none;
+  padding-block: 10px 14px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 101, 155, 0.28) transparent;
 }
 
 .page-dashboard .calendar-chips::-webkit-scrollbar {
-  display: none;
+  height: 6px;
+}
+
+.page-dashboard .calendar-chips::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 999px;
+}
+
+.page-dashboard .calendar-chips::-webkit-scrollbar-thumb {
+  background: rgba(0, 101, 155, 0.28);
+  border-radius: 999px;
+}
+
+.page-dashboard .calendar-chips::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 101, 155, 0.55);
 }
 
 .page-dashboard .calendar-chip {
@@ -934,7 +994,8 @@ html {
 }
 
 .page-dashboard .chip-rekomendasi {
-  background: #0065a3;
+  background: linear-gradient(135deg, #0284c7, #005689);
+  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.35);
 }
 
 .page-dashboard .date-strip {

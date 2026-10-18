@@ -1,6 +1,7 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
 import { resolveTheme, translate } from "@/script/i18n";
+import { calendarFilters } from "@/script/opportunities";
 export const demoProfile = {
     name: "Pengguna Demo",
     email: "demo@navika.local",
@@ -35,7 +36,7 @@ export function AppProvider({ children }) {
                     setTheme(parsed.theme);
                 if (typeof parsed.deadlineAlerts === "boolean")
                     setDeadlineAlerts(parsed.deadlineAlerts);
-                if (["Semua", "Beasiswa", "Deadline", "Bootcamp", "Disimpan", "Magang", "Rekomendasi"].includes(parsed.calendarFilter))
+                if (calendarFilters.includes(parsed.calendarFilter))
                     setCalendarFilter(parsed.calendarFilter);
             }
         }

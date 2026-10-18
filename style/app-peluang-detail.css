@@ -184,6 +184,30 @@ html {
   background: #355647;
 }
 
+.page-peluang-detail .badge-magang {
+  background: #ff8e3f;
+}
+
+.page-peluang-detail .badge-bootcamp {
+  background: #d366eb;
+}
+
+.page-peluang-detail .badge-studi-independen {
+  background: #0284c7;
+}
+
+.page-peluang-detail .badge-workshop {
+  background: #b45309;
+}
+
+.page-peluang-detail .badge-seminar-webinar {
+  background: #4f46e5;
+}
+
+.page-peluang-detail .badge-kompetisi {
+  background: #be123c;
+}
+
 .page-peluang-detail .badge-time {
   background: #f32125;
   margin-left: auto;
@@ -288,9 +312,46 @@ html {
   margin-bottom: 8px;
 }
 
-.page-peluang-detail .official-link {
+.page-peluang-detail .detail-screen {
+  padding-bottom: 80px;
+}
+
+.page-peluang-detail .detail-sticky-cta {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 100px;
+  max-width: 700px;
+  margin-inline: auto;
+  z-index: 19;
+  display: flex;
+}
+
+.page-peluang-detail .detail-sticky-cta .official-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  margin-bottom: 30px;
+  min-height: 52px;
+  padding: 12px 20px;
+  border-radius: 20px;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(105deg, #049ed4, #00659b);
+  box-shadow: 0 10px 24px rgba(0, 101, 155, 0.35);
+  text-decoration: none;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.page-peluang-detail .detail-sticky-cta .official-link:hover {
+  transform: translateY(-2px);
+  filter: brightness(0.96);
+}
+
+.page-peluang-detail .detail-sticky-cta .official-link:active {
+  transform: translateY(0);
 }
 
 @media (min-width:700px) {
@@ -644,6 +705,10 @@ html {
   background: #1f8d5d;
 }
 
+:root[data-theme=dark] .page-peluang-detail .detail-sticky-cta .official-link {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+}
+
 @media (min-width: 1000px) {
   .page-peluang-detail .main-nav {
     bottom: auto;
@@ -658,6 +723,26 @@ html {
 
   .page-peluang-detail .app-content {
     padding-bottom: 48px;
+  }
+
+  .page-peluang-detail .detail-screen {
+    padding-bottom: 0;
+  }
+
+  .page-peluang-detail .detail-sticky-cta {
+    position: static;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    max-width: none;
+    margin: 24px 0 30px;
+    z-index: auto;
+  }
+
+  .page-peluang-detail .detail-sticky-cta .official-link {
+    width: 100%;
+    border-radius: 18px;
+    box-shadow: none;
   }
 }
 
@@ -680,6 +765,11 @@ html {
   }
 
   .page-peluang-detail .main-nav {
+    left: 8px;
+    right: 8px;
+  }
+
+  .page-peluang-detail .detail-sticky-cta {
     left: 8px;
     right: 8px;
   }

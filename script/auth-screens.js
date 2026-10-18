@@ -20,9 +20,9 @@ export function LoginScreen() {
     const [password, setPassword] = useState("");
     const handleSubmit = (event) => {
         event.preventDefault();
-        updateProfile({ ...profile, email });
+        updateProfile({ ...profile, email: email || profile.email });
         setPassword("");
-        router.push("/dashboard");
+        router.push("/profil/edit?from=login");
     };
     return <main className="auth-page page-width"><Brand /><div className="auth-layout"><div><AuthHero kind="login"/><div className="auth-intro"><h1>{tr("Temukan peluang yang sesuai untukmu", "Find opportunities that suit you")}</h1><p>{tr("Masuk untuk melanjutkan ke akun demo.", "Sign in to continue to your demo profile.")}</p><DemoNote /></div></div><form className="auth-form" onSubmit={handleSubmit}><label htmlFor="email">Email</label><input id="email" type="email" placeholder="nama@email.com" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required/><label htmlFor="password">{tr("Kata Sandi", "Password")}</label><input id="password" type="password" placeholder={tr("Kata sandi demo", "Demo password")} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required/><p className="form-hint">{tr("Form demo menerima kata sandi apa pun dan tidak menyimpannya.", "The demo accepts any password and does not store it.")}</p><button className="primary-button" type="submit">{tr("Masuk ke demo", "Enter Demo")}</button><p className="auth-switch">{tr("Belum punya akun?", "No account yet?")} <Link href="/daftar">{tr("Daftar", "Sign Up")}</Link></p></form></div></main>;
 }

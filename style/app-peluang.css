@@ -240,6 +240,22 @@ html {
   background: #d366eb;
 }
 
+.page-peluang .badge-studi-independen {
+  background: #0284c7;
+}
+
+.page-peluang .badge-workshop {
+  background: #b45309;
+}
+
+.page-peluang .badge-seminar-webinar {
+  background: #4f46e5;
+}
+
+.page-peluang .badge-kompetisi {
+  background: #be123c;
+}
+
 .page-peluang .badge-time {
   background: #f32125;
   margin-left: auto;

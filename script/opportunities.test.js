@@ -5,7 +5,7 @@ import { normalizeGpa } from "./profile.js";
 import { resolveTheme } from "./i18n.js";
 
 test("katalog demo punya ID unik dan tautan sumber HTTP(S)", () => {
-  assert.equal(opportunities.length, 15);
+  assert.equal(opportunities.length, 46);
   assert.equal(new Set(opportunities.map((item) => item.id)).size, opportunities.length);
   assert.ok(opportunities.every((item) => /^https?:\/\//.test(item.sourceUrl)));
   assert.ok(opportunities.every((item) => item.requirements.length === item.requirementsEn.length));

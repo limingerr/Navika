@@ -226,6 +226,26 @@ html {
   background: #ff8e3f;
 }
 
+.page-tersimpan .badge-bootcamp {
+  background: #d366eb;
+}
+
+.page-tersimpan .badge-studi-independen {
+  background: #0284c7;
+}
+
+.page-tersimpan .badge-workshop {
+  background: #b45309;
+}
+
+.page-tersimpan .badge-seminar-webinar {
+  background: #4f46e5;
+}
+
+.page-tersimpan .badge-kompetisi {
+  background: #be123c;
+}
+
 .page-tersimpan .badge-time {
   background: #f32125;
   margin-left: auto;

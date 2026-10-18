@@ -163,8 +163,7 @@ Navika/
 
 ---
 
-## 👥 Kontributor & Lisensi
+## 👥 Kontributor
 
 Proyek ini dikembangkan oleh **Kelompok 8 Web & UI/UX Developer** sebagai solusi pencarian dan pemantauan peluang pendidikan serta karier bagi mahasiswa.
 
-Hak cipta dilindungi undang-undang. Lisensi bersifat *Private / Educational Purpose*.

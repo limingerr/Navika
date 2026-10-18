@@ -236,8 +236,8 @@ svg { display: block; }
 .chip-bootcamp span  { background: var(--pink); }
 .chip-semua span     { background: var(--hitam-pekat); }
 .chip-ekstra span    { background: var(--ungu); }
-.chip-magang span    { background: var(--oranye); color: var(--hitam); }
-.chip-rekomendasi span { background: var(--abu); color: var(--hitam); }
+.chip-magang span    { background: var(--oranye); color: #fff; }
+.chip-rekomendasi span { background: var(--abu); color: #fff; }
 
 @media (hover: hover) {
   .chip:hover span { filter: brightness(.93); }

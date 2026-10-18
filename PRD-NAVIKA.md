@@ -1,7 +1,10 @@
 # NAVIKA
 Product Requirements Document | Rencana Pengembangan Berikutnya
 
-Versi 1.2 - Revisi berdasarkan laporan Tugas Modul 5 | 17 Oktober 2026
+Versi 1.3 - Aplikasi Terpublikasi di GitHub & Pengembangan Fitur Lanjutan | 18 Oktober 2026
+
+- **Repositori GitHub Publik**: [https://github.com/limingerr/Navika](https://github.com/limingerr/Navika)
+- **Desain Figma (Kelompok 8)**: [https://www.figma.com/design/SD9ZLtfASaAoMpCW1r2k0I/Kelompok-8Navika](https://www.figma.com/design/SD9ZLtfASaAoMpCW1r2k0I/Kelompok-8Navika)
 
 ## 1. Executive Summary
 
@@ -392,6 +395,8 @@ R5 - `export/`: PNG layar NAVIKA terang/gelap, termasuk alur akun, Home, daftar 
 
 R6 - Laporan Tugas Modul 5 — Rancang Prototipe Siap Produksi, Kelompok 8 Web & UI/UX Developer, 8 halaman. Menjadi dasar untuk deskripsi proyek/tujuan (hal. 1), user flow dan inventaris layar (hal. 2), dokumentasi variasi light/dark (hal. 3-4), typography dan token warna (hal. 5-6), visual reference (hal. 7), serta interactive components (hal. 8). Link Figma yang dicantumkan dalam laporan: https://www.figma.com/design/SD9ZLtfASaAoMpCW1r2k0I/Kelompok-8Navika.
 Lokasi: `export/` pada repositori ini. Matriks layar dan prioritas terdapat di bagian 2.5.
+
+R7 - Repositori GitHub Publik NAVIKA: https://github.com/limingerr/Navika. Menyimpan implementasi produksi Next.js 16 (App Router), 46 katalog peluang terverifikasi (Beasiswa, Magang, Bootcamp, Studi Independen, Workshop, Seminar/Webinar, Kompetisi), rekomendasi berbasis jurusan, kalender interaktif, dan halaman detail mobile dengan floating CTA.
 
 | Kebutuhan | Dasar | Status dalam PRD |
 | --- | --- | --- |

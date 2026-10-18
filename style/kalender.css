@@ -275,13 +275,14 @@ svg { display: block; }
   transition: filter 180ms ease;
 }
 
-.chip-beasiswa  { background: var(--hijau); }
-.chip-deadline  { background: var(--merah); }
-.chip-bootcamp  { background: var(--pink); }
-.chip-semua     { background: var(--hitam-pekat); }
-.chip-magang    { background: var(--oranye); color: #fff; }
+.chip-beasiswa    { background: var(--hijau); }
+.chip-deadline    { background: var(--merah); }
+.chip-bootcamp    { background: var(--pink); }
+.chip-semua       { background: var(--hitam-pekat); }
+.chip-ekstra      { background: var(--ungu); }
+.chip-magang      { background: var(--oranye); color: #fff; }
 .chip-rekomendasi { background: var(--abu); color: #fff; }
-.chip-aktif     { outline: 2px solid var(--biru-aksi); outline-offset: 2px; }
+.chip-aktif       { outline: 2px solid var(--biru-aksi); outline-offset: 2px; }
 
 @media (hover: hover) {
   .chip:hover { filter: brightness(.93); }
@@ -290,47 +291,37 @@ svg { display: block; }
 /* ---- Bagian agenda ---- */
 
 .bagian-agenda {
-  margin: 20px 0 0;
+  margin: 20px 16px 0;
 }
 
 .judul-agenda {
-  margin: 0 0 12px;
-  padding: 0 16px;
+  margin: 0 0 14px;
   font-size: 17px;
   font-weight: 800;
   letter-spacing: -0.1px;
 }
 
-/* Strip horizontal: scroll seperti kartu rekomendasi dashboard */
-.agenda-strip {
+.agenda-daftar-kartu {
   display: flex;
-  gap: 12px;
-  padding: 4px 16px 8px;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-  scroll-snap-type: x mandatory;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.agenda-strip::-webkit-scrollbar { display: none; }
-
-/* ---- Kartu agenda — visual sama dengan .kartu-peluang di dashboard ---- */
+/* ---- Kartu agenda — visual sama persis dengan .kartu-peluang di dashboard ---- */
 
 .kartu-agenda {
-  flex: none;
-  width: calc(min(100vw, 440px) - 32px);
+  width: 100%;
   background: var(--biru-kartu);
   color: #fff;
   border-radius: var(--radius-kartu);
   padding: 18px;
-  scroll-snap-align: start;
   transition: transform 220ms ease, box-shadow 220ms ease;
 }
 
 @media (hover: hover) {
   .kartu-agenda:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 26px rgba(9,9,9,.18);
+    box-shadow: 0 12px 28px rgba(9,9,9,.2);
   }
 }
 
@@ -344,7 +335,7 @@ svg { display: block; }
 /* Pesan kosong */
 .agenda-kosong {
   margin: 0;
-  padding: 4px 16px;
+  padding: 4px 2px;
   font-size: 13px;
   font-weight: 500;
   color: var(--teks-redup);
@@ -388,6 +379,9 @@ svg { display: block; }
 .kat-beasiswa { background: var(--hijau); color: #fff; }
 .kat-magang   { background: var(--oranye); color: #fff; }
 .kat-bootcamp { background: var(--pink); color: #fff; }
+.kat-deadline { background: var(--merah); color: #fff; }
+.kat-ekstra   { background: var(--ungu); color: #fff; }
+.kat-umum     { background: var(--hitam-pekat); color: #fff; }
 
 /* Badge tenggat: bergaris tipis seperti di dashboard */
 .badge-tenggat {
@@ -400,6 +394,7 @@ svg { display: block; }
 .badge-tenggat.mendesak {
   background: var(--merah);
   border-color: transparent;
+  box-shadow: 0 3px 8px rgba(195,50,40,.4);
 }
 
 .judul-peluang {
@@ -450,7 +445,7 @@ svg { display: block; }
 
 @media (hover: hover) {
   .simpan:hover { color: var(--pink-tua); }
-  .simpan:hover svg { transform: scale(1.1); }
+  .simpan:hover svg { transform: scale(1.12); }
 }
 
 .tombol-detail {
@@ -475,6 +470,7 @@ svg { display: block; }
     color: #fff;
   }
   .tombol-detail:hover svg { transform: translateX(3px); }
+  .tombol-detail:hover svg path { stroke: var(--biru-aksi); }
 }
 
 /* ---- Navigasi bawah ---- */
@@ -502,9 +498,9 @@ svg { display: block; }
   gap: 3px;
   padding: 8px 4px;
   border-radius: 16px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  color: var(--teks);
+  color: var(--teks-redup);
   transition: background-color 180ms ease, color 180ms ease;
 }
 

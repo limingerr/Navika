@@ -103,9 +103,9 @@
       return;
     }
 
-    /* Kartu dibungkus strip horizontal, scroll-snap per kartu */
-    var strip = document.createElement("div");
-    strip.className = "agenda-strip";
+    /* Kartu dibungkus daftar vertikal ke bawah */
+    var wadah = document.createElement("div");
+    wadah.className = "agenda-daftar-kartu";
 
     for (var i = 0; i < isi.length; i++) {
       var item = isi[i];
@@ -145,10 +145,10 @@
             '</svg>' +
           '</a>' +
         '</div>';
-      strip.appendChild(art);
+      wadah.appendChild(art);
     }
 
-    elAgenda.appendChild(strip);
+    elAgenda.appendChild(wadah);
   }
 
   function kelasBadge(warna) {

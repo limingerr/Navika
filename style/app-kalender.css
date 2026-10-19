@@ -1,849 +1,665 @@
-body {
-  margin: 0;
-}
+/* ============================================================
+   NAVIKA - Kalender (Next.js Responsive)
+   Acuan: kalender.html, style/kalender.css, script/kalender.js
+   Responsive: Mobile (1-col, floating nav) -> Tablet (2-col) -> Desktop (>=1000px sidebar, 3-col)
+   Font: Poppins. Token warna diwarisi dari dashboard.
+   ============================================================ */
 
 .page-kalender {
+  --biru-utama:   #00A6E0;
+  --biru-kartu:   #5AA4D8;
+  --biru-aksi:    #0067A6;  /* putih 6,0:1 */
+  --biru-aktif:   #5AA4D8;  /* teks putih 2,7:1 */
+  --biru-teks:    #2F5F94;  /* 4,75:1 di atas --biru-lembut */
+  --biru-lembut:  #C7DDF8;
+  --biru-muda:    #EAF5FC;
+  --hijau:        #3E5145;  /* putih 8,5:1 */
+  --merah:        #C33228;  /* putih 5,5:1 */
+  --pink:         #D17AEF;
+  --oranye:       #FF8A3D;  /* teks gelap 8,5:1 */
+  --ungu:         #3217C9;  /* putih 10,0:1 */
+  --hitam:        #090909;
+  --hitam-pekat:  #080808;
+  --abu:          #D9D9D9;
+  --pink-tua:     #98004A;
+
+  --teks:         #090909;
+  --teks-redup:   #5B6470;  /* 6,0:1 di atas putih */
+  --garis:        #E5E7EB;
+  --garis-hari:   #E5E7EB;
+  --biru-hover:   #00527F;  /* 8,4:1 di atas putih */
+
+  --radius-kartu: 24px;
+  --radius-sel:   12px;
+  --font: "Poppins", "Segoe UI", system-ui, -apple-system, sans-serif;
+
   min-height: 100vh;
-}
-
-.page-kalender {
-  --blue: #05a5d9;
-  --deep: #00699d;
-  --ink: #111827;
-  --muted: #58616e;
-  --soft: #f5f7f9;
-  --line: #e8edf1;
-  --shadow: 0 16px 28px rgba(13,33,53,.11);
-}
-
-.page-kalender, .page-kalender * {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-.page-kalender {
   margin: 0;
-  color: var(--ink);
-  background: #fff;
-  font-family: Arial,Helvetica,sans-serif;
-  line-height: 1.5;
+  background: #F0F4F8;
+  color: var(--teks);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-kalender *,
+.page-kalender *::before,
+.page-kalender *::after {
+  box-sizing: border-box;
 }
 
 .page-kalender button,
 .page-kalender input,
-.page-kalender select {
-  font: inherit;
-}
-
-.page-kalender button {
-  cursor: pointer;
+.page-kalender select,
+.page-kalender textarea {
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .page-kalender a {
   color: inherit;
   text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.page-kalender img {
-  max-width: 100%;
-  object-fit: contain;
+.page-kalender a:focus-visible,
+.page-kalender button:focus-visible {
+  outline: 3px solid var(--biru-aksi);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 
-.page-kalender h1,
-.page-kalender h2,
-.page-kalender h3,
-.page-kalender p {
-  margin-top: 0;
+.page-kalender svg {
+  display: block;
 }
 
-.page-kalender :focus-visible {
-  outline: 3px solid #0069ae;
-  outline-offset: 3px;
+/* Bingkai aplikasi & tata letak konten */
+.page-kalender .app-content {
+  padding-bottom: 120px;
+}
+
+.page-kalender .screen-main,
+.page-kalender .kepala,
+.page-kalender .top-header,
+.page-kalender .kartu-kalender,
+.page-kalender .chip-baris,
+.page-kalender .calendar-chips,
+.page-kalender .bagian-agenda,
+.page-kalender .calendar-agenda {
+  width: min(100% - 32px, 440px);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .page-kalender .demo-note {
-  display: inline-block;
-  width: fit-content;
-  margin: 8px 0 18px;
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: #eaf7fe;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 auto 16px;
+  padding: 11px 15px;
+  border-radius: 14px;
+  background: #c0e1f8;
   color: #075d85;
-  font-size: .83rem;
   font-weight: 700;
+  font-size: .9rem;
 }
 
-.page-kalender .app-shell {
-  min-height: 100vh;
-}
+/* ---- Header ---- */
 
-.page-kalender .app-content {
-  min-width: 0;
-  padding-bottom: 112px;
-}
-
-.page-kalender .screen-main {
-  width: min(100% - 32px,1100px);
-  margin-inline: auto;
-}
-
+.page-kalender .kepala,
 .page-kalender .top-header {
   display: flex;
   align-items: center;
-  gap: 16px;
-  min-height: 94px;
-  padding: 18px max(16px,calc((100vw - 1100px)/2));
-  background: #f8fafb;
-  box-shadow: 0 4px 8px rgba(0,0,0,.12);
-  border-radius: 0 0 18px 18px;
+  gap: 12px;
+  margin: 16px auto 0;
+  padding: 16px 18px;
+  background: #fff;
+  border-radius: var(--radius-kartu);
+  box-shadow: 0 4px 16px rgba(9,9,9,.07);
 }
 
-.page-kalender .top-header h1 {
-  margin: 0;
-  font-size: clamp(1.65rem,4vw,2.3rem);
-}
-
-.page-kalender .main-nav {
-  position: fixed;
-  z-index: 20;
-  left: 16px;
-  right: 16px;
-  bottom: 14px;
+.page-kalender .ikon-tombol,
+.page-kalender .icon-link,
+.page-kalender .back-link {
   display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 4px;
-  max-width: 700px;
-  margin-inline: auto;
-  padding: 8px;
-  background: rgba(255,255,255,.97);
-  border-radius: 28px;
-  box-shadow: 0 16px 36px rgba(0,0,0,.14);
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 0;
+  background: transparent;
+  color: var(--hitam);
+  cursor: pointer;
+  transition: background-color 200ms ease;
+  flex: none;
 }
 
-.page-kalender .main-nav a {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  min-height: 62px;
-  border-radius: 19px;
-  font-size: .85rem;
-  font-weight: 600;
+@media (hover: hover) {
+  .page-kalender .ikon-tombol:hover,
+  .page-kalender .icon-link:hover,
+  .page-kalender .back-link:hover {
+    background: #F2F4F7;
+  }
 }
 
-.page-kalender .main-nav a.active {
-  background: #b9dffe;
-  color: #00659b;
+.page-kalender .judul-kepala,
+.page-kalender .top-header h1 {
+  flex: 1;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  text-align: center;
 }
 
-.page-kalender .main-nav img {
-  width: 23px;
-  height: 23px;
+/* ---- Kartu kalender (Grid bulanan) ---- */
+
+.page-kalender .kartu-kalender,
+.page-kalender .calendar-panel {
+  margin-top: 16px;
+  background: #fff;
+  border-radius: var(--radius-kartu);
+  padding: 16px 16px 20px;
+  box-shadow: 0 4px 16px rgba(9,9,9,.07);
 }
 
+/* Navigasi bulan */
+.page-kalender .nav-bulan,
 .page-kalender .calendar-heading {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 4px;
+  margin-bottom: 16px;
 }
 
+.page-kalender .judul-bulan,
 .page-kalender .calendar-heading h2 {
+  flex: 1;
+  min-width: 0;
   margin: 0;
-  font-size: clamp(1.4rem,3.2vw,2rem);
   text-align: center;
+  font-size: clamp(18px, 5vw, 22px);
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-transform: capitalize;
 }
 
+.page-kalender .ikon-bulan,
 .page-kalender .calendar-heading button {
-  width: 40px;
-  height: 44px;
-  border: 0;
-  background: transparent;
-  font-size: 2rem;
-  line-height: 1;
-}
-
-.page-kalender .opportunity-grid {
   display: grid;
-  gap: 18px;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  padding: 0;
+  background: none;
+  border-radius: 10px;
+  color: var(--hitam);
+  cursor: pointer;
+  transition: background-color 200ms ease;
 }
 
-.page-kalender .opportunity-card {
+@media (hover: hover) {
+  .page-kalender .ikon-bulan:hover,
+  .page-kalender .calendar-heading button:hover {
+    background: #F2F4F7;
+  }
+}
+
+/* Grid kalender bulanan */
+.page-kalender .grid-kalender {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.page-kalender .grid-kalender thead th {
+  padding: 4px 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--teks-redup);
+  text-align: center;
+}
+
+.page-kalender .grid-kalender tbody td {
+  padding: 3px;
+  text-align: center;
+}
+
+.page-kalender .sel-hari {
   display: flex;
   flex-direction: column;
-  min-width: 0;
-  min-height: 218px;
-  padding: 22px;
-  border-radius: 28px;
-  background: var(--blue);
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  min-height: 52px;
+  padding: 7px 2px 5px;
+  border: 0;
+  background: none;
+  border-radius: 10px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--teks);
+  cursor: pointer;
+  transition: background-color 180ms ease;
+}
+
+.page-kalender .sel-hari.redup,
+.page-kalender .sel-hari.muted {
+  color: #C0C8D0;
+}
+
+.page-kalender .sel-hari.terpilih,
+.page-kalender .sel-hari.selected {
+  background: var(--biru-aktif);
   color: #fff;
 }
 
+.page-kalender .sel-hari.hari-ini:not(.terpilih):not(.selected) {
+  background: var(--biru-muda);
+  color: var(--biru-aksi);
+  font-weight: 700;
+}
+
+@media (hover: hover) {
+  .page-kalender .sel-hari:not(.terpilih):not(.selected):hover {
+    background: var(--biru-muda);
+  }
+  .page-kalender .sel-hari.terpilih:hover,
+  .page-kalender .sel-hari.selected:hover {
+    background: var(--biru-aktif);
+  }
+}
+
+/* Titik indikator di bawah angka tanggal */
+.page-kalender .titik-baris,
+.page-kalender .calendar-day-dots {
+  display: flex;
+  gap: 2px;
+  height: 5px;
+}
+
+.page-kalender .titik,
+.page-kalender .calendar-day-dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  display: block;
+}
+
+.page-kalender .titik-hijau,  .page-kalender .dot-beasiswa { background: var(--hijau); }
+.page-kalender .titik-merah,  .page-kalender .dot-deadline { background: var(--merah); }
+.page-kalender .titik-pink,   .page-kalender .dot-bootcamp { background: var(--pink); }
+.page-kalender .titik-oranye, .page-kalender .dot-magang { background: var(--oranye); }
+.page-kalender .titik-ungu,   .page-kalender .dot-disimpan { background: var(--ungu); }
+.page-kalender .titik-hitam,  .page-kalender .dot-umum { background: var(--hitam-pekat); }
+.page-kalender .dot-studi-independen { background: #0284c7; }
+.page-kalender .dot-workshop { background: #b45309; }
+.page-kalender .dot-seminar-webinar { background: #4f46e5; }
+.page-kalender .dot-kompetisi { background: #be123c; }
+
+/* Terpilih: titik putih */
+.page-kalender .sel-hari.terpilih .titik,
+.page-kalender .sel-hari.selected .titik,
+.page-kalender .sel-hari.terpilih .calendar-day-dots i,
+.page-kalender .sel-hari.selected .calendar-day-dots i {
+  background: rgba(255,255,255,.8);
+}
+
+/* ---- Chip filter kategori (Dipertahankan) ---- */
+
+.page-kalender .chip-baris,
+.page-kalender .calendar-chips {
+  display: flex;
+  gap: 11px;
+  margin: 14px auto 18px;
+  padding: 6px 6px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.page-kalender .chip-baris::-webkit-scrollbar,
+.page-kalender .calendar-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.page-kalender .chip,
+.page-kalender .calendar-chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: filter 180ms ease, box-shadow 180ms ease;
+}
+
+.page-kalender .chip span,
+.page-kalender .calendar-chip span {
+  display: inline;
+  padding: 0;
+  border-radius: inherit;
+  color: inherit;
+  background: transparent;
+}
+
+.page-kalender .chip-beasiswa    { background: var(--hijau); }
+.page-kalender .chip-deadline    { background: var(--merah); }
+.page-kalender .chip-bootcamp    { background: var(--pink); }
+.page-kalender .chip-semua       { background: var(--hitam-pekat); }
+.page-kalender .chip-ekstra,
+.page-kalender .chip-disimpan    { background: var(--ungu); }
+.page-kalender .chip-magang      { background: var(--oranye); color: #fff; }
+.page-kalender .chip-rekomendasi { background: var(--abu); color: #fff; }
+.page-kalender .chip-studi-independen { background: #0284c7; }
+.page-kalender .chip-workshop    { background: #b45309; }
+.page-kalender .chip-seminar-webinar { background: #4f46e5; }
+.page-kalender .chip-kompetisi   { background: #be123c; }
+
+.page-kalender .chip-aktif,
+.page-kalender .chip.terpilih,
+.page-kalender .chip.selected,
+.page-kalender .calendar-chip.terpilih,
+.page-kalender .calendar-chip.selected {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--biru-aksi);
+  outline: none;
+}
+
+@media (hover: hover) {
+  .page-kalender .chip:hover,
+  .page-kalender .calendar-chip:hover {
+    filter: brightness(.93);
+  }
+}
+
+/* ---- Bagian agenda ---- */
+
+.page-kalender .bagian-agenda,
+.page-kalender .calendar-agenda {
+  margin: 20px auto 0;
+}
+
+.page-kalender .judul-agenda,
+.page-kalender .calendar-agenda h2 {
+  margin: 0 0 14px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.1px;
+}
+
+.page-kalender .agenda-daftar-kartu,
+.page-kalender .opportunity-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ---- Kartu agenda (visual sama persis dengan kartu-peluang di dashboard) ---- */
+
+.page-kalender .kartu-agenda,
+.page-kalender .kartu-peluang,
+.page-kalender .opportunity-card {
+  width: 100%;
+  background: var(--biru-kartu);
+  color: #fff;
+  border-radius: var(--radius-kartu);
+  padding: 18px;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (hover: hover) {
+  .page-kalender .kartu-agenda:hover,
+  .page-kalender .kartu-peluang:hover,
+  .page-kalender .opportunity-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(9,9,9,.2);
+  }
+}
+
+.page-kalender .kartu-agenda :focus-visible,
+.page-kalender .kartu-peluang :focus-visible,
+.page-kalender .opportunity-card :focus-visible {
+  outline-color: #fff;
+}
+
+.page-kalender .kartu-agenda h3,
+.page-kalender .kartu-peluang h3,
+.page-kalender .opportunity-card h3 {
+  color: #fff;
+}
+
+/* Pesan kosong */
+.page-kalender .agenda-kosong,
+.page-kalender .no-agenda {
+  margin: 0;
+  padding: 4px 2px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--teks-redup);
+}
+
+.page-kalender .meta-atas,
 .page-kalender .card-badges {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  padding: 6px 10px 12px;
+  margin: -6px -10px -12px;
+}
+
+.page-kalender .meta-atas::-webkit-scrollbar,
+.page-kalender .card-badges::-webkit-scrollbar {
+  display: none;
 }
 
 .page-kalender .badge {
   display: inline-flex;
   align-items: center;
-  min-height: 28px;
-  padding: 3px 10px;
-  border-radius: 11px;
-  font-size: .77rem;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(9,9,9,.3);
+  font-size: 12px;
   font-weight: 700;
+  line-height: 1;
   white-space: nowrap;
-  box-shadow: 0 5px 8px rgba(0,0,0,.13);
 }
 
+.page-kalender .badge-rekomendasi,
 .page-kalender .badge-blue {
-  background: #006ca9;
+  background: var(--biru-aksi);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.28);
+  font-size: 10.5px;
+  letter-spacing: .4px;
 }
 
-.page-kalender .badge-beasiswa {
-  background: #355647;
-}
+.page-kalender .kat-beasiswa, .page-kalender .badge-beasiswa { background: var(--hijau); color: #fff; }
+.page-kalender .kat-magang,   .page-kalender .badge-magang   { background: var(--oranye); color: #fff; }
+.page-kalender .kat-bootcamp, .page-kalender .badge-bootcamp { background: var(--pink); color: #fff; }
+.page-kalender .kat-deadline, .page-kalender .badge-deadline { background: var(--merah); color: #fff; }
+.page-kalender .kat-ekstra,   .page-kalender .badge-disimpan { background: var(--ungu); color: #fff; }
+.page-kalender .kat-umum,     .page-kalender .badge-umum     { background: var(--hitam-pekat); color: #fff; }
 
-.page-kalender .badge-magang {
-  background: #ff8e3f;
-}
-
-.page-kalender .badge-bootcamp {
-  background: #d366eb;
-}
-
-.page-kalender .badge-studi-independen {
-  background: #0284c7;
-}
-
-.page-kalender .badge-workshop {
-  background: #b45309;
-}
-
-.page-kalender .badge-seminar-webinar {
-  background: #4f46e5;
-}
-
-.page-kalender .badge-kompetisi {
-  background: #be123c;
-}
-
+/* Badge tenggat: bergaris tipis seperti di dashboard */
+.page-kalender .badge-tenggat,
 .page-kalender .badge-time {
-  background: #f32125;
   margin-left: auto;
+  border: 1.5px solid rgba(255,255,255,.75);
+  padding: 5px 9px;
+  box-shadow: none;
+  color: #fff;
 }
 
+.page-kalender .badge-tenggat.mendesak,
+.page-kalender .badge-time-urgent {
+  background: var(--merah);
+  border-color: transparent;
+  box-shadow: 0 3px 8px rgba(195,50,40,.4);
+}
+
+.page-kalender .judul-peluang,
 .page-kalender .opportunity-card h3 {
-  font-size: clamp(1.35rem,3.4vw,1.85rem);
-  line-height: 1.18;
-  margin: 22px 0 8px;
+  margin: 14px 0 5px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  line-height: 1.25;
+  color: #fff;
 }
 
+.page-kalender .organisasi,
 .page-kalender .card-org {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #e8f7fd;
-  font-size: .92rem;
   margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,.85);
 }
 
-.page-kalender .card-org img {
-  filter: brightness(0) invert(1);
-}
-
+.page-kalender .aksi-kartu,
 .page-kalender .card-actions {
   display: flex;
-  align-items: end;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-top: auto;
-  padding-top: 25px;
+  margin-top: 16px;
 }
 
+.page-kalender .simpan,
 .page-kalender .heart-button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -6px 0 -6px -10px;
+  border-radius: 12px;
   border: 0;
   background: transparent;
   color: #fff;
-  font-size: 2.4rem;
-  line-height: 1;
-  min-width: 44px;
-  min-height: 44px;
+  cursor: pointer;
+  transition: color 200ms ease;
 }
 
-.page-kalender .heart-button.saved {
-  color: #fff;
+.page-kalender .simpan svg,
+.page-kalender .heart-button svg {
+  transition: transform 200ms ease;
 }
 
+@media (hover: hover) {
+  .page-kalender .simpan:hover,
+  .page-kalender .heart-button:hover {
+    color: var(--pink-tua);
+  }
+  .page-kalender .simpan:hover svg,
+  .page-kalender .heart-button:hover svg {
+    transform: scale(1.12);
+  }
+}
+
+.page-kalender .tombol-detail,
 .page-kalender .detail-pill {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  min-height: 36px;
-  padding: 4px 12px;
-  border-radius: 999px;
+  gap: 8px;
+  padding: 12px 15px;
+  border-radius: var(--radius-sel);
   background: #fff;
-  color: #000;
+  color: var(--hitam);
+  font-size: 14px;
   font-weight: 700;
-  box-shadow: 0 5px 8px rgba(0,0,0,.16);
-  white-space: nowrap;
+  box-shadow: 0 4px 8px rgba(17,24,39,.22);
+  transition: background-color 200ms ease, color 200ms ease;
 }
 
-.page-kalender .detail-pill span {
-  display: grid;
-  place-items: center;
-  width: 23px;
-  height: 23px;
-  border-radius: 50%;
-  background: #000;
-  color: #fff;
+.page-kalender .tombol-detail svg,
+.page-kalender .detail-pill svg {
+  transition: transform 200ms ease;
 }
 
-.page-kalender .back-link {
-  font-size: 2rem;
-  line-height: 1;
-  min-width: 38px;
-  text-align: center;
+@media (hover: hover) {
+  .page-kalender .tombol-detail:hover,
+  .page-kalender .detail-pill:hover {
+    background: var(--biru-aksi);
+    color: #fff;
+  }
+  .page-kalender .tombol-detail:hover svg,
+  .page-kalender .detail-pill:hover svg {
+    transform: translateX(3px);
+  }
 }
 
-.page-kalender .title-header h1 {
-  margin-right: auto;
-}
+/* ---- Navigasi bawah / AppShell ---- */
 
-.page-kalender .calendar-panel {
-  background: #ceced2;
-  padding: 28px 16px 40px;
-}
-
-.page-kalender .calendar-heading {
-  width: min(100%,900px);
-  margin: auto;
-  color: #fff;
-}
-
-.page-kalender .calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7,minmax(0,1fr));
-  gap: 4px;
-  width: min(100%,900px);
-  margin: 0 auto;
-}
-
-.page-kalender .weekday-row {
-  margin: 26px auto 12px;
-  text-align: center;
-  font-weight: 700;
-  color: #fff;
-}
-
-.page-kalender .calendar-grid button {
-  position: relative;
-  display: grid;
-  place-items: center;
-  min-width: 0;
-  height: 54px;
-  border: 0;
-  border-radius: 12px;
-  background: transparent;
-  color: #fff;
-  font-size: 1.2rem;
-}
-
-.page-kalender .calendar-grid button.muted {
-  color: #929397;
-}
-
-.page-kalender .calendar-grid button.selected {
-  color: #111;
+.page-kalender .nav-bawah,
+.page-kalender .main-nav {
+  position: fixed;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 28px);
+  max-width: 412px;
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
   background: #fff;
-  box-shadow: 0 5px 8px rgba(0,0,0,.18);
+  border-radius: 24px;
+  box-shadow: 0 10px 26px rgba(17,24,39,.18), 0 2px 6px rgba(17,24,39,.08);
+  z-index: 50;
 }
 
-.page-kalender .calendar-grid button span {
-  position: absolute;
-  bottom: 1px;
-  color: #df2025;
-  font-size: .7rem;
-}
-
-.page-kalender .calendar-agenda {
-  padding-top: 16px;
-}
-
-.page-kalender .calendar-agenda h2 {
-  font-size: 1.45rem;
-  margin: 12px 0;
-}
-
-.page-kalender .calendar-agenda h3 {
-  margin-top: 32px;
-}
-
-.page-kalender .no-agenda {
-  padding: 20px;
-  background: var(--soft);
-  border-radius: 16px;
-}
-
-.page-kalender .deadline-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.page-kalender .deadline-list li {
+.page-kalender .nav-item,
+.page-kalender .main-nav a {
+  flex: 1;
   display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.page-kalender .deadline-list a {
-  color: var(--deep);
-  font-weight: 700;
-}
-
-.page-kalender .deadline-list span {
-  text-align: right;
-  color: var(--muted);
-}
-
-@media (min-width:700px) {
-  .page-kalender .opportunity-grid {
-    grid-template-columns: repeat(2,minmax(0,1fr));
-  }
-
-  .page-kalender .screen-main {
-    width: min(100% - 48px,1100px);
-  }
-}
-
-@media (min-width:1000px) {
-  .page-kalender .app-shell {
-    display: grid;
-    grid-template-columns: 210px minmax(0,1fr);
-  }
-
-  .page-kalender .app-content {
-    grid-column: 2;
-    grid-row: 1;
-    padding-bottom: 50px;
-  }
-
-  .page-kalender .main-nav {
-    position: sticky;
-    top: 0;
-    bottom: auto;
-    left: auto;
-    right: auto;
-    grid-column: 1;
-    grid-row: 1;
-    align-self: start;
-    display: flex;
-    flex-direction: column;
-    width: auto;
-    height: 100vh;
-    max-width: none;
-    margin: 0;
-    padding: 32px 14px;
-    border-radius: 0;
-    border-right: 1px solid var(--line);
-    box-shadow: none;
-  }
-
-  .page-kalender .main-nav:before {
-    content: "NAVIKA";
-    display: block;
-    padding: 10px 14px 34px;
-    color: var(--deep);
-    font-size: 1.5rem;
-    font-weight: 800;
-  }
-
-  .page-kalender .main-nav a {
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 12px;
-    padding: 0 16px;
-    font-size: 1rem;
-  }
-
-  .page-kalender .main-nav img {
-    width: 25px;
-    height: 25px;
-  }
-
-  .page-kalender .top-header {
-    padding-inline: max(28px,calc((100vw - 210px - 1100px)/2));
-  }
-
-  .page-kalender .screen-main {
-    width: min(100% - 56px,1100px);
-  }
-
-  .page-kalender .opportunity-grid {
-    grid-template-columns: repeat(3,minmax(0,1fr));
-  }
-
-  .page-kalender .calendar-screen {
-    display: grid;
-    grid-template-columns: minmax(340px,43%) 1fr;
-    align-items: start;
-  }
-
-  .page-kalender .calendar-panel {
-    min-height: calc(100vh - 94px);
-  }
-
-  .page-kalender .calendar-agenda {
-    width: min(100% - 50px,620px);
-    padding-top: 24px;
-  }
-
-  .page-kalender .calendar-agenda .opportunity-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width:380px) {
-  .page-kalender .screen-main {
-    width: calc(100% - 24px);
-  }
-
-  .page-kalender .card-badges {
-    gap: 5px;
-  }
-
-  .page-kalender .badge {
-    font-size: .69rem;
-    padding-inline: 7px;
-  }
-
-  .page-kalender .opportunity-card {
-    padding: 18px;
-  }
-
-  .page-kalender .calendar-grid button {
-    height: 44px;
-  }
-
-  .page-kalender .top-header {
-    gap: 6px;
-  }
-}
-
-.page-kalender .calendar-chips {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  padding: 12px 0 16px;
-  scrollbar-width: thin;
-  scroll-snap-type: x proximity;
-}
-
-.page-kalender .calendar-chip {
-  flex: none;
-  scroll-snap-align: start;
-  min-height: 42px;
-  padding: 5px 15px;
-  border: 2px solid transparent;
-  border-radius: 10px;
-  color: #fff;
-  font-size: .88rem;
-  font-weight: 700;
-  white-space: nowrap;
-  box-shadow: 0 4px 7px rgba(0,0,0,.13);
-}
-
-.page-kalender .calendar-chip.selected {
-  outline: 3px solid #0a689c;
-  outline-offset: 2px;
-}
-
-.page-kalender .chip-beasiswa {
-  background: #355647;
-}
-
-.page-kalender .chip-deadline {
-  background: #c71920;
-}
-
-.page-kalender .chip-bootcamp {
-  background: #7d299f;
-}
-
-.page-kalender .chip-semua {
-  background: #111;
-}
-
-.page-kalender .chip-disimpan {
-  background: #215cb4;
-}
-
-.page-kalender .chip-magang {
-  background: #a54c0c;
-}
-
-.page-kalender .chip-rekomendasi {
-  background: #006da7;
-}
-
-.page-kalender .chip-studi-independen {
-  background: #0284c7;
-}
-
-.page-kalender .chip-workshop {
-  background: #b45309;
-}
-
-.page-kalender .chip-seminar-webinar {
-  background: #4f46e5;
-}
-
-.page-kalender .chip-kompetisi {
-  background: #be123c;
-}
-
-.page-kalender .calendar-day-dots {
-  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 3px;
-  min-height: 10px;
+  padding: 8px 4px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--teks-redup);
+  transition: background-color 180ms ease, color 180ms ease;
 }
 
-.page-kalender .calendar-day-dots i {
-  display: block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-}
-
-.page-kalender .dot-beasiswa {
-  background: #355647;
-}
-
-.page-kalender .dot-magang {
-  background: #f06430;
-}
-
-.page-kalender .dot-bootcamp {
-  background: #d463ee;
-}
-
-.page-kalender .dot-studi-independen {
-  background: #0284c7;
-}
-
-.page-kalender .dot-workshop {
-  background: #b45309;
-}
-
-.page-kalender .dot-seminar-webinar {
-  background: #4f46e5;
-}
-
-.page-kalender .dot-kompetisi {
-  background: #be123c;
-}
-
-.page-kalender .calendar-day-dots {
-  position: absolute;
-  bottom: 4px;
-  left: 0;
-  right: 0;
-}
-
-.page-kalender .calendar-grid button .calendar-day-dots {
-  color: inherit;
-  font-size: inherit;
-}
-
-.page-kalender .calendar-disclaimer {
-  margin: 10px 4px 0;
-  color: var(--muted);
-  font-size: .86rem;
-}
-
-:root[data-theme=dark] .page-kalender {
-  --page: #0c1823;
-  --surface: #162735;
-  --ink: #f5f8fa;
-  --muted: #b9c7d1;
-  --soft: #172936;
-  --line: #344958;
-  --blue: #087da8;
-  --deep: #8ed8f6;
-  --shadow: 0 16px 28px rgba(0,0,0,.28);
-}
-
-:root[data-theme=dark] .page-kalender {
-  background: var(--page);
-  color: var(--ink);
-}
-
-:root[data-theme=dark] .page-kalender .top-header,
-:root[data-theme=dark] .page-kalender .main-nav {
-  background: var(--surface);
-  color: var(--ink);
-  border-color: var(--line);
-}
-
-:root[data-theme=dark] .page-kalender .calendar-panel {
-  background: var(--soft);
-  color: var(--ink);
-}
-
-:root[data-theme=dark] .page-kalender .calendar-grid button,
-:root[data-theme=dark] .page-kalender .calendar-heading,
-:root[data-theme=dark] .page-kalender .weekday-row {
-  color: var(--ink);
-}
-
-:root[data-theme=dark] .page-kalender .calendar-grid button.selected {
-  background: #a9def4;
-  color: #0b2030;
-}
-
-:root[data-theme=dark] .page-kalender .detail-pill {
-  background: var(--surface);
-  color: var(--ink);
-  border-color: var(--line);
-}
-
-:root[data-theme=dark] .page-kalender .demo-note {
-  background: #19435a;
-  color: #b8e7fb;
-}
-
-:root[data-theme=dark] .page-kalender .opportunity-card {
-  background: #125776;
-}
-
-:root[data-theme=dark] .page-kalender .main-nav a.active {
-  background: #194b67;
-  color: #d8f3ff;
-}
-
-:root[data-theme=dark] .page-kalender .main-nav img {
-  filter: brightness(0) invert(1);
-}
-
-:root[data-theme=dark] .page-kalender .calendar-chip.selected {
-  outline-color: #d6f2ff;
-}
-
-@media (min-width:700px) {
-  .page-kalender .calendar-chips {
-    gap: 12px;
+@media (hover: hover) {
+  .page-kalender .nav-item:not(.aktif):hover,
+  .page-kalender .main-nav a:not(.active):hover {
+    background: #F2F4F7;
   }
 }
 
-.page-kalender {
-  --blue: #00a5e0;
-  --deep: #0065a3;
-  --ink: #1d242b;
-  --muted: #68737d;
-  --soft: #f4f7f9;
-  --line: #e5e7eb;
-  --page: #fff;
-  --surface: #fff;
-  --shadow: 0 12px 28px rgba(29, 36, 43, .12);
-  --gradient: linear-gradient(105deg, #00a5e0, #0065a3);
-}
-
-.page-kalender {
-  background: var(--page);
-  color: var(--ink);
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-
-.page-kalender button,
-.page-kalender input,
-.page-kalender select {
-  font: inherit;
-}
-
-.page-kalender button,
-.page-kalender a,
-.page-kalender input,
-.page-kalender select {
-  -webkit-tap-highlight-color: transparent;
-}
-
-.page-kalender button:disabled {
-  cursor: not-allowed;
-}
-
-.page-kalender :focus-visible {
-  outline: 3px solid var(--deep);
-  outline-offset: 3px;
-}
-
-.page-kalender .screen-main {
-  width: min(100% - 40px, 1100px);
-}
-
-.page-kalender .demo-note {
-  background: #e7f5fc;
-  color: #075d85;
-}
-
-.page-kalender .app-content {
-  padding-bottom: calc(100px + env(safe-area-inset-bottom));
-}
-
-.page-kalender .top-header {
-  min-height: 104px;
-  padding: 20px max(20px, calc((100vw - 1100px)/2));
-  border-radius: 0 0 22px 22px;
-  background: var(--surface);
-  box-shadow: 0 5px 12px rgba(0,0,0,.14);
-}
-
-.page-kalender .top-header h1 {
-  font-weight: 800;
-}
-
-.page-kalender .main-nav {
-  bottom: calc(12px + env(safe-area-inset-bottom));
-  max-width: 700px;
-  padding: 9px;
-  border-radius: 28px;
-  background: var(--surface);
-  box-shadow: 0 14px 32px rgba(0,0,0,.15);
-}
-
-.page-kalender .main-nav a {
-  min-height: 62px;
-  color: #1d242b;
-  transition: background .16s ease, color .16s ease;
-}
-
-.page-kalender .main-nav a:hover {
-  background: #eef7fc;
-}
-
+.page-kalender .nav-item.aktif,
 .page-kalender .main-nav a.active {
-  background: #bbdefb;
-  color: #0067a6;
+  background: var(--biru-lembut);
+  color: var(--biru-teks);
 }
 
 .page-kalender .nav-icon {
   display: block;
   flex: none;
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   background: currentColor;
   -webkit-mask-position: center;
   mask-position: center;
@@ -868,323 +684,265 @@ html {
   mask-image: url("/asset/profile.svg");
 }
 
-.page-kalender .calendar-heading button {
-  color: var(--ink);
+/* ============================================================
+   RESPONSIVE BREAKPOINTS
+   ============================================================ */
+
+/* Tablet (>= 700px) */
+@media (min-width: 700px) {
+  .page-kalender .screen-main,
+  .page-kalender .kepala,
+  .page-kalender .top-header,
+  .page-kalender .kartu-kalender,
+  .page-kalender .chip-baris,
+  .page-kalender .calendar-chips,
+  .page-kalender .bagian-agenda,
+  .page-kalender .calendar-agenda {
+    width: min(100% - 48px, 1100px);
+    max-width: none;
+  }
+
+  .page-kalender .kartu-kalender,
+  .page-kalender .calendar-panel {
+    padding: 22px 28px;
+  }
+
+  .page-kalender .agenda-daftar-kartu,
+  .page-kalender .opportunity-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .page-kalender .nav-bawah,
+  .page-kalender .main-nav {
+    max-width: 500px;
+  }
 }
 
-.page-kalender .calendar-chips {
-  margin-inline: -1px;
-  padding-block: 10px 14px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 101, 155, 0.28) transparent;
-}
-
-.page-kalender .calendar-chips::-webkit-scrollbar {
-  height: 6px;
-}
-
-.page-kalender .calendar-chips::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.04);
-  border-radius: 999px;
-}
-
-.page-kalender .calendar-chips::-webkit-scrollbar-thumb {
-  background: rgba(0, 101, 155, 0.28);
-  border-radius: 999px;
-}
-
-.page-kalender .calendar-chips::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 101, 155, 0.55);
-}
-
-.page-kalender .calendar-chip {
-  min-height: 36px;
-  padding: 5px 13px;
-  border: 0;
-  border-radius: 9px;
-  box-shadow: none;
-}
-
-.page-kalender .calendar-chip.selected {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
-}
-
-.page-kalender .chip-beasiswa {
-  background: #374f41;
-}
-
-.page-kalender .chip-deadline {
-  background: #d71920;
-}
-
-.page-kalender .chip-bootcamp {
-  background: #d566eb;
-}
-
-.page-kalender .chip-semua {
-  background: #050505;
-}
-
-.page-kalender .chip-disimpan {
-  background: #2511c2;
-}
-
-.page-kalender .chip-magang {
-  background: #ff8e3f;
-}
-
-.page-kalender .chip-rekomendasi {
-  background: linear-gradient(135deg, #0284c7, #005689);
-  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.35);
-}
-
-.page-kalender .opportunity-grid {
-  gap: 20px;
-}
-
-.page-kalender .opportunity-card {
-  background: var(--blue);
-  border-radius: 30px;
-  box-shadow: none;
-}
-
-.page-kalender .opportunity-card {
-  min-height: 285px;
-  padding: 23px;
-}
-
-.page-kalender .card-badges {
-  gap: 7px;
-}
-
-.page-kalender .badge {
-  border-radius: 10px;
-  box-shadow: 0 5px 7px rgba(0,0,0,.21);
-}
-
-.page-kalender .badge-blue {
-  background: #0067a6;
-}
-
-.page-kalender .badge-beasiswa {
-  background: #374f41;
-}
-
-.page-kalender .badge-magang {
-  background: #ff8e3f;
-}
-
-.page-kalender .badge-bootcamp {
-  background: #d566eb;
-}
-
-.page-kalender .badge-time {
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  padding-inline: 0;
-}
-
-.page-kalender .badge-time-urgent {
-  background: #ff0105;
-  border: 2px solid #ff7a80;
-  padding: 1px 8px;
-  box-shadow: 0 5px 7px rgba(0,0,0,.21);
-}
-
-.page-kalender .opportunity-card h3 {
-  margin-block: 21px 8px;
-  font-weight: 800;
-}
-
-.page-kalender .card-org {
-  color: rgba(255,255,255,.85);
-}
-
-.page-kalender .card-summary {
-  margin: 14px 0 0;
-  color: rgba(255,255,255,.92);
-  font-size: .94rem;
-  line-height: 1.5;
-}
-
-.page-kalender .card-actions {
-  padding-top: 21px;
-}
-
-.page-kalender .heart-button {
-  font-weight: 400;
-}
-
-.page-kalender .detail-pill {
-  border-radius: 16px;
-  box-shadow: 0 5px 7px rgba(0,0,0,.23);
-}
-
-.page-kalender .detail-pill span {
-  background: #000;
-}
-
+/* Desktop (>= 1000px) */
 @media (min-width: 1000px) {
-  .page-kalender .opportunity-card .card-badges {
-    gap: 5px;
+  .page-kalender .app-shell {
+    display: grid;
+    grid-template-columns: 210px minmax(0, 1fr);
   }
 
-  .page-kalender .opportunity-card .badge {
-    padding-inline: 8px;
-    font-size: .72rem;
+  .page-kalender .app-content {
+    grid-column: 2;
+    grid-row: 1;
+    padding-bottom: 50px;
+  }
+
+  .page-kalender .nav-bawah,
+  .page-kalender .main-nav {
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    transform: none;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    height: 100vh;
+    max-width: none;
+    margin: 0;
+    padding: 32px 14px;
+    border-radius: 0;
+    border-right: 1px solid var(--garis);
+    box-shadow: none;
+    background: #fff;
+  }
+
+  .page-kalender .main-nav:before,
+  .page-kalender .nav-bawah:before {
+    content: "NAVIKA";
+    display: block;
+    padding: 10px 14px 34px;
+    color: var(--biru-aksi);
+    font-size: 1.5rem;
+    font-weight: 800;
+    font-family: var(--font);
+    letter-spacing: -0.5px;
+  }
+
+  .page-kalender .main-nav a,
+  .page-kalender .nav-item {
+    flex: none;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    font-size: 1rem;
+    border-radius: 16px;
+    min-height: 50px;
+  }
+
+  .page-kalender .main-nav a .nav-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .page-kalender .screen-main,
+  .page-kalender .kepala,
+  .page-kalender .top-header,
+  .page-kalender .kartu-kalender,
+  .page-kalender .bagian-agenda,
+  .page-kalender .calendar-agenda {
+    width: min(100% - 56px, 1100px);
+    margin: 20px auto 0;
+  }
+
+  .page-kalender .chip-baris,
+  .page-kalender .calendar-chips {
+    width: min(100% - 56px, 1100px);
+    margin: 20px auto 18px;
+    padding: 6px 6px;
+  }
+
+  .page-kalender .agenda-daftar-kartu,
+  .page-kalender .opportunity-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
   }
 }
 
-.page-kalender .no-agenda {
-  background: var(--soft);
-}
-
-.page-kalender .calendar-panel {
-  background: #ceced2;
-}
-
-.page-kalender .calendar-heading h2 {
-  font-weight: 800;
-}
-
-.page-kalender .calendar-grid button.selected {
-  color: #000;
-}
-
-.page-kalender .calendar-agenda {
-  padding-bottom: 30px;
-}
+/* ============================================================
+   DARK MODE
+   ============================================================ */
 
 :root[data-theme=dark] .page-kalender {
-  --page: #0c1216;
-  --surface: #1d242b;
-  --ink: #f8fafc;
-  --muted: #85929e;
-  --soft: #1d242b;
-  --line: #5a6269;
-  --blue: #00a5e0;
-  --deep: #3faae8;
-  --gradient: linear-gradient(105deg, #00a5e0, #0065a3);
+  --teks:        #F8FAFC;
+  --teks-redup:  #94A3B8;
+  --garis:       #334155;
+  --garis-hari:  #334155;
+  --biru-kartu:  #1E3A5F;
+  --hitam:       #F8FAFC;
+  background:    #0F172A;
+  color:         var(--teks);
 }
 
+:root[data-theme=dark] .page-kalender .app-shell {
+  background: #0F172A;
+}
+
+:root[data-theme=dark] .page-kalender .kepala,
 :root[data-theme=dark] .page-kalender .top-header,
+:root[data-theme=dark] .page-kalender .kartu-kalender,
+:root[data-theme=dark] .page-kalender .calendar-panel,
+:root[data-theme=dark] .page-kalender .nav-bawah,
 :root[data-theme=dark] .page-kalender .main-nav {
-  background: var(--surface);
-  color: var(--ink);
-  border-color: var(--line);
+  background: #1E293B;
+  color: var(--teks);
+  box-shadow: 0 4px 16px rgba(0,0,0,.3);
 }
 
-:root[data-theme=dark] .page-kalender .calendar-panel {
-  background: var(--soft);
-  color: var(--ink);
+:root[data-theme=dark] .page-kalender .ikon-tombol,
+:root[data-theme=dark] .page-kalender .icon-link,
+:root[data-theme=dark] .page-kalender .ikon-bulan {
+  color: var(--teks);
 }
 
+:root[data-theme=dark] .page-kalender .ikon-tombol:hover,
+:root[data-theme=dark] .page-kalender .icon-link:hover,
+:root[data-theme=dark] .page-kalender .ikon-bulan:hover {
+  background: #334155;
+}
+
+:root[data-theme=dark] .page-kalender .sel-hari {
+  color: var(--teks);
+}
+
+:root[data-theme=dark] .page-kalender .sel-hari.redup,
+:root[data-theme=dark] .page-kalender .sel-hari.muted {
+  color: #64748B;
+}
+
+:root[data-theme=dark] .page-kalender .sel-hari:hover {
+  background: #334155;
+}
+
+:root[data-theme=dark] .page-kalender .kartu-agenda,
+:root[data-theme=dark] .page-kalender .kartu-peluang,
 :root[data-theme=dark] .page-kalender .opportunity-card {
-  background: #1a4960;
-}
-
-:root[data-theme=dark] .page-kalender .main-nav {
-  background: #1d242b;
-}
-
-:root[data-theme=dark] .page-kalender .main-nav a {
-  color: #85929e;
-}
-
-:root[data-theme=dark] .page-kalender .main-nav a:hover {
-  background: #26353d;
-}
-
-:root[data-theme=dark] .page-kalender .main-nav a.active {
-  background: #123140;
-  color: #3faae8;
+  background: #1E3A5F;
 }
 
 :root[data-theme=dark] .page-kalender .chip-beasiswa,
+:root[data-theme=dark] .page-kalender .kat-beasiswa,
 :root[data-theme=dark] .page-kalender .badge-beasiswa {
   background: #1f8d5d;
 }
 
+:root[data-theme=dark] .page-kalender .chip-aktif,
+:root[data-theme=dark] .page-kalender .chip.terpilih,
+:root[data-theme=dark] .page-kalender .chip.selected,
+:root[data-theme=dark] .page-kalender .calendar-chip.terpilih,
 :root[data-theme=dark] .page-kalender .calendar-chip.selected {
-  outline-color: #fff;
+  box-shadow: 0 0 0 2px #1E293B, 0 0 0 4px #38BDF8;
 }
 
-:root[data-theme=dark] .page-kalender .calendar-heading,
-:root[data-theme=dark] .page-kalender .weekday-row,
-:root[data-theme=dark] .page-kalender .calendar-grid button {
-  color: var(--ink);
-}
-
-:root[data-theme=dark] .page-kalender .calendar-grid button.selected {
-  color: #111;
-}
-
+:root[data-theme=dark] .page-kalender .tombol-detail,
 :root[data-theme=dark] .page-kalender .detail-pill {
-  color: #111;
-  background: #fff;
+  background: #F8FAFC;
+  color: #090909;
 }
 
-@media (min-width: 1000px) {
-  .page-kalender .main-nav {
-    bottom: auto;
-    border-radius: 0;
-    box-shadow: none;
-    border-right: 1px solid var(--line);
-  }
-
-  .page-kalender .main-nav:before {
-    color: var(--deep);
-  }
-
-  .page-kalender .app-content {
-    padding-bottom: 48px;
-  }
-
-  .page-kalender .top-header {
-    padding-inline: max(28px, calc((100vw - 210px - 1100px)/2));
-  }
-
-  .page-kalender .calendar-panel {
-    min-height: calc(100vh - 104px);
-  }
+:root[data-theme=dark] .page-kalender .main-nav:before,
+:root[data-theme=dark] .page-kalender .nav-bawah:before {
+  color: #38BDF8;
 }
 
-@media (max-width: 699px) {
-  .page-kalender .top-header {
-    gap: 8px;
-  }
-
-  .page-kalender .opportunity-card {
-    min-height: 280px;
-  }
+:root[data-theme=dark] .page-kalender .main-nav a.active,
+:root[data-theme=dark] .page-kalender .nav-item.aktif {
+  background: #0369A1;
+  color: #F0F9FF;
 }
 
-@media (max-width: 380px) {
-  .page-kalender .screen-main {
-    width: calc(100% - 28px);
+:root[data-theme=dark] .page-kalender .demo-note {
+  background: #19435a;
+  color: #b8e7fb;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .page-kalender .kartu-agenda,
+  .page-kalender .kartu-peluang,
+  .page-kalender .opportunity-card,
+  .page-kalender .tombol-detail,
+  .page-kalender .detail-pill,
+  .page-kalender .tombol-detail svg,
+  .page-kalender .detail-pill svg,
+  .page-kalender .simpan,
+  .page-kalender .heart-button,
+  .page-kalender .simpan svg,
+  .page-kalender .heart-button svg,
+  .page-kalender .ikon-tombol,
+  .page-kalender .icon-link,
+  .page-kalender .ikon-bulan,
+  .page-kalender .main-nav a,
+  .page-kalender .nav-item,
+  .page-kalender .chip,
+  .page-kalender .calendar-chip,
+  .page-kalender .chip span,
+  .page-kalender .calendar-chip span,
+  .page-kalender .sel-hari {
+    transition: none;
   }
 
-  .page-kalender .top-header {
-    padding-inline: 14px;
-  }
-
-  .page-kalender .card-badges {
-    gap: 5px;
-  }
-
-  .page-kalender .badge {
-    padding-inline: 6px;
-    font-size: .67rem;
-  }
-
-  .page-kalender .badge-time {
-    margin-left: auto;
-  }
-
-  .page-kalender .main-nav {
-    left: 8px;
-    right: 8px;
+  .page-kalender .kartu-agenda:hover,
+  .page-kalender .kartu-peluang:hover,
+  .page-kalender .opportunity-card:hover,
+  .page-kalender .tombol-detail:hover svg,
+  .page-kalender .detail-pill:hover svg,
+  .page-kalender .simpan:hover svg,
+  .page-kalender .heart-button:hover svg {
+    transform: none;
   }
 }

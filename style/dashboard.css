@@ -201,9 +201,9 @@ svg { display: block; }
 /* Chip filter */
 .chip-baris {
   display: flex;
-  gap: 7px;
-  margin: 12px 0 0;
-  padding: 3px 1px;
+  gap: 11px;
+  margin: 12px 0 16px;
+  padding: 6px 6px;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
@@ -215,13 +215,9 @@ svg { display: block; }
 
 .chip {
   flex: none;
-  display: block;
-  padding: 4px 0;
-}
-
-.chip span {
-  display: inline-block;
-  padding: 7px 13px;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
@@ -231,15 +227,38 @@ svg { display: block; }
   transition: filter 180ms ease;
 }
 
+.chip span {
+  display: inline;
+  padding: 0;
+  border-radius: inherit;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+}
+
+.chip-beasiswa,
 .chip-beasiswa span  { background: var(--hijau); }
+.chip-deadline,
 .chip-deadline span  { background: var(--merah); }
+.chip-bootcamp,
 .chip-bootcamp span  { background: var(--pink); }
+.chip-semua,
 .chip-semua span     { background: var(--hitam-pekat); }
+.chip-ekstra,
 .chip-ekstra span    { background: var(--ungu); }
+.chip-magang,
 .chip-magang span    { background: var(--oranye); color: #fff; }
+.chip-rekomendasi,
 .chip-rekomendasi span { background: var(--abu); color: #fff; }
 
+.chip-aktif,
+.chip.terpilih,
+.chip.selected {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--biru-aksi);
+}
+
 @media (hover: hover) {
+  .chip:hover,
   .chip:hover span { filter: brightness(.93); }
 
   .hari:hover {
@@ -615,6 +634,7 @@ svg { display: block; }
   .ikon-tombol,
   .ikon-bulan,
   .nav-item,
+  .chip,
   .chip span,
   .hari,
   .lihat-semua { transition: none; }

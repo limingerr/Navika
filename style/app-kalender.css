@@ -7,9 +7,9 @@
 
 .page-kalender {
   --biru-utama:   #00A6E0;
-  --biru-kartu:   #5AA4D8;
+  --biru-kartu:   #05a5d9;
   --biru-aksi:    #0067A6;  /* putih 6,0:1 */
-  --biru-aktif:   #5AA4D8;  /* teks putih 2,7:1 */
+  --biru-aktif:   #05a5d9;  /* teks putih 2,7:1 */
   --biru-teks:    #2F5F94;  /* 4,75:1 di atas --biru-lembut */
   --biru-lembut:  #C7DDF8;
   --biru-muda:    #EAF5FC;
@@ -29,7 +29,7 @@
   --garis-hari:   #E5E7EB;
   --biru-hover:   #00527F;  /* 8,4:1 di atas putih */
 
-  --radius-kartu: 24px;
+  --radius-kartu: 28px;
   --radius-sel:   12px;
   --font: "Poppins", "Segoe UI", system-ui, -apple-system, sans-serif;
 
@@ -291,16 +291,16 @@
   display: block;
 }
 
-.page-kalender .titik-hijau,  .page-kalender .dot-beasiswa { background: var(--hijau); }
-.page-kalender .titik-merah,  .page-kalender .dot-deadline { background: var(--merah); }
-.page-kalender .titik-pink,   .page-kalender .dot-bootcamp { background: var(--pink); }
-.page-kalender .titik-oranye, .page-kalender .dot-magang { background: var(--oranye); }
-.page-kalender .titik-ungu,   .page-kalender .dot-disimpan { background: var(--ungu); }
-.page-kalender .titik-hitam,  .page-kalender .dot-umum { background: var(--hitam-pekat); }
-.page-kalender .dot-studi-independen { background: #0284c7; }
-.page-kalender .dot-workshop { background: #b45309; }
-.page-kalender .dot-seminar-webinar { background: #4f46e5; }
-.page-kalender .dot-kompetisi { background: #be123c; }
+.page-kalender .titik-hijau,  .page-kalender .titik-beasiswa, .page-kalender .dot-beasiswa { background: var(--hijau); }
+.page-kalender .titik-merah,  .page-kalender .titik-deadline, .page-kalender .dot-deadline { background: var(--merah); }
+.page-kalender .titik-pink,   .page-kalender .titik-bootcamp, .page-kalender .dot-bootcamp { background: var(--pink); }
+.page-kalender .titik-oranye, .page-kalender .titik-magang, .page-kalender .dot-magang { background: var(--oranye); }
+.page-kalender .titik-ungu,   .page-kalender .titik-disimpan, .page-kalender .dot-disimpan { background: var(--ungu); }
+.page-kalender .titik-hitam,  .page-kalender .titik-umum, .page-kalender .dot-umum { background: var(--hitam-pekat); }
+.page-kalender .titik-studi-independen, .page-kalender .dot-studi-independen { background: #0284c7; }
+.page-kalender .titik-workshop, .page-kalender .dot-workshop { background: #b45309; }
+.page-kalender .titik-seminar-webinar, .page-kalender .dot-seminar-webinar { background: #4f46e5; }
+.page-kalender .titik-kompetisi, .page-kalender .dot-kompetisi { background: #be123c; }
 
 /* Terpilih: titik putih */
 .page-kalender .sel-hari.terpilih .titik,

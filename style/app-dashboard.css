@@ -7,9 +7,9 @@
 
 .page-dashboard {
   --biru-utama:  #00A6E0;
-  --biru-kartu:  #5AA4D8;
+  --biru-kartu:  #05a5d9;
   --biru-aksi:   #0067A6;
-  --biru-aktif:  #5AA4D8;
+  --biru-aktif:  #05a5d9;
   --biru-teks:   #2F5F94;
   --biru-lembut: #C7DDF8;
   --biru-muda:   #EAF5FC;
@@ -29,7 +29,7 @@
   --garis-hari:  #E5E7EB;
   --biru-hover:  #00527F;
 
-  --radius-kartu: 24px;
+  --radius-kartu: 28px;
   --radius-sel:   12px;
   --font: "Poppins", "Segoe UI", system-ui, -apple-system, sans-serif;
 
@@ -412,20 +412,30 @@
 }
 
 .page-dashboard .titik-hijau,
-.page-dashboard .dot-beasiswa { background: #374f41; }
+.page-dashboard .titik-beasiswa,
+.page-dashboard .dot-beasiswa { background: #228F51; }
 .page-dashboard .titik-merah,
+.page-dashboard .titik-deadline,
 .page-dashboard .dot-deadline { background: #d71920; }
 .page-dashboard .titik-pink,
-.page-dashboard .dot-bootcamp { background: #d566eb; }
+.page-dashboard .titik-bootcamp,
+.page-dashboard .dot-bootcamp { background: #D17AEF; }
 .page-dashboard .titik-oranye,
-.page-dashboard .dot-magang { background: #ff8e3f; }
+.page-dashboard .titik-magang,
+.page-dashboard .dot-magang { background: #FF8A3D; }
 .page-dashboard .titik-ungu,
+.page-dashboard .titik-disimpan,
 .page-dashboard .dot-disimpan { background: #2511c2; }
 .page-dashboard .titik-hitam,
+.page-dashboard .titik-umum,
 .page-dashboard .dot-umum { background: #080808; }
+.page-dashboard .titik-studi-independen,
 .page-dashboard .dot-studi-independen { background: #0284c7; }
+.page-dashboard .titik-workshop,
 .page-dashboard .dot-workshop { background: #b45309; }
+.page-dashboard .titik-seminar-webinar,
 .page-dashboard .dot-seminar-webinar { background: #4f46e5; }
+.page-dashboard .titik-kompetisi,
 .page-dashboard .dot-kompetisi { background: #be123c; }
 
 @media (hover: hover) {
@@ -486,8 +496,10 @@
 
 .page-dashboard .agenda-baris .titik {
   flex: none;
-  width: 8px;
-  height: 8px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.95), 0 2px 4px rgba(0, 0, 0, 0.18);
 }
 
 .page-dashboard .agenda-teks {

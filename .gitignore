@@ -2,3 +2,9 @@ node_modules/
 .next/
 out/
 .env*.local
+.vscode/
+.md/
+error*.png
+Screenshot*.png
+.agents/skills/*
+!.agents/skills/antislop*

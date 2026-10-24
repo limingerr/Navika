@@ -1,18 +1,28 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
 import { resolveTheme, translate } from "@/script/i18n";
-import { calendarFilters } from "@/script/opportunities";
-export const demoProfile = {
-    name: "Pengguna Demo",
-    email: "demo@navika.local",
+import { calendarFilters, opportunities as initialOpportunities } from "@/script/opportunities";
+export const defaultProfile = {
+    name: "Mahasiswa",
+    email: "mahasiswa@navika.id",
     university: "",
     major: "",
     semester: "",
     gpa: "",
     interest: "",
 };
+export const demoProfile = defaultProfile;
+
+export function isAdminIdentifier(identifier) {
+    if (!identifier) return false;
+    const clean = identifier.trim().toLowerCase();
+    return clean === "admin" || clean === "adm-navika" || clean.startsWith("adm-") || clean === "admin@navika.id" || clean.startsWith("admin@");
+}
 const AppContext = createContext(null);
 const storageKey = "navika-demo-v1";
+const oppsStorageKey = "navika-opportunities-custom-v1";
+const adminStorageKey = "navika-admin-session-v1";
+
 export function AppProvider({ children }) {
     const [profile, setProfile] = useState(demoProfile);
     const [saved, setSaved] = useState(["djarum", "vinix7", "kip-kuliah"]);
@@ -20,6 +30,8 @@ export function AppProvider({ children }) {
     const [theme, setTheme] = useState("light");
     const [deadlineAlerts, setDeadlineAlerts] = useState(true);
     const [calendarFilter, setCalendarFilter] = useState("Semua");
+    const [opportunities, setOpportunities] = useState(initialOpportunities);
+    const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
     const [ready, setReady] = useState(false);
     useEffect(() => {
         try {
@@ -39,6 +51,17 @@ export function AppProvider({ children }) {
                 if (calendarFilters.includes(parsed.calendarFilter))
                     setCalendarFilter(parsed.calendarFilter);
             }
+            const oppRaw = localStorage.getItem(oppsStorageKey);
+            if (oppRaw) {
+                const parsedOpps = JSON.parse(oppRaw);
+                if (Array.isArray(parsedOpps) && parsedOpps.length > 0) {
+                    setOpportunities(parsedOpps);
+                }
+            }
+            const adminRaw = localStorage.getItem(adminStorageKey);
+            if (adminRaw === "true") {
+                setIsAdminLoggedIn(true);
+            }
         }
         catch {
             // Data demo yang rusak tidak boleh menghalangi aplikasi dibuka.
@@ -55,6 +78,89 @@ export function AppProvider({ children }) {
             // Penyimpanan browser mungkin nonaktif; sesi saat ini tetap berjalan.
         }
     }, [profile, saved, locale, theme, deadlineAlerts, calendarFilter, ready]);
+
+    const saveOpportunitiesState = (updatedList) => {
+        setOpportunities(updatedList);
+        try {
+            localStorage.setItem(oppsStorageKey, JSON.stringify(updatedList));
+        } catch {}
+    };
+
+    const addOpportunity = (newOpp) => {
+        const id = newOpp.id || ("opp-" + Date.now());
+        const itemWithDefaults = {
+            id,
+            status: "Terbit",
+            requirementsEn: [],
+            benefitsEn: [],
+            summaryEn: newOpp.summary || "",
+            ...newOpp,
+            requirements: Array.isArray(newOpp.requirements) ? newOpp.requirements : [],
+            benefits: Array.isArray(newOpp.benefits) ? newOpp.benefits : [],
+        };
+        const updated = [itemWithDefaults, ...opportunities];
+        saveOpportunitiesState(updated);
+        return itemWithDefaults;
+    };
+
+    const updateOpportunity = (id, fields) => {
+        const updated = opportunities.map((item) => {
+            if (item.id === id) {
+                return { ...item, ...fields };
+            }
+            return item;
+        });
+        saveOpportunitiesState(updated);
+    };
+
+    const deleteOpportunity = (id) => {
+        const updated = opportunities.filter((item) => item.id !== id);
+        saveOpportunitiesState(updated);
+    };
+
+    const resetOpportunities = () => {
+        setOpportunities(initialOpportunities);
+        try {
+            localStorage.removeItem(oppsStorageKey);
+        } catch {}
+    };
+
+    const loginAdmin = (email, password) => {
+        setIsAdminLoggedIn(true);
+        try {
+            localStorage.setItem(adminStorageKey, "true");
+        } catch {}
+        return true;
+    };
+
+    const login = (identifier, password) => {
+        if (isAdminIdentifier(identifier)) {
+            setIsAdminLoggedIn(true);
+            try {
+                localStorage.setItem(adminStorageKey, "true");
+            } catch {}
+            return { role: "admin" };
+        } else {
+            const studentEmail = identifier.trim();
+            const formattedName = profile.name === "Mahasiswa" || profile.name === "Pengguna Demo"
+                ? (studentEmail.includes("@") ? studentEmail.split("@")[0].replace(/[._-]/g, " ") : studentEmail)
+                : profile.name;
+            const updated = {
+                ...profile,
+                email: studentEmail.includes("@") ? studentEmail : `${studentEmail}@mahasiswa.id`,
+                name: formattedName.charAt(0).toUpperCase() + formattedName.slice(1)
+            };
+            setProfile(updated);
+            return { role: "mahasiswa" };
+        }
+    };
+
+    const logoutAdmin = () => {
+        setIsAdminLoggedIn(false);
+        try {
+            localStorage.removeItem(adminStorageKey);
+        } catch {}
+    };
     useEffect(() => {
         document.documentElement.lang = locale;
         document.title = locale === "en" ? "NAVIKA — Find Your Opportunity" : "NAVIKA — Temukan peluangmu";
@@ -81,7 +187,31 @@ export function AppProvider({ children }) {
         }
         catch { }
     };
-    return (<AppContext.Provider value={{ ready, profile, updateProfile: setProfile, saved, toggleSaved, locale, setLocale, theme, setTheme, deadlineAlerts, setDeadlineAlerts, calendarFilter, setCalendarFilter, clearDemo }}>
+    return (<AppContext.Provider value={{
+      ready,
+      profile,
+      updateProfile: setProfile,
+      saved,
+      toggleSaved,
+      locale,
+      setLocale,
+      theme,
+      setTheme,
+      deadlineAlerts,
+      setDeadlineAlerts,
+      calendarFilter,
+      setCalendarFilter,
+      clearDemo,
+      opportunities,
+      addOpportunity,
+      updateOpportunity,
+      deleteOpportunity,
+      resetOpportunities,
+      isAdminLoggedIn,
+      login,
+      loginAdmin,
+      logoutAdmin,
+    }}>
       {children}
     </AppContext.Provider>);
 }

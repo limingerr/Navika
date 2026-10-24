@@ -4,8 +4,6 @@ out/
 .env*.local
 .vscode/
 .md/
-error*.png
-Screenshot*.png
-2*.png
+/*.png
 .agents/skills/*
 !.agents/skills/antislop*

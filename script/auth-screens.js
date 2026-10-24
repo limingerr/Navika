@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useApp, useTr } from "@/script/app-provider";
 import { Brand, DemoNote } from "@/script/ui";
+import { isSupabaseConfigured, signUpUser } from "@/script/supabase-service";
 function AuthHero({ kind }) {
     const tr = useTr();
     return <div className="auth-hero"><img src={`/asset/asset-ilustrasi-${kind === "login" ? "masuk" : "daftar"}.png`} alt={kind === "login" ? tr("Ilustrasi mahasiswa menggunakan laptop", "Illustration of a student using a laptop") : tr("Ilustrasi mahasiswa membawa buku", "Illustration of a student carrying books")}/></div>;
@@ -19,21 +20,25 @@ export function LoginScreen() {
     const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         if (!identifier.trim() || !password.trim()) {
             setError(tr("Silakan isi email/ID dan kata sandi.", "Please enter your email/ID and password."));
             return;
         }
-        const result = login(identifier, password);
+        const result = await login(identifier, password);
+        if (result?.error) {
+            setError(result.error);
+            return;
+        }
         setPassword("");
-        if (result.role === "admin") {
+        if (result?.role === "admin") {
             router.push("/admin");
         } else {
             router.push("/dashboard");
         }
     };
-    return <main className="auth-page page-width"><Brand /><div className="auth-layout"><div><AuthHero kind="login"/><div className="auth-intro"><h1>{tr("Temukan peluang yang sesuai untukmu", "Find opportunities that suit you")}</h1><p>{tr("Masuk untuk melanjutkan ke akun NAVIKA.", "Sign in to continue to your NAVIKA account.")}</p><DemoNote /></div></div><form className="auth-form" onSubmit={handleSubmit}><label htmlFor="identifier">{tr("Email Mahasiswa atau ID Admin", "Student Email or Admin ID")}</label><input id="identifier" type="text" placeholder={tr("nama@email.com atau ID Admin", "name@email.com or Admin ID")} value={identifier} onChange={(e) => { setIdentifier(e.target.value); setError(""); }} autoComplete="username" required/><label htmlFor="password">{tr("Kata Sandi", "Password")}</label><input id="password" type="password" placeholder={tr("Masukkan kata sandi", "Enter password")} value={password} onChange={(e) => { setPassword(e.target.value); setError(""); }} autoComplete="current-password" required/>{error && <p className="form-error" role="alert">{error}</p>}<p className="form-hint">{tr("Pengelola dapat masuk menggunakan ID Admin (misal: ADM-NAVIKA atau admin@navika.id).", "Staff can log in using Admin ID (e.g. ADM-NAVIKA or admin@navika.id).")}</p><button className="primary-button" type="submit">{tr("Masuk", "Sign In")}</button><p className="auth-switch">{tr("Belum punya akun?", "No account yet?")} <Link href="/daftar">{tr("Daftar", "Sign Up")}</Link></p></form></div></main>;
+    return <main className="auth-page page-width"><Brand /><div className="auth-layout"><div><AuthHero kind="login"/><div className="auth-intro"><h1>{tr("Temukan peluang yang sesuai untukmu", "Find opportunities that suit you")}</h1><p>{tr("Masuk untuk melanjutkan ke akun NAVIKA.", "Sign in to continue to your NAVIKA account.")}</p><DemoNote /></div></div><form className="auth-form" onSubmit={handleSubmit}><label htmlFor="identifier">{tr("Email", "Email")}</label><input id="identifier" type="text" placeholder="nama@email.com" value={identifier} onChange={(e) => { setIdentifier(e.target.value); setError(""); }} autoComplete="username" required/><label htmlFor="password">{tr("Kata Sandi", "Password")}</label><input id="password" type="password" placeholder={tr("Masukkan kata sandi", "Enter password")} value={password} onChange={(e) => { setPassword(e.target.value); setError(""); }} autoComplete="current-password" required/>{error && <p className="form-error" role="alert">{error}</p>}<button className="primary-button" type="submit">{tr("Masuk", "Sign In")}</button><p className="auth-switch">{tr("Belum punya akun?", "No account yet?")} <Link href="/daftar">{tr("Daftar", "Sign Up")}</Link></p></form></div></main>;
 }
 export function RegisterScreen() {
     const router = useRouter();
@@ -44,11 +49,18 @@ export function RegisterScreen() {
     const [password, setPassword] = useState("");
     const [confirm, setConfirm] = useState("");
     const [error, setError] = useState("");
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         if (password !== confirm) {
             setError(tr("Konfirmasi kata sandi tidak sama.", "The password confirmation does not match."));
             return;
+        }
+        if (isSupabaseConfigured()) {
+            const res = await signUpUser(name, email, password);
+            if (!res.success) {
+                setError(res.error || "Pendaftaran gagal. Silakan periksa kembali data Anda.");
+                return;
+            }
         }
         updateProfile({ ...profile, name: name.trim(), email });
         setPassword("");

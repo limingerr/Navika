@@ -2,6 +2,18 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { resolveTheme, translate } from "@/script/i18n";
 import { calendarFilters, opportunities as initialOpportunities } from "@/script/opportunities";
+import {
+    isSupabaseConfigured,
+    signInUser,
+    signOutUser,
+    fetchUserProfile,
+    saveUserProfile,
+    fetchOpportunitiesFromDb,
+    fetchSavedOpportunityIds,
+    toggleBookmarkInDb,
+    adminSaveOpportunityToDb,
+    adminArchiveOpportunityInDb
+} from "@/script/supabase-service";
 export const defaultProfile = {
     name: "Mahasiswa",
     email: "mahasiswa@navika.id",
@@ -13,10 +25,24 @@ export const defaultProfile = {
 };
 export const demoProfile = defaultProfile;
 
+export const SECRET_ADMIN_TOKEN = "NAV-SEC-9842-X7";
+
 export function isAdminIdentifier(identifier) {
     if (!identifier) return false;
     const clean = identifier.trim().toLowerCase();
-    return clean === "admin" || clean === "adm-navika" || clean.startsWith("adm-") || clean === "admin@navika.id" || clean.startsWith("admin@");
+    const envToken = (process.env.NEXT_PUBLIC_ADMIN_TOKEN || SECRET_ADMIN_TOKEN).trim().toLowerCase();
+    return clean === envToken || clean === "admin@navika.id" || clean === "adm-navika";
+}
+
+export function verifyAdminCredentials(identifier, password) {
+    if (!identifier || !password) return false;
+    const cleanId = identifier.trim().toLowerCase();
+    const envToken = (process.env.NEXT_PUBLIC_ADMIN_TOKEN || SECRET_ADMIN_TOKEN).trim().toLowerCase();
+    const envPass = (process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "NavikaAdmin2026!").trim();
+    if (cleanId === envToken) {
+        return password.trim() === envPass;
+    }
+    return false;
 }
 const AppContext = createContext(null);
 const storageKey = "navika-demo-v1";
@@ -62,6 +88,25 @@ export function AppProvider({ children }) {
             if (adminRaw === "true") {
                 setIsAdminLoggedIn(true);
             }
+
+            // Jika Supabase terkonfigurasi, sinkronkan data langsung dari database
+            if (isSupabaseConfigured()) {
+                fetchOpportunitiesFromDb().then((dbOpps) => {
+                    if (dbOpps && dbOpps.length > 0) {
+                        setOpportunities(dbOpps);
+                    }
+                }).catch(() => {});
+
+                fetchUserProfile().then((p) => {
+                    if (p) setProfile((prev) => ({ ...prev, ...p }));
+                }).catch(() => {});
+
+                fetchSavedOpportunityIds().then((savedIds) => {
+                    if (savedIds && savedIds.length > 0) {
+                        setSaved(savedIds);
+                    }
+                }).catch(() => {});
+            }
         }
         catch {
             // Data demo yang rusak tidak boleh menghalangi aplikasi dibuka.
@@ -100,22 +145,33 @@ export function AppProvider({ children }) {
         };
         const updated = [itemWithDefaults, ...opportunities];
         saveOpportunitiesState(updated);
+        if (isSupabaseConfigured()) {
+            adminSaveOpportunityToDb(itemWithDefaults).catch(() => {});
+        }
         return itemWithDefaults;
     };
 
     const updateOpportunity = (id, fields) => {
+        let updatedOpp = null;
         const updated = opportunities.map((item) => {
             if (item.id === id) {
-                return { ...item, ...fields };
+                updatedOpp = { ...item, ...fields };
+                return updatedOpp;
             }
             return item;
         });
         saveOpportunitiesState(updated);
+        if (isSupabaseConfigured() && updatedOpp) {
+            adminSaveOpportunityToDb(updatedOpp).catch(() => {});
+        }
     };
 
     const deleteOpportunity = (id) => {
         const updated = opportunities.filter((item) => item.id !== id);
         saveOpportunitiesState(updated);
+        if (isSupabaseConfigured()) {
+            adminArchiveOpportunityInDb(id).catch(() => {});
+        }
     };
 
     const resetOpportunities = () => {
@@ -133,8 +189,26 @@ export function AppProvider({ children }) {
         return true;
     };
 
-    const login = (identifier, password) => {
-        if (isAdminIdentifier(identifier)) {
+    const login = async (identifier, password) => {
+        if (isSupabaseConfigured()) {
+            const res = await signInUser(identifier, password);
+            if (!res.success) {
+                return { error: res.error || "Email/ID atau kata sandi tidak valid." };
+            }
+            if (res.role === "admin") {
+                setIsAdminLoggedIn(true);
+                try { localStorage.setItem(adminStorageKey, "true"); } catch {}
+                return { role: "admin" };
+            } else {
+                setIsAdminLoggedIn(false);
+                const p = await fetchUserProfile();
+                if (p) setProfile((prev) => ({ ...prev, ...p }));
+                return { role: "mahasiswa" };
+            }
+        }
+
+        // Mode fallback lokal
+        if (verifyAdminCredentials(identifier, password) || isAdminIdentifier(identifier)) {
             setIsAdminLoggedIn(true);
             try {
                 localStorage.setItem(adminStorageKey, "true");
@@ -160,6 +234,9 @@ export function AppProvider({ children }) {
         try {
             localStorage.removeItem(adminStorageKey);
         } catch {}
+        if (isSupabaseConfigured()) {
+            signOutUser().catch(() => {});
+        }
     };
     useEffect(() => {
         document.documentElement.lang = locale;
@@ -173,7 +250,17 @@ export function AppProvider({ children }) {
         return () => media.removeEventListener("change", apply);
     }, [theme]);
     const toggleSaved = (id) => {
-        setSaved((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+        const isCurrentlySaved = saved.includes(id);
+        setSaved((current) => isCurrentlySaved ? current.filter((item) => item !== id) : [...current, id]);
+        if (isSupabaseConfigured()) {
+            toggleBookmarkInDb(id, isCurrentlySaved).catch(() => {});
+        }
+    };
+    const updateProfile = (newProfile) => {
+        setProfile(newProfile);
+        if (isSupabaseConfigured()) {
+            saveUserProfile(newProfile).catch(() => {});
+        }
     };
     const clearDemo = () => {
         setProfile(demoProfile);
@@ -190,7 +277,7 @@ export function AppProvider({ children }) {
     return (<AppContext.Provider value={{
       ready,
       profile,
-      updateProfile: setProfile,
+      updateProfile,
       saved,
       toggleSaved,
       locale,

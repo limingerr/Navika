@@ -28,8 +28,7 @@ export function Brand() {
     return <Link className="brand" href="/" aria-label={tr("NAVIKA, halaman awal", "NAVIKA, home page")}><img src="/asset/Logo%20Navika.png" alt=""/><strong>NAVIKA</strong></Link>;
 }
 export function DemoNote() {
-    const tr = useTr();
-    return <p className="demo-note">{tr("Mode demo · Data dan tanggal peluang hanya contoh", "Demo mode · Opportunity data and dates are examples")}</p>;
+    return null;
 }
 export function MainNav() {
     const pathname = usePathname();
@@ -67,5 +66,5 @@ export function OpportunityList({ items, displayCategory }) {
 export function DeadlineLabel({ opportunity }) {
     const { locale } = useApp();
     const tr = useTr();
-    return <><strong>{tr("Deadline demo:", "Demo deadline:")}</strong> {formatDate(demoDeadline(opportunity.demoDays), locale)}</>;
+    return <><strong>{tr("Batas pendaftaran:", "Application deadline:")}</strong> {formatDate(demoDeadline(opportunity.demoDays), locale)}</>;
 }

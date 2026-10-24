@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useApp, useTr } from "@/script/app-provider";
 import { AppShell, DeadlineLabel, DemoNote, Icon, OpportunityCard, OpportunityList } from "@/script/ui";
-import { calendarFilterLabel, calendarFilters, categories, categoryLabel, demoDeadline, demoReminders, fieldLabel, filterCalendarOpportunities, formatDate, hasCategory, isOpportunityRecommended, opportunities } from "@/script/opportunities";
+import { calendarFilterLabel, calendarFilters, categories, categoryLabel, demoDeadline, demoReminders, fieldLabel, filterCalendarOpportunities, formatDate, hasCategory, isOpportunityRecommended, opportunities as staticOpportunities } from "@/script/opportunities";
 const AGENDA_DATA = {
     "2026-09-08": [
         { warna: "hijau", judul: "Djarum Beasiswa Plus", jenis: "Buka pendaftaran", id: "djarum", kategori: "Beasiswa" }
@@ -87,12 +87,13 @@ function formatKey(date) {
     return `${y}-${m}-${d}`;
 }
 
-function getDayAgenda(date, filter = "Semua", saved = [], profile = null) {
+function getDayAgenda(date, filter = "Semua", saved = [], profile = null, oppList = staticOpportunities) {
     const key = formatKey(date);
     const staticItems = AGENDA_DATA[key] || [];
 
     // Sertakan juga batas pendaftaran dari data peluang
-    const oppEvents = opportunities
+    const oppEvents = oppList
+        .filter((item) => item.status !== "Ditutup" && item.status !== "Diarsipkan")
         .filter((item) => sameDay(demoDeadline(item.demoDays), date))
         .map((item) => {
             const catClass = item.category.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-");
@@ -122,7 +123,7 @@ function getDayAgenda(date, filter = "Semua", saved = [], profile = null) {
     if (filter === "Rekomendasi") {
         return allItems.filter(it => {
             if (!it.id) return false;
-            const opp = opportunities.find(o => o.id === it.id);
+            const opp = oppList.find(o => o.id === it.id);
             return opp ? isOpportunityRecommended(opp, profile?.major) : false;
         });
     }
@@ -130,8 +131,8 @@ function getDayAgenda(date, filter = "Semua", saved = [], profile = null) {
     return allItems.filter(it => it.kategori === filter || it.warna === normFilter);
 }
 
-function getDayDots(date, filter = "Semua", saved = [], profile = null) {
-    const items = getDayAgenda(date, filter, saved, profile);
+function getDayDots(date, filter = "Semua", saved = [], profile = null, oppList = staticOpportunities) {
+    const items = getDayAgenda(date, filter, saved, profile, oppList);
     const seen = new Set();
     const dots = [];
     for (const it of items) {
@@ -173,12 +174,12 @@ function CategoryTabs({ selected, onSelect }) {
     return <div className="category-tabs" role="group" aria-label={tr("Kategori peluang", "Opportunity categories")}>{categories.map((item) => <button key={item} type="button" className={selected === item ? "selected" : ""} aria-pressed={selected === item} onClick={() => onSelect(item)}>{categoryLabel(item, locale)}</button>)}</div>;
 }
 export function DashboardScreen() {
-    const { profile, saved, locale, calendarFilter, setCalendarFilter, deadlineAlerts } = useApp();
+    const { profile, saved, locale, calendarFilter, setCalendarFilter, deadlineAlerts, opportunities = staticOpportunities } = useApp();
     const tr = useTr();
     const [viewMonth, setViewMonth] = useState(new Date(2026, 9, 1));
     const [selected, setSelected] = useState(new Date(2026, 9, 13));
     const reminders = deadlineAlerts ? demoReminders(saved) : [];
-    const displayName = profile.name === "Pengguna Demo" ? tr("Pengguna Demo", "Demo User") : profile.name.split(" ")[0];
+    const displayName = profile.name === "Pengguna Demo" || profile.name === "Mahasiswa" || !profile.name ? tr("Mahasiswa", "Student") : profile.name.split(" ")[0];
 
     const currentYear = viewMonth.getFullYear();
     const currentMonth = viewMonth.getMonth();
@@ -196,13 +197,14 @@ export function DashboardScreen() {
     const monthTitle = new Intl.DateTimeFormat(locale === "en" ? "en-US" : "id-ID", { month: "long", year: "numeric" }).format(viewMonth);
     const dayNames = locale === "en" ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] : ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
-    const currentAgenda = getDayAgenda(selected, calendarFilter, saved, profile);
+    const currentAgenda = getDayAgenda(selected, calendarFilter, saved, profile, opportunities);
 
     const recommendedList = useMemo(() => {
-        const matches = opportunities.filter((item) => isOpportunityRecommended(item, profile.major));
-        const others = opportunities.filter((item) => !matches.includes(item));
+        const active = opportunities.filter((item) => item.status !== "Ditutup" && item.status !== "Diarsipkan");
+        const matches = active.filter((item) => isOpportunityRecommended(item, profile.major));
+        const others = active.filter((item) => !matches.includes(item));
         return [...matches, ...others].slice(0, 8);
-    }, [profile.major]);
+    }, [opportunities, profile.major]);
 
     return <AppShell>
     <header className="kepala top-header dashboard-header">
@@ -259,7 +261,7 @@ export function DashboardScreen() {
           {monthDays.map((day) => {
             const isFirst = day.getDate() === 1;
             const isSelected = sameDay(day, selected);
-            const dots = getDayDots(day, calendarFilter, saved, profile);
+            const dots = getDayDots(day, calendarFilter, saved, profile, opportunities);
             return (
               <li key={day.getTime()} className={isFirst ? "awal-bulan" : ""}>
                 <button
@@ -287,7 +289,7 @@ export function DashboardScreen() {
             <ul className="agenda-daftar">
               {currentAgenda.map((item, idx) => (
                 <li key={idx} className="agenda-baris">
-                  <span className={`titik titik-${item.warna}`} aria-hidden="true" />
+                  <span className={`titik titik-${item.warna} dot-${item.warna}`} aria-hidden="true" />
                   <div className="agenda-teks">
                     <span className="agenda-judul">
                       {item.id ? <Link href={`/peluang/${item.id}`}>{item.judul}</Link> : item.judul}
@@ -323,7 +325,7 @@ export function DashboardScreen() {
   </AppShell>;
 }
 export function CatalogScreen() {
-    const { locale, profile } = useApp();
+    const { locale, profile, opportunities = staticOpportunities } = useApp();
     const tr = useTr();
     const [query, setQuery] = useState("");
     const [category, setCategory] = useState("Semua");
@@ -331,21 +333,23 @@ export function CatalogScreen() {
     const [showFilters, setShowFilters] = useState(false);
     const fields = ["Semua bidang", ...Array.from(new Set(opportunities.map((item) => item.field)))];
     const filtered = useMemo(() => {
-        const list = opportunities.filter((item) => {
-            const text = `${item.title} ${item.organization} ${item.summary} ${item.summaryEn}`.toLocaleLowerCase();
-            return (category === "Semua" || hasCategory(item, category)) && (field === "Semua bidang" || item.field === field) && text.includes(query.trim().toLocaleLowerCase());
-        });
+        const list = opportunities
+            .filter((item) => item.status !== "Ditutup" && item.status !== "Diarsipkan")
+            .filter((item) => {
+                const text = `${item.title} ${item.organization} ${item.summary} ${item.summaryEn}`.toLocaleLowerCase();
+                return (category === "Semua" || hasCategory(item, category)) && (field === "Semua bidang" || item.field === field) && text.includes(query.trim().toLocaleLowerCase());
+            });
         return list.slice().sort((a, b) => {
             const aRec = isOpportunityRecommended(a, profile?.major) ? 1 : 0;
             const bRec = isOpportunityRecommended(b, profile?.major) ? 1 : 0;
             return bRec - aRec;
         });
-    }, [query, category, field, profile?.major]);
+    }, [opportunities, query, category, field, profile?.major]);
     const reset = () => { setQuery(""); setCategory("Semua"); setField("Semua bidang"); };
     return <AppShell><header className="top-header search-header"><Link href="/dashboard" className="back-link" aria-label={tr("Kembali ke dashboard", "Back to dashboard")}>←</Link><label className="search-box"><span className="sr-only">{tr("Cari peluang", "Search opportunities")}</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={tr("Cari beasiswa, magang...", "Search scholarships, internships...")}/><Icon name="search.svg"/></label><button type="button" className="icon-button" aria-label={tr("Tampilkan filter bidang", "Show field filter")} aria-expanded={showFilters} onClick={() => setShowFilters(!showFilters)}><Icon name="settings.jpg"/></button></header><main className="screen-main"><DemoNote /><div className="filter-row"><CategoryTabs selected={category} onSelect={setCategory}/></div>{showFilters && <div className="filter-panel"><label htmlFor="field-filter">{tr("Bidang", "Field")}</label><select id="field-filter" value={field} onChange={(event) => setField(event.target.value)}>{fields.map((item) => <option key={item} value={item}>{item === "Semua bidang" ? tr("Semua bidang", "All fields") : fieldLabel(item, locale)}</option>)}</select></div>}<p className="result-count">{filtered.length} {tr("peluang ditemukan", "opportunities found")}</p>{filtered.length ? <OpportunityList items={filtered} displayCategory={category === "Semua" ? undefined : category}/> : <div className="empty-state"><span aria-hidden="true">×</span><h1>{tr("Peluang Tidak Ditemukan", "No Opportunities Found")}</h1><p>{tr("Tidak ada peluang yang sesuai dengan kata kunci atau filter yang dipilih.", "No opportunities match your keyword or filters.")}</p><button type="button" className="primary-button" onClick={reset}>{tr("Hapus filter", "Clear Filters")}</button></div>}</main></AppShell>;
 }
 export function DetailScreen({ id }) {
-    const { saved, toggleSaved, locale, profile } = useApp();
+    const { saved, toggleSaved, locale, profile, opportunities = staticOpportunities } = useApp();
     const tr = useTr();
     const item = opportunities.find((opportunity) => opportunity.id === id);
     if (!item)
@@ -354,10 +358,10 @@ export function DetailScreen({ id }) {
     const handleSave = () => toggleSaved(id);
     const isRecommended = isOpportunityRecommended(item, profile?.major);
     const catClass = item.category.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-");
-    return <AppShell><main className="detail-screen screen-main"><div className="detail-top"><Link href="/peluang" className="text-back">← <span>{tr("Kembali", "Back")}</span></Link><button type="button" className="save-text" onClick={handleSave} aria-pressed={isSaved}><span aria-hidden="true">{isSaved ? "♥" : "♡"}</span>{isSaved ? tr("Tersimpan", "Saved") : tr("Simpan", "Save")}</button></div><DemoNote /><article><header className="detail-hero"><div className="card-badges">{isRecommended && <span className="badge badge-blue">✧ {tr("REKOMENDASI", "FEATURED")}</span>}<span className="badge badge-blue">{fieldLabel(item.field, locale).toUpperCase()}</span><span className={`badge badge-${catClass}`}>{categoryLabel(item.category, locale)}</span>{item.alsoCategories?.map((extra) => { const extraClass = extra.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-"); return <span key={extra} className={`badge badge-${extraClass}`}>{categoryLabel(extra, locale)}</span>; })}<span className={`badge badge-time ${item.demoDays <= 3 ? "badge-time-urgent" : ""}`}>◷ {item.demoDays} {tr("Hari", "Days")}</span></div><h1>{item.title}</h1><p className="card-org"><Icon name="enterprise.svg" size={22}/> {item.organization}</p><p><DeadlineLabel opportunity={item}/></p></header><section className="detail-body"><h2>{tr("DESKRIPSI", "DESCRIPTION")}</h2><p>{locale === "en" ? item.summaryEn : item.summary}</p>{item.referenceOnly && <p className="form-hint">{tr("Judul ini contoh katalog, bukan pembukaan yang telah terverifikasi. Periksa program dan jadwal terbaru pada situs penyelenggara.", "This title is a catalog example, not a verified opening. Check current programs and schedules on the provider site.")}</p>}{item.requirements.length > 0 && <><h3>{tr("Persyaratan utama", "Main Requirements")}</h3><ul>{(locale === "en" ? item.requirementsEn : item.requirements).map((requirement) => <li key={requirement}>{requirement}</li>)}</ul></>}{item.benefits && <><h3>{tr("Manfaat", "Benefits")}</h3><ul>{(locale === "en" ? item.benefitsEn : item.benefits)?.map((benefit) => <li key={benefit}>{benefit}</li>)}</ul></>}<p className="form-hint">{item.requirements.length > 0 ? tr("Syarat dan tanggal ini adalah contoh. Periksa informasi terkini pada situs penyelenggara.", "These requirements and dates are examples. Check current information on the provider's site.") : tr("Tanggal ini hanya contoh. Periksa jadwal terbaru pada situs penyelenggara.", "This date is only an example. Check the latest schedule on the provider's site.")}</p></section><div className="detail-sticky-cta"><a className="primary-button official-link" href={item.sourceUrl} target="_blank" rel="noopener noreferrer">{tr("Kunjungi Website Resmi", "Visit Official Website")} ↗</a></div></article></main></AppShell>;
+    return <AppShell><main className="detail-screen screen-main"><div className="detail-top"><Link href="/peluang" className="text-back">← <span>{tr("Kembali", "Back")}</span></Link><button type="button" className="save-text" onClick={handleSave} aria-pressed={isSaved}><span aria-hidden="true">{isSaved ? "♥" : "♡"}</span>{isSaved ? tr("Tersimpan", "Saved") : tr("Simpan", "Save")}</button></div><DemoNote /><article><header className="detail-hero"><div className="card-badges">{isRecommended && <span className="badge badge-blue">✧ {tr("REKOMENDASI", "FEATURED")}</span>}<span className="badge badge-blue">{fieldLabel(item.field, locale).toUpperCase()}</span><span className={`badge badge-${catClass}`}>{categoryLabel(item.category, locale)}</span>{item.alsoCategories?.map((extra) => { const extraClass = extra.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-"); return <span key={extra} className={`badge badge-${extraClass}`}>{categoryLabel(extra, locale)}</span>; })}<span className={`badge badge-time ${item.demoDays <= 3 ? "badge-time-urgent" : ""}`}>◷ {item.demoDays} {tr("Hari", "Days")}</span></div><h1>{item.title}</h1><p className="card-org"><Icon name="enterprise.svg" size={22}/> {item.organization}</p><p><DeadlineLabel opportunity={item}/></p></header><section className="detail-body"><h2>{tr("DESKRIPSI", "DESCRIPTION")}</h2><p>{locale === "en" ? item.summaryEn : item.summary}</p>{item.referenceOnly && <p className="form-hint">{tr("Periksa program dan jadwal pendaftaran terbaru pada situs resmi penyelenggara.", "Check current programs and schedules on the official provider site.")}</p>}{item.requirements.length > 0 && <><h3>{tr("Persyaratan utama", "Main Requirements")}</h3><ul>{(locale === "en" ? item.requirementsEn : item.requirements).map((requirement) => <li key={requirement}>{requirement}</li>)}</ul></>}{item.benefits && <><h3>{tr("Manfaat", "Benefits")}</h3><ul>{(locale === "en" ? item.benefitsEn : item.benefits)?.map((benefit) => <li key={benefit}>{benefit}</li>)}</ul></>}<p className="form-hint">{item.requirements.length > 0 ? tr("Syarat dan tanggal ini adalah contoh. Periksa informasi terkini pada situs penyelenggara.", "These requirements and dates are examples. Check current information on the provider's site.") : tr("Tanggal ini hanya contoh. Periksa jadwal terbaru pada situs penyelenggara.", "This date is only an example. Check the latest schedule on the provider's site.")}</p></section><div className="detail-sticky-cta"><a className="primary-button official-link" href={item.sourceUrl} target="_blank" rel="noopener noreferrer">{tr("Kunjungi Website Resmi", "Visit Official Website")} ↗</a></div></article></main></AppShell>;
 }
 export function SavedScreen() {
-    const { saved } = useApp();
+    const { saved, opportunities = staticOpportunities } = useApp();
     const tr = useTr();
     const [category, setCategory] = useState("Semua");
     const [query, setQuery] = useState("");
@@ -365,7 +369,7 @@ export function SavedScreen() {
     return <AppShell><header className="top-header title-header"><h1>{tr("Tersimpan", "Saved")}</h1><label className="saved-search"><span className="sr-only">{tr("Cari peluang tersimpan", "Search saved opportunities")}</span><Icon name="search.svg"/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={tr("Cari", "Search")}/></label></header><main className="screen-main"><DemoNote /><CategoryTabs selected={category} onSelect={setCategory}/>{items.length ? <div className="saved-grid">{items.map((item) => <OpportunityCard key={item.id} opportunity={item} displayCategory={category === "Semua" ? undefined : category}/>)}</div> : <div className="empty-state"><h2>{tr("Belum ada peluang tersimpan", "No Saved Opportunities")}</h2><p>{tr("Simpan peluang dari daftar untuk melihatnya di sini.", "Save an opportunity from the list to see it here.")}</p><Link className="primary-button" href="/peluang">{tr("Cari peluang", "Find Opportunities")}</Link></div>}</main></AppShell>;
 }
 export function CalendarScreen() {
-    const { saved, toggleSaved, locale, calendarFilter, setCalendarFilter, profile } = useApp();
+    const { saved, toggleSaved, locale, calendarFilter, setCalendarFilter, profile, opportunities = staticOpportunities } = useApp();
     const tr = useTr();
     const today = new Date();
     const [viewMonth, setViewMonth] = useState(new Date(2026, 9, 1));
@@ -412,7 +416,7 @@ export function CalendarScreen() {
         rows.push(row);
     }
 
-    const currentAgenda = getDayAgenda(selected, calendarFilter, saved, profile);
+    const currentAgenda = getDayAgenda(selected, calendarFilter, saved, profile, opportunities);
     const isToday = sameDay(selected, today);
 
     const agendaTitle = isToday
@@ -487,7 +491,7 @@ export function CalendarScreen() {
                             {rows.map((row, rIdx) => (
                                 <tr key={rIdx}>
                                     {row.map((cell) => {
-                                        const dots = getDayDots(cell.date, calendarFilter, saved, profile);
+                                        const dots = getDayDots(cell.date, calendarFilter, saved, profile, opportunities);
                                         const isSelected = sameDay(cell.date, selected);
                                         const isCellToday = sameDay(cell.date, today);
                                         return (

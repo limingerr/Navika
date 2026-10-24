@@ -10,8 +10,6 @@ export function Icon({ name, size = 24, alt = "" }) {
         return <ActionIcon name="sliders" size={size}/>;
     if (name === "kalender.jpg")
         return <ActionIcon name="calendar" size={size}/>;
-    if (name === "setting-gerigi.svg")
-        return <ActionIcon name="settings" size={size}/>;
     return <img src={`/asset/${name}`} width={size} height={size} alt={alt}/>;
 }
 export function ActionIcon({ name, size = 26 }) {

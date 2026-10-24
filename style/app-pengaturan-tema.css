@@ -170,18 +170,31 @@ html {
   gap: 12px;
   min-height: 48px;
   font-weight: 700;
+  text-decoration: none;
 }
 
-.page-pengaturan-tema .settings-back span {
-  display: grid;
-  place-items: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 15px;
+.page-pengaturan-tema .settings-back span,
+.page-pengaturan-tema .settings-back .settings-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
   background: #b9dffe;
   color: #00699d;
-  font-size: 2rem;
-  line-height: 1;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.page-pengaturan-tema .settings-back:hover span,
+.page-pengaturan-tema .settings-back:hover .settings-back-btn {
+  transform: translateX(-3px);
+  background: #a3d4fd;
+}
+
+.page-pengaturan-tema .settings-back svg {
+  display: block;
 }
 
 .page-pengaturan-tema .settings-heading {

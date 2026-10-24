@@ -237,7 +237,50 @@ html {
   margin-bottom: 16px;
 }
 
-.page-peluang-detail .text-back,
+.page-peluang-detail .text-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  border: 0;
+  background: transparent;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.page-peluang-detail .text-back .back-icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: #b9dffe;
+  color: #00699d;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.page-peluang-detail .text-back:hover .back-icon-box {
+  transform: translateX(-3px);
+  background: #a3d4fd;
+}
+
+.page-peluang-detail .text-back svg {
+  display: block;
+}
+
+:root[data-theme=dark] .page-peluang-detail .text-back .back-icon-box {
+  background: #1d5473;
+  color: #d8f3ff;
+}
+
+:root[data-theme=dark] .page-peluang-detail .text-back:hover .back-icon-box {
+  background: #25668c;
+}
+
 .page-peluang-detail .save-text {
   display: inline-flex;
   align-items: center;
@@ -247,15 +290,7 @@ html {
   background: transparent;
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--ink); /* <-- INI PERBAIKANNYA: Supaya tombol ikut mode gelap/terang */
-}
-
-.page-peluang-detail .text-back {
-  font-size: 1.6rem;
-}
-
-.page-peluang-detail .text-back span {
-  font-size: 1rem;
+  color: var(--ink);
 }
 
 .page-peluang-detail .save-text span {

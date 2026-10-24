@@ -93,18 +93,31 @@ html {
   gap: 12px;
   min-height: 48px;
   font-weight: 700;
+  text-decoration: none;
 }
 
-.page-pengaturan-bantuan .settings-back span {
-  display: grid;
-  place-items: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 15px;
+.page-pengaturan-bantuan .settings-back span,
+.page-pengaturan-bantuan .settings-back .settings-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
   background: #b9dffe;
   color: #00699d;
-  font-size: 2rem;
-  line-height: 1;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.page-pengaturan-bantuan .settings-back:hover span,
+.page-pengaturan-bantuan .settings-back:hover .settings-back-btn {
+  transform: translateX(-3px);
+  background: #a3d4fd;
+}
+
+.page-pengaturan-bantuan .settings-back svg {
+  display: block;
 }
 
 .page-pengaturan-bantuan .settings-heading {

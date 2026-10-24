@@ -332,10 +332,35 @@ html {
 }
 
 .page-peluang .back-link {
-  font-size: 2rem;
-  line-height: 1;
-  min-width: 38px;
-  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: #b9dffe;
+  color: #00699d;
+  flex-shrink: 0;
+  text-decoration: none;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.page-peluang .back-link:hover {
+  transform: translateX(-3px);
+  background: #a3d4fd;
+}
+
+.page-peluang .back-link svg {
+  display: block;
+}
+
+:root[data-theme=dark] .page-peluang .back-link {
+  background: #1d5473;
+  color: #d8f3ff;
+}
+
+:root[data-theme=dark] .page-peluang .back-link:hover {
+  background: #25668c;
 }
 
 .page-peluang .search-box {

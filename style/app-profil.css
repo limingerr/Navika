@@ -113,17 +113,16 @@ html {
 }
 
 .page-profil .outline-icon {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
   flex: none;
-  border-radius: 14px;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
-  color: #111827;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  transition: transform 0.2s ease, filter 0.2s ease;
   cursor: pointer;
 }
 
@@ -190,20 +189,14 @@ html {
 }
 
 .page-profil .outline-icon:hover {
-  background: #EAF5FC;
-  border-color: #0067A6;
-  color: #0067A6;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 103, 166, 0.15);
+  filter: brightness(0.96);
 }
 
-.page-profil .outline-icon svg {
+.page-profil .outline-icon img {
+  width: 40px;
+  height: 40px;
   display: block;
-  transition: transform 0.25s ease;
-}
-
-.page-profil .outline-icon:hover svg {
-  transform: rotate(30deg);
 }
 
 .page-profil .profile-hero {
@@ -643,16 +636,13 @@ html {
 }
 
 :root[data-theme=dark] .page-profil .outline-icon {
-  background: #1E293B;
-  border-color: #334155;
-  color: #F8FAFC;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
-:root[data-theme=dark] .page-profil .outline-icon:hover {
-  background: #27374D;
-  border-color: #00A6E0;
-  color: #00A6E0;
+:root[data-theme=dark] .page-profil .outline-icon img {
+  filter: invert(0.88) hue-rotate(180deg);
 }
 
 @media (min-width: 1000px) {

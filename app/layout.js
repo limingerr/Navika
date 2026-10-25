@@ -30,6 +30,16 @@ export default function RootLayout({ children }) {
                 appId: "${ONESIGNAL_APP_ID}",
                 allowLocalhostAsSecureOrigin: true,
               });
+
+              try {
+                if (OneSignal.Slidedown && OneSignal.Slidedown.promptPush) {
+                  await OneSignal.Slidedown.promptPush({ force: true });
+                } else if (OneSignal.Notifications && OneSignal.Notifications.requestPermission) {
+                  await OneSignal.Notifications.requestPermission();
+                }
+              } catch (e) {
+                console.warn("OneSignal auto-prompt notice:", e);
+              }
             });
           `}
         </Script>

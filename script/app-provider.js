@@ -25,6 +25,17 @@ export const defaultProfile = {
 };
 export const demoProfile = defaultProfile;
 
+export const adminProfile = {
+    name: "Pengelola Navika",
+    email: "admin@navika.id",
+    university: "Pusat Pengelola Navika",
+    major: "Pengelola Konten & Katalog",
+    semester: "Admin",
+    gpa: "4.00",
+    interest: "Katalog Peluang & Pemeliharaan",
+    role: "admin",
+};
+
 export const SECRET_ADMIN_TOKEN = "NAV-SEC-9842-X7";
 
 export function isAdminIdentifier(identifier) {
@@ -39,8 +50,13 @@ export function verifyAdminCredentials(identifier, password) {
     const cleanId = identifier.trim().toLowerCase();
     const envToken = (process.env.NEXT_PUBLIC_ADMIN_TOKEN || SECRET_ADMIN_TOKEN).trim().toLowerCase();
     const envPass = (process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "NavikaAdmin2026!").trim();
-    if (cleanId === envToken) {
-        return password.trim() === envPass;
+    const cleanPass = password.trim();
+
+    if (cleanId === envToken && cleanPass === envPass) {
+        return true;
+    }
+    if ((cleanId === "admin@navika.id" || cleanId === "adm-navika") && (cleanPass === "admin123" || cleanPass === envPass)) {
+        return true;
     }
     return false;
 }
@@ -87,6 +103,7 @@ export function AppProvider({ children }) {
             const adminRaw = localStorage.getItem(adminStorageKey);
             if (adminRaw === "true") {
                 setIsAdminLoggedIn(true);
+                setProfile(adminProfile);
             }
 
             // Jika Supabase terkonfigurasi, sinkronkan data langsung dari database
@@ -97,9 +114,11 @@ export function AppProvider({ children }) {
                     }
                 }).catch(() => {});
 
-                fetchUserProfile().then((p) => {
-                    if (p) setProfile((prev) => ({ ...prev, ...p }));
-                }).catch(() => {});
+                if (adminRaw !== "true") {
+                    fetchUserProfile().then((p) => {
+                        if (p) setProfile((prev) => ({ ...prev, ...p }));
+                    }).catch(() => {});
+                }
 
                 fetchSavedOpportunityIds().then((savedIds) => {
                     if (savedIds && savedIds.length > 0) {
@@ -181,12 +200,58 @@ export function AppProvider({ children }) {
         } catch {}
     };
 
-    const loginAdmin = (email, password) => {
-        setIsAdminLoggedIn(true);
-        try {
-            localStorage.setItem(adminStorageKey, "true");
-        } catch {}
-        return true;
+    const loginAdmin = async (identifier, password) => {
+        // Mode verifikasi kredensial token / ID lokal
+        if (verifyAdminCredentials(identifier, password)) {
+            setIsAdminLoggedIn(true);
+            try {
+                localStorage.setItem(adminStorageKey, "true");
+            } catch {}
+            setProfile(adminProfile);
+            try {
+                localStorage.setItem(storageKey, JSON.stringify({
+                    profile: adminProfile,
+                    saved: [],
+                    locale: locale || "id",
+                    theme: theme || "light",
+                    deadlineAlerts: true,
+                    calendarFilter: "Semua"
+                }));
+            } catch {}
+            return { success: true, role: "admin" };
+        }
+
+        // Mode verifikasi Supabase
+        if (isSupabaseConfigured()) {
+            const res = await signInUser(identifier, password);
+            if (res.success && res.role === "admin") {
+                setIsAdminLoggedIn(true);
+                try {
+                    localStorage.setItem(adminStorageKey, "true");
+                } catch {}
+                setProfile(adminProfile);
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify({
+                        profile: adminProfile,
+                        saved: [],
+                        locale: locale || "id",
+                        theme: theme || "light",
+                        deadlineAlerts: true,
+                        calendarFilter: "Semua"
+                    }));
+                } catch {}
+                return { success: true, role: "admin" };
+            }
+            return {
+                success: false,
+                error: res.error || "Email/token atau kata sandi pengelola tidak valid."
+            };
+        }
+
+        return {
+            success: false,
+            error: "Email/token atau kata sandi pengelola tidak valid."
+        };
     };
 
     const login = async (identifier, password) => {
@@ -198,6 +263,17 @@ export function AppProvider({ children }) {
             if (res.role === "admin") {
                 setIsAdminLoggedIn(true);
                 try { localStorage.setItem(adminStorageKey, "true"); } catch {}
+                setProfile(adminProfile);
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify({
+                        profile: adminProfile,
+                        saved: [],
+                        locale: locale || "id",
+                        theme: theme || "light",
+                        deadlineAlerts: true,
+                        calendarFilter: "Semua"
+                    }));
+                } catch {}
                 return { role: "admin" };
             } else {
                 setIsAdminLoggedIn(false);
@@ -209,27 +285,50 @@ export function AppProvider({ children }) {
         }
 
         // Mode fallback lokal
-        if (verifyAdminCredentials(identifier, password) || isAdminIdentifier(identifier)) {
+        if (verifyAdminCredentials(identifier, password)) {
             setIsAdminLoggedIn(true);
             try {
                 localStorage.setItem(adminStorageKey, "true");
             } catch {}
+            setProfile(adminProfile);
+            try {
+                localStorage.setItem(storageKey, JSON.stringify({
+                    profile: adminProfile,
+                    saved: [],
+                    locale: locale || "id",
+                    theme: theme || "light",
+                    deadlineAlerts: true,
+                    calendarFilter: "Semua"
+                }));
+            } catch {}
             return { role: "admin" };
+        } else if (isAdminIdentifier(identifier)) {
+            return { error: "Kata sandi admin tidak valid." };
         } else {
             setIsAdminLoggedIn(false);
             try {
                 localStorage.removeItem(adminStorageKey);
             } catch {}
             const studentEmail = identifier.trim();
-            const formattedName = profile.name === "Mahasiswa" || profile.name === "Pengguna Demo"
+            const formattedName = profile.name === "Mahasiswa" || profile.name === "Pengguna Demo" || profile.name === "Pengelola Navika"
                 ? (studentEmail.includes("@") ? studentEmail.split("@")[0].replace(/[._-]/g, " ") : studentEmail)
                 : profile.name;
             const updated = {
-                ...profile,
+                ...demoProfile,
                 email: studentEmail.includes("@") ? studentEmail : `${studentEmail}@mahasiswa.id`,
                 name: formattedName.charAt(0).toUpperCase() + formattedName.slice(1)
             };
             setProfile(updated);
+            try {
+                localStorage.setItem(storageKey, JSON.stringify({
+                    profile: updated,
+                    saved: saved || [],
+                    locale: locale || "id",
+                    theme: theme || "light",
+                    deadlineAlerts: true,
+                    calendarFilter: "Semua"
+                }));
+            } catch {}
             return { role: "mahasiswa" };
         }
     };
@@ -238,6 +337,17 @@ export function AppProvider({ children }) {
         setIsAdminLoggedIn(false);
         try {
             localStorage.removeItem(adminStorageKey);
+        } catch {}
+        setProfile(demoProfile);
+        try {
+            localStorage.setItem(storageKey, JSON.stringify({
+                profile: demoProfile,
+                saved: [],
+                locale: locale || "id",
+                theme: theme || "light",
+                deadlineAlerts: true,
+                calendarFilter: "Semua"
+            }));
         } catch {}
         if (isSupabaseConfigured()) {
             signOutUser().catch(() => {});

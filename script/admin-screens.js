@@ -102,7 +102,7 @@ export function AdminLayout({ children }) {
 
   const handleLogout = () => {
     logoutAdmin();
-    router.push("/dashboard");
+    router.push("/admin/login");
   };
 
   const getBreadcrumbs = () => {
@@ -933,13 +933,31 @@ export function AdminPeluangForm({ mode = "create", id = null }) {
 export function AdminLogin() {
   const router = useRouter();
   const { loginAdmin } = useApp();
-  const [email, setEmail] = useState("admin@navika.id");
-  const [password, setPassword] = useState("admin123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    loginAdmin(email, password);
-    router.push("/admin");
+    if (!email.trim() || !password.trim()) {
+      setError("Silakan masukkan email/token dan kata sandi pengelola.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    try {
+      const res = await loginAdmin(email, password);
+      if (res && res.success) {
+        router.push("/admin");
+      } else {
+        setError(res?.error || "Kredensial atau token pengelola tidak valid.");
+      }
+    } catch {
+      setError("Terjadi kendala autentikasi. Silakan periksa kredensial Anda.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -979,15 +997,18 @@ export function AdminLogin() {
 
           <form className="admin-auth-form" onSubmit={handleSubmit}>
             <div className="admin-form-group">
-              <label htmlFor="admin-email">Email Admin</label>
+              <label htmlFor="admin-email">Email atau Token Pengelola</label>
               <input
                 id="admin-email"
-                type="email"
+                type="text"
                 className="admin-input admin-input-lg"
-                placeholder="nama@navika.id"
+                placeholder="admin@navika.id atau Token Unik"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError("");
+                }}
+                autoComplete="username"
                 required
               />
             </div>
@@ -1000,15 +1021,24 @@ export function AdminLogin() {
                 className="admin-input admin-input-lg"
                 placeholder="Kata sandi admin"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError("");
+                }}
                 autoComplete="current-password"
                 required
               />
               <p className="form-hint">Kredensial pengelola: ID ADM-NAVIKA atau admin@navika.id / sandi admin123</p>
             </div>
 
-            <button type="submit" className="admin-btn admin-btn-auth-primary">
-              Masuk ke Dashboard Admin &rarr;
+            {error && (
+              <div className="admin-form-error" role="alert">
+                {error}
+              </div>
+            )}
+
+            <button type="submit" className="admin-btn admin-btn-auth-primary" disabled={loading}>
+              {loading ? "Memverifikasi..." : "Masuk ke Dashboard Admin →"}
             </button>
 
             <div className="admin-auth-links">

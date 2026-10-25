@@ -928,6 +928,19 @@ body {
   margin: 0 0 24px;
 }
 
+.admin-form-error {
+  color: #DC2626;
+  background-color: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  margin: 0 0 16px;
+  text-align: left;
+  line-height: 1.45;
+}
+
 .admin-input-lg {
   height: 54px;
   border-radius: 14px;

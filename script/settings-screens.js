@@ -16,8 +16,12 @@ export function SettingsScreen() {
     const router = useRouter();
     const { profile, locale, theme, clearDemo, isAdminLoggedIn } = useApp();
     const tr = useTr();
-    const displayName = profile.name === "Pengguna Demo" || !profile.name ? tr("Mahasiswa", "Student") : profile.name;
-    const initials = (profile.name || "M").split(" ").filter(Boolean).slice(0, 3).map((word) => word[0].toUpperCase()).join("");
+    const displayName = isAdminLoggedIn
+        ? tr("Pengelola Navika", "Navika Administrator")
+        : (profile.name === "Pengguna Demo" || !profile.name ? tr("Mahasiswa", "Student") : profile.name);
+    const initials = isAdminLoggedIn
+        ? "AD"
+        : (profile.name || "M").split(" ").filter(Boolean).slice(0, 3).map((word) => word[0].toUpperCase()).join("");
     const handleLogout = () => {
         if (!window.confirm(tr("Apakah Anda yakin ingin keluar dari akun?", "Are you sure you want to sign out?")))
             return;
@@ -30,7 +34,7 @@ export function SettingsScreen() {
             <div className="settings-avatar">{initials}</div>
             <div>
                 <strong>{displayName}</strong>
-                <span>{tr("Akun Mahasiswa Aktif", "Active Student Account")}</span>
+                <span>{isAdminLoggedIn ? tr("Akun Pengelola (Admin)", "Administrator Account") : tr("Akun Mahasiswa Aktif", "Active Student Account")}</span>
             </div>
         </div>
         <div className="settings-list">

@@ -106,6 +106,13 @@ Dikembangkan menggunakan **Next.js 16 App Router**, **React 19**, **JavaScript E
      npm.cmd run start
      ```
 
+### Login dengan Google
+
+- Isi `NEXT_PUBLIC_SUPABASE_URL` dan `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` di `.env.local` untuk pengembangan dan di environment Production Vercel untuk situs utama. Jangan commit `.env.local`.
+- Di Google Cloud, buat OAuth client web dengan origin `https://navika-pi.vercel.app` dan `http://localhost:3000`, serta redirect URI `https://rlmdzuzajibfnurkrwgj.supabase.co/auth/v1/callback`. Masukkan Client ID dan Client Secret ke pengaturan provider Google di Supabase, lalu aktifkan provider tersebut. Simpan Client Secret hanya di dashboard.
+- Di Supabase Auth URL Configuration, gunakan Site URL `https://navika-pi.vercel.app` dan izinkan `https://navika-pi.vercel.app/auth/callback`. Tambahkan `http://localhost:3000/auth/callback` untuk pengembangan lokal.
+- Setelah konfigurasi selesai, buka `/masuk` atau `/daftar` dan gunakan tombol Google. Kedua tombol membuat atau memakai akun Supabase yang sama. Kegagalan login kembali ke `/masuk`; `/dev/auth/status` hanya tersedia dalam mode development.
+
 ---
 
 ## 📁 Struktur Direktori Proyek

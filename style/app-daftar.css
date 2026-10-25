@@ -446,3 +446,40 @@ html {
     transition: none;
   }
 }
+
+.page-daftar .google-auth-divider {
+  margin: 18px 0 12px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.page-daftar .google-auth-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 54px;
+  padding: 12px 20px;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  background: var(--surface, #fff);
+  color: var(--ink);
+  font-weight: 700;
+  text-align: center;
+  transition: border-color .16s ease;
+}
+
+:root:not([data-theme=dark]) .page-daftar .google-auth-link {
+  box-shadow: 0 8px 21px rgba(13, 33, 53, .12);
+}
+
+.page-daftar .google-auth-link:hover {
+  border-color: var(--deep);
+}
+
+.page-daftar .google-auth-link img {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}

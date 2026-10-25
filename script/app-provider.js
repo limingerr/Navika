@@ -201,6 +201,7 @@ export function AppProvider({ children }) {
                 return { role: "admin" };
             } else {
                 setIsAdminLoggedIn(false);
+                try { localStorage.removeItem(adminStorageKey); } catch {}
                 const p = await fetchUserProfile();
                 if (p) setProfile((prev) => ({ ...prev, ...p }));
                 return { role: "mahasiswa" };
@@ -215,6 +216,10 @@ export function AppProvider({ children }) {
             } catch {}
             return { role: "admin" };
         } else {
+            setIsAdminLoggedIn(false);
+            try {
+                localStorage.removeItem(adminStorageKey);
+            } catch {}
             const studentEmail = identifier.trim();
             const formattedName = profile.name === "Mahasiswa" || profile.name === "Pengguna Demo"
                 ? (studentEmail.includes("@") ? studentEmail.split("@")[0].replace(/[._-]/g, " ") : studentEmail)
@@ -269,7 +274,9 @@ export function AppProvider({ children }) {
         setTheme("light");
         setDeadlineAlerts(true);
         setCalendarFilter("Semua");
+        setIsAdminLoggedIn(false);
         try {
+            localStorage.removeItem(adminStorageKey);
             localStorage.setItem(storageKey, JSON.stringify({ profile: demoProfile, saved: [], locale: "id", theme: "light", deadlineAlerts: true, calendarFilter: "Semua" }));
         }
         catch { }

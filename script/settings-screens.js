@@ -14,7 +14,7 @@ function SettingsRow({ href, icon, title, detail, danger = false }) {
 }
 export function SettingsScreen() {
     const router = useRouter();
-    const { profile, locale, theme, clearDemo } = useApp();
+    const { profile, locale, theme, clearDemo, isAdminLoggedIn } = useApp();
     const tr = useTr();
     const displayName = profile.name === "Pengguna Demo" || !profile.name ? tr("Mahasiswa", "Student") : profile.name;
     const initials = (profile.name || "M").split(" ").filter(Boolean).slice(0, 3).map((word) => word[0].toUpperCase()).join("");
@@ -41,7 +41,9 @@ export function SettingsScreen() {
             <SettingsRow href="/pengaturan/tema" icon="tema-profile.svg" title={tr("Tema", "Theme")} detail={{ light: tr("Terang", "Light"), dark: tr("Gelap", "Dark"), system: tr("Ikut Sistem", "Follow System") }[theme]} />
             <SettingsRow href="/pengaturan/bantuan" icon="bantuandukungan-profile.svg" title={tr("Bantuan & Dukungan", "Help & Support")} detail={tr("Pertanyaan umum dan panduan", "Frequently asked questions")} />
             <SettingsRow href="/pengaturan/tentang" icon="tentangaplikasi-profile.svg" title={tr("Tentang Aplikasi", "About the App")} detail={tr("Informasi NAVIKA", "About NAVIKA")} />
-            <SettingsRow href="/admin" icon="setting-gerigi.svg" title={tr("Panel Admin", "Admin Panel")} detail={tr("Kelola katalog peluang & pemeliharaan data", "Manage opportunity catalog & data")} />
+            {isAdminLoggedIn && (
+                <SettingsRow href="/admin" icon="setting-gerigi.svg" title={tr("Panel Admin", "Admin Panel")} detail={tr("Kelola katalog peluang & pemeliharaan data", "Manage opportunity catalog & data")} />
+            )}
             <button type="button" className="settings-row danger" onClick={handleLogout}>
                 <span className="settings-icon"><Icon name="keluar-profile.svg" /></span>
                 <span className="settings-row-copy">
@@ -79,7 +81,25 @@ function NotificationsScreen() {
     const { deadlineAlerts, setDeadlineAlerts, saved, locale } = useApp();
     const tr = useTr();
     const reminders = demoReminders(saved);
-    return <SettingsLayout title={tr("Notifikasi", "Notifications")} subtitle={tr("Atur pengingat peluang di aplikasi.", "Manage in-app opportunity reminders.")}><DemoNote /><div className="settings-list"><label className="settings-row settings-choice"><span className="settings-icon"><Icon name="notif-profile.svg"/></span><span className="settings-row-copy"><strong>{tr("Deadline Terdekat", "Upcoming Deadlines")}</strong><small>{tr("Tampilkan pengingat mulai H-3", "Show reminders from three days before the deadline")}</small></span><input type="checkbox" role="switch" checked={deadlineAlerts} onChange={(event) => setDeadlineAlerts(event.target.checked)}/></label></div><h2 className="settings-section-label">{tr("PENGINGAT SAAT INI", "CURRENT REMINDERS")}</h2>{deadlineAlerts && reminders.length ? <ul className="reminder-list">{reminders.map((item) => <li key={item.id}><Link href={`/peluang/${item.id}`}>{item.title}</Link><span>{formatDate(demoDeadline(item.demoDays), locale)}</span></li>)}</ul> : <p className="settings-empty">{tr("Tidak ada pengingat aktif saat ini.", "There are no active reminders right now.")}</p>}<p className="settings-hint">{tr("Pengingat hanya tampil di aplikasi. NAVIKA belum mengirim email atau push.", "Reminders appear only in the app. NAVIKA does not send email or push notifications yet.")}</p></SettingsLayout>;
+
+    const handleToggleAlerts = (checked) => {
+        setDeadlineAlerts(checked);
+        if (checked && typeof window !== "undefined" && window.OneSignalDeferred) {
+            window.OneSignalDeferred.push(async function(OneSignal) {
+                try {
+                    if (OneSignal.Notifications && OneSignal.Notifications.requestPermission) {
+                        await OneSignal.Notifications.requestPermission();
+                    } else if (OneSignal.Slidedown && OneSignal.Slidedown.promptPush) {
+                        await OneSignal.Slidedown.promptPush();
+                    }
+                } catch (err) {
+                    console.warn("OneSignal permission request notice:", err);
+                }
+            });
+        }
+    };
+
+    return <SettingsLayout title={tr("Notifikasi", "Notifications")} subtitle={tr("Atur pengingat peluang di aplikasi.", "Manage in-app opportunity reminders.")}><DemoNote /><div className="settings-list"><label className="settings-row settings-choice"><span className="settings-icon"><Icon name="notif-profile.svg"/></span><span className="settings-row-copy"><strong>{tr("Deadline Terdekat & Web Push", "Upcoming Deadlines & Web Push")}</strong><small>{tr("Pengingat mulai H-3 via aplikasi & browser push", "Reminders starting H-3 via in-app & browser push")}</small></span><input type="checkbox" role="switch" checked={deadlineAlerts} onChange={(event) => handleToggleAlerts(event.target.checked)}/></label></div><h2 className="settings-section-label">{tr("PENGINGAT SAAT INI", "CURRENT REMINDERS")}</h2>{deadlineAlerts && reminders.length ? <ul className="reminder-list">{reminders.map((item) => <li key={item.id}><Link href={`/peluang/${item.id}`}>{item.title}</Link><span>{formatDate(demoDeadline(item.demoDays), locale)}</span></li>)}</ul> : <p className="settings-empty">{tr("Tidak ada pengingat aktif saat ini.", "There are no active reminders right now.")}</p>}<p className="settings-hint">{tr("Pengingat didukung oleh Web Push OneSignal untuk mengirim notifikasi ke peramban atau layar HP Anda.", "Reminders are supported by OneSignal Web Push to deliver notifications to your browser or mobile screen.")}</p></SettingsLayout>;
 }
 function PrivacyScreen() {
     const { profile, saved, locale, theme, deadlineAlerts, clearDemo } = useApp();

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useApp, useTr } from "@/script/app-provider";
@@ -84,8 +84,14 @@ function AdminIcon({ name, size = 18 }) {
 export function AdminLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { theme, setTheme, isAdminLoggedIn, logoutAdmin } = useApp();
+  const { theme, setTheme, isAdminLoggedIn, logoutAdmin, ready } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (ready && !isAdminLoggedIn && pathname !== "/admin/login") {
+      router.replace("/admin/login");
+    }
+  }, [ready, isAdminLoggedIn, pathname, router]);
 
   const navItems = [
     { href: "/admin", label: "Dashboard Overview", icon: "dashboard", exact: true },
@@ -119,6 +125,10 @@ export function AdminLayout({ children }) {
 
   if (pathname === "/admin/login") {
     return <div className="admin-shell">{children}</div>;
+  }
+
+  if (ready && !isAdminLoggedIn) {
+    return null;
   }
 
   return (

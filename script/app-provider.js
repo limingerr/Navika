@@ -36,26 +36,26 @@ export const adminProfile = {
     role: "admin",
 };
 
-export const SECRET_ADMIN_TOKEN = "NAV-SEC-9842-X7";
+export const SECRET_ADMIN_TOKEN = process.env.NEXT_PUBLIC_ADMIN_TOKEN || "";
 
 export function isAdminIdentifier(identifier) {
     if (!identifier) return false;
     const clean = identifier.trim().toLowerCase();
-    const envToken = (process.env.NEXT_PUBLIC_ADMIN_TOKEN || SECRET_ADMIN_TOKEN).trim().toLowerCase();
-    return clean === envToken || clean === "admin@navika.id" || clean === "adm-navika";
+    const envToken = SECRET_ADMIN_TOKEN.trim().toLowerCase();
+    return (envToken && clean === envToken) || clean === "admin@navika.id" || clean === "adm-navika";
 }
 
 export function verifyAdminCredentials(identifier, password) {
     if (!identifier || !password) return false;
     const cleanId = identifier.trim().toLowerCase();
-    const envToken = (process.env.NEXT_PUBLIC_ADMIN_TOKEN || SECRET_ADMIN_TOKEN).trim().toLowerCase();
-    const envPass = (process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "NavikaAdmin2026!").trim();
+    const envToken = SECRET_ADMIN_TOKEN.trim().toLowerCase();
+    const envPass = (process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "").trim();
     const cleanPass = password.trim();
 
-    if (cleanId === envToken && cleanPass === envPass) {
+    if (envToken && cleanId === envToken && envPass && cleanPass === envPass) {
         return true;
     }
-    if ((cleanId === "admin@navika.id" || cleanId === "adm-navika") && (cleanPass === "admin123" || cleanPass === envPass)) {
+    if ((cleanId === "admin@navika.id" || cleanId === "adm-navika") && cleanPass === "admin123") {
         return true;
     }
     return false;

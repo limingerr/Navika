@@ -6,7 +6,7 @@ export const metadata = {
     description: "Jelajahi peluang beasiswa, magang, dan bootcamp untuk mahasiswa.",
 };
 
-const ONESIGNAL_APP_ID = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID || "772b0572-55ce-4a28-aea9-a64695604c0e";
+const ONESIGNAL_APP_ID = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID || "";
 
 export default function RootLayout({ children }) {
     return (<html lang="id">

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { opportunities as staticOpportunities } from "@/script/opportunities";
 import { sendDeadlineReminderEmail } from "@/script/email-service";
+import { getNotificationRecipients } from "@/lib/supabase/admin";
 
 export async function GET(request) {
   try {
@@ -109,7 +110,6 @@ export async function GET(request) {
     let sentCount = 0;
     let emailSentCount = 0;
     const results = [];
-    const notificationEmail = process.env.NOTIFICATION_EMAIL_TO || "limingerr681@gmail.com";
 
     for (const opp of opportunitiesToNotify) {
       // 5a. Push Notification OneSignal
@@ -144,18 +144,31 @@ export async function GET(request) {
         results.push({ id: opp.id, pushError: e.message });
       }
 
-      // 5b. Email Notification Resend
-      if (process.env.RESEND_API_KEY && notificationEmail) {
+      // 5b. Email Notification Resend ke user Supabase (penerima bookmark atau seluruh user)
+      if (process.env.RESEND_API_KEY) {
         try {
-          const emailRes = await sendDeadlineReminderEmail({
-            to: notificationEmail,
-            opportunity: opp,
-            targetDate: dateStr,
-            siteUrl,
-          });
-          if (emailRes.success) emailSentCount++;
+          const recipientInfo = await getNotificationRecipients({ opportunityId: opp.id });
+          if (recipientInfo.emails.length > 0) {
+            const emailRes = await sendDeadlineReminderEmail({
+              to: recipientInfo.emails,
+              opportunity: opp,
+              targetDate: dateStr,
+              siteUrl,
+            });
+            if (emailRes.success) {
+              emailSentCount += emailRes.totalSent || 1;
+            }
+            results.push({
+              id: opp.id,
+              emailStatus: emailRes.success ? 200 : 500,
+              recipientsCount: recipientInfo.count,
+              recipientsSource: recipientInfo.source,
+              emailResult: emailRes,
+            });
+          }
         } catch (e) {
           console.warn("Gagal mengirim email pengingat:", e.message);
+          results.push({ id: opp.id, emailError: e.message });
         }
       }
     }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { sendNewOpportunityEmail } from "@/script/email-service";
+import { getNotificationRecipients } from "@/lib/supabase/admin";
 
 export async function POST(request) {
   try {
@@ -57,25 +58,29 @@ export async function POST(request) {
       }
     }
 
-    // 2. Kirim Email Notifikasi via Resend jika key tersedia
+    // 2. Ambil seluruh email pengguna terdaftar dari Supabase (atau fallback jika belum disetel)
     let emailResult = null;
-    const notificationEmail = process.env.NOTIFICATION_EMAIL_TO || "limingerr681@gmail.com";
+    let recipientInfo = { emails: [], source: "none", count: 0 };
 
-    if (process.env.RESEND_API_KEY && notificationEmail) {
-      try {
-        emailResult = await sendNewOpportunityEmail({
-          to: notificationEmail,
-          opportunity: {
-            id: opportunitySlug,
-            title: title.trim(),
-            organization: orgName,
-            category: categoryName,
-            field: field || "Semua Jurusan",
-          },
-          siteUrl,
-        });
-      } catch (err) {
-        console.warn("Gagal mengirim notifikasi email:", err.message);
+    if (process.env.RESEND_API_KEY) {
+      recipientInfo = await getNotificationRecipients();
+
+      if (recipientInfo.emails.length > 0) {
+        try {
+          emailResult = await sendNewOpportunityEmail({
+            to: recipientInfo.emails,
+            opportunity: {
+              id: opportunitySlug,
+              title: title.trim(),
+              organization: orgName,
+              category: categoryName,
+              field: field || "Semua Jurusan",
+            },
+            siteUrl,
+          });
+        } catch (err) {
+          console.warn("Gagal mengirim notifikasi email massal:", err.message);
+        }
       }
     }
 
@@ -88,6 +93,9 @@ export async function POST(request) {
       },
       email: {
         sent: Boolean(emailResult?.success),
+        recipientsSource: recipientInfo.source,
+        totalRecipients: recipientInfo.count,
+        totalSent: emailResult?.totalSent || (emailResult?.success ? 1 : 0),
         result: emailResult,
       },
     });

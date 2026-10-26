@@ -332,89 +332,31 @@ export async function toggleBookmarkInDb(opportunitySlugOrId, isSaved) {
 }
 
 /**
- * Admin: Menyimpan / Memperbarui Peluang ke Supabase
+ * Admin: Menyimpan / Memperbarui Peluang ke Supabase melalui Server API Route
  */
 export async function adminSaveOpportunityToDb(opp) {
-  const supabase = getSupabase();
-  if (!supabase) return;
-
   try {
-    // Cari ID kategori utama
-    const { data: cat } = await supabase
-      .from("categories")
-      .select("id")
-      .ilike("name", opp.category || "Beasiswa")
-      .single();
-
-    const categoryId = cat?.id;
-    if (!categoryId) return;
-
-    const slug = opp.id || opp.slug || `opp-${Date.now()}`;
-    const pubStatus = opp.status === "Draft" ? "draf" : opp.status === "Diarsipkan" ? "diarsipkan" : opp.status === "Ditutup" ? "ditutup" : "terbit";
-
-    const { data: savedOpp, error } = await supabase
-      .from("opportunities")
-      .upsert({
-        slug,
-        title: opp.title,
-        organization: opp.organization,
-        primary_category_id: categoryId,
-        field: opp.field || "Umum",
-        source_url: opp.sourceUrl || "https://navika.id",
-        summary: opp.summary || "",
-        summary_en: opp.summaryEn || opp.summary || "",
-        requirements: opp.requirements || [],
-        requirements_en: opp.requirementsEn || [],
-        benefits: opp.benefits || [],
-        benefits_en: opp.benefitsEn || [],
-        publication_status: pubStatus,
-        recommended: Boolean(opp.recommended),
-        verified_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      }, { onConflict: "slug" })
-      .select("id")
-      .single();
-
-    if (!error && savedOpp?.id) {
-      // Simpan deadlines & eligibility rules
-      const days = Number(opp.demoDays) || 10;
-      const targetDate = new Date();
-      targetDate.setDate(targetDate.getDate() + days);
-      const localDateStr = targetDate.toISOString().split("T")[0];
-
-      await supabase.from("deadlines").upsert({
-        opportunity_id: savedOpp.id,
-        local_date: localDateStr,
-        precision: "tanggal",
-      });
-
-      await supabase.from("eligibility_rules").upsert({
-        opportunity_id: savedOpp.id,
-        allowed_majors: opp.targetMajors || ["Semua Jurusan"],
-        other_requirements: opp.summary || "",
-      });
-    }
+    const res = await fetch("/api/opportunities", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(opp),
+    });
+    return await res.json();
   } catch (err) {
-    // Diamkan agar alur UI tidak macet jika Supabase offline
+    console.warn("Gagal menyimpan ke Supabase via API:", err);
   }
 }
 
 /**
- * Admin: Mengarsipkan Peluang di Supabase (Soft Delete)
+ * Admin: Mengarsipkan Peluang di Supabase (Soft Delete) melalui Server API Route
  */
 export async function adminArchiveOpportunityInDb(slugOrId) {
-  const supabase = getSupabase();
-  if (!supabase) return;
-
   try {
-    const { data: opp } = await supabase
-      .from("opportunities")
-      .select("id")
-      .or(`slug.eq.${slugOrId},id.eq.${slugOrId}`)
-      .single();
-
-    if (opp?.id) {
-      await supabase.rpc("archive_opportunity", { p_id: opp.id });
-    }
-  } catch {}
+    const res = await fetch(`/api/opportunities?id=${encodeURIComponent(slugOrId)}`, {
+      method: "DELETE",
+    });
+    return await res.json();
+  } catch (err) {
+    console.warn("Gagal mengarsipkan peluang di Supabase via API:", err);
+  }
 }

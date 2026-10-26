@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --test script/opportunities.test.js"
+    "test": "node --test script/*.test.js"
   },
   "dependencies": {
     "@supabase/server": "^1.9.2",

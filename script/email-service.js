@@ -9,37 +9,151 @@ export async function sendEmail({ to, subject, html }) {
   }
 
   const from = process.env.RESEND_FROM_EMAIL || "NAVIKA <onboarding@resend.dev>";
-  const recipients = Array.isArray(to) ? to : [to];
-  const validRecipients = recipients.filter((email) => email && typeof email === "string" && email.includes("@"));
+  const rawList = Array.isArray(to) ? to : [to];
+  const validRecipients = Array.from(
+    new Set(
+      rawList
+        .filter((email) => email && typeof email === "string" && email.includes("@"))
+        .map((email) => email.trim().toLowerCase())
+    )
+  );
 
   if (validRecipients.length === 0) {
-    return { success: false, error: "Alamat email penerima tidak valid." };
+    return { success: false, error: "Alamat email penerima tidak valid atau kosong." };
   }
 
-  try {
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from,
-        to: validRecipients,
-        subject,
-        html,
-      }),
-    });
+  // Skenario 1: Penerima tunggal
+  if (validRecipients.length === 1) {
+    try {
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from,
+          to: [validRecipients[0]],
+          subject,
+          html,
+        }),
+      });
 
-    const data = await response.json();
-    if (!response.ok) {
-      return { success: false, status: response.status, error: data.message || "Gagal mengirim email.", data };
+      const data = await response.json();
+      if (!response.ok) {
+        return {
+          success: false,
+          status: response.status,
+          error: data.message || "Gagal mengirim email.",
+          data,
+        };
+      }
+
+      return {
+        success: true,
+        id: data.id,
+        recipients: validRecipients,
+        totalSent: 1,
+      };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }
+
+  // Skenario 2: Banyak penerima (Massal / Seluruh Pengguna)
+  // Menggunakan Resend Batch API (/emails/batch) dengan maksimal 100 email per panggilan HTTP.
+  // Setiap user menerima email secara personal tanpa mengekspos alamat email user lain di header 'To'.
+  const chunkSize = 100;
+  const chunks = [];
+  for (let i = 0; i < validRecipients.length; i += chunkSize) {
+    chunks.push(validRecipients.slice(i, i + chunkSize));
+  }
+
+  let totalSent = 0;
+  const ids = [];
+  const errors = [];
+
+  for (const chunk of chunks) {
+    const batchPayload = chunk.map((recipient) => ({
+      from,
+      to: [recipient],
+      subject,
+      html,
+    }));
+
+    try {
+      const response = await fetch("https://api.resend.com/emails/batch", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(batchPayload),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        errors.push(data.message || `HTTP ${response.status}`);
+      } else {
+        const sentInChunk = Array.isArray(data?.data) ? data.data.length : chunk.length;
+        totalSent += sentInChunk;
+        if (Array.isArray(data?.data)) {
+          ids.push(...data.data.map((item) => item.id));
+        }
+      }
+    } catch (err) {
+      errors.push(err.message);
+    }
+  }
+
+  // Jika pengiriman batch gagal (misalnya karena akun Resend free-tier hanya mengizinkan email terdaftar),
+  // coba kirim ke email fallback jika tersedia agar pengujian pengembang tidak macet.
+  if (totalSent === 0 && errors.length > 0) {
+    const fallbackEmail = process.env.NOTIFICATION_EMAIL_TO;
+    if (fallbackEmail && typeof fallbackEmail === "string" && fallbackEmail.includes("@")) {
+      console.warn("Batch Resend gagal, mencoba fallback ke email testing terdaftar:", errors.join("; "));
+      try {
+        const fallbackRes = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from,
+            to: [fallbackEmail.trim().toLowerCase()],
+            subject: `[Fallback Testing] ${subject}`,
+            html,
+          }),
+        });
+        const fbData = await fallbackRes.json();
+        if (fallbackRes.ok) {
+          return {
+            success: true,
+            id: fbData.id,
+            recipients: [fallbackEmail],
+            totalSent: 1,
+            warning: "Email dikirim ke alamat fallback karena pembatasan tier Resend: " + errors.join("; "),
+          };
+        }
+      } catch {}
     }
 
-    return { success: true, id: data.id, recipients: validRecipients };
-  } catch (err) {
-    return { success: false, error: err.message };
+    return {
+      success: false,
+      error: errors.join("; "),
+      recipients: validRecipients,
+      totalSent: 0,
+    };
   }
+
+  return {
+    success: totalSent > 0,
+    totalSent,
+    recipients: validRecipients,
+    ids,
+    errors: errors.length > 0 ? errors : undefined,
+  };
 }
 
 /**

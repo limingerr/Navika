@@ -1,22 +1,13 @@
 import { NextResponse } from "next/server";
+import { sendNewOpportunityEmail } from "@/script/email-service";
 
 export async function POST(request) {
   try {
     const onesignalAppId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
     const onesignalRestKey = process.env.ONESIGNAL_REST_API_KEY;
 
-    if (!onesignalAppId || !onesignalRestKey) {
-      return NextResponse.json(
-        {
-          error: "Konfigurasi OneSignal belum lengkap di server.",
-          detail: "Pastikan NEXT_PUBLIC_ONESIGNAL_APP_ID dan ONESIGNAL_REST_API_KEY sudah diset di environment variables.",
-        },
-        { status: 500 }
-      );
-    }
-
     const body = await request.json().catch(() => ({}));
-    const { title, organization, category, slug, id } = body;
+    const { title, organization, category, field, slug, id } = body;
 
     if (!title || !title.trim()) {
       return NextResponse.json(
@@ -30,48 +21,75 @@ export async function POST(request) {
     const categoryName = category || "Peluang";
     const orgName = organization || "Mitra NAVIKA";
 
-    const payload = {
-      app_id: onesignalAppId,
-      included_segments: ["Subscribed Users"],
-      headings: {
-        id: `📢 Info Terbaru: ${title.trim()}`,
-        en: `📢 New Opportunity: ${title.trim()}`,
-      },
-      contents: {
-        id: `Telah dibuka ${categoryName} dari ${orgName}. Cek info lengkap dan persyaratannya sekarang di Navika!`,
-        en: `New ${categoryName} from ${orgName} is now open. Check eligibility and requirements on Navika!`,
-      },
-      url: `${siteUrl}/peluang/${opportunitySlug}`,
-    };
+    let pushSuccess = false;
+    let pushData = null;
 
-    const response = await fetch("https://api.onesignal.com/notifications", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Key ${onesignalRestKey}`,
-      },
-      body: JSON.stringify(payload),
-    });
+    // 1. Kirim Push Notification via OneSignal jika key tersedia
+    if (onesignalAppId && onesignalRestKey) {
+      try {
+        const payload = {
+          app_id: onesignalAppId,
+          included_segments: ["Total Subscriptions", "Subscribed Users"],
+          headings: {
+            id: `📢 Info Terbaru: ${title.trim()}`,
+            en: `📢 New Opportunity: ${title.trim()}`,
+          },
+          contents: {
+            id: `Telah dibuka ${categoryName} dari ${orgName}. Cek info lengkap dan persyaratannya sekarang di Navika!`,
+            en: `New ${categoryName} from ${orgName} is now open. Check eligibility and requirements on Navika!`,
+          },
+          url: `${siteUrl}/peluang/${opportunitySlug}`,
+        };
 
-    const data = await response.json();
+        const response = await fetch("https://api.onesignal.com/notifications", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Key ${onesignalRestKey}`,
+          },
+          body: JSON.stringify(payload),
+        });
 
-    if (!response.ok) {
-      return NextResponse.json(
-        {
-          success: false,
-          status: response.status,
-          error: data.errors || "Gagal mengirim notifikasi OneSignal.",
-          data,
-        },
-        { status: response.status }
-      );
+        pushData = await response.json();
+        pushSuccess = response.ok;
+      } catch (err) {
+        console.warn("Gagal mengirim OneSignal push:", err.message);
+      }
+    }
+
+    // 2. Kirim Email Notifikasi via Resend jika key tersedia
+    let emailResult = null;
+    const notificationEmail = process.env.NOTIFICATION_EMAIL_TO || "limingerr681@gmail.com";
+
+    if (process.env.RESEND_API_KEY && notificationEmail) {
+      try {
+        emailResult = await sendNewOpportunityEmail({
+          to: notificationEmail,
+          opportunity: {
+            id: opportunitySlug,
+            title: title.trim(),
+            organization: orgName,
+            category: categoryName,
+            field: field || "Semua Jurusan",
+          },
+          siteUrl,
+        });
+      } catch (err) {
+        console.warn("Gagal mengirim notifikasi email:", err.message);
+      }
     }
 
     return NextResponse.json({
       success: true,
-      message: `Notifikasi peluang baru "${title}" berhasil dikirim ke seluruh pengguna.`,
-      recipientCount: data.recipients || 0,
-      data,
+      message: `Pemberitahuan peluang baru "${title}" berhasil diproses.`,
+      push: {
+        sent: pushSuccess,
+        data: pushData,
+      },
+      email: {
+        sent: Boolean(emailResult?.success),
+        result: emailResult,
+      },
     });
   } catch (error) {
     return NextResponse.json(

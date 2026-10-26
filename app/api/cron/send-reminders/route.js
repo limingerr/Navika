@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { opportunities as staticOpportunities } from "@/script/opportunities";
+import { sendDeadlineReminderEmail } from "@/script/email-service";
 
 export async function GET(request) {
   try {
@@ -104,15 +105,18 @@ export async function GET(request) {
       });
     }
 
-    // 5. Kirim Push Notification ke OneSignal untuk tiap peluang yang deadline-nya H-2
+    // 5. Kirim Push Notification & Email untuk tiap peluang yang deadline-nya H-2
     let sentCount = 0;
+    let emailSentCount = 0;
     const results = [];
+    const notificationEmail = process.env.NOTIFICATION_EMAIL_TO || "limingerr681@gmail.com";
 
     for (const opp of opportunitiesToNotify) {
+      // 5a. Push Notification OneSignal
       try {
         const payload = {
           app_id: onesignalAppId,
-          included_segments: ["Subscribed Users"],
+          included_segments: ["Total Subscriptions", "Subscribed Users"],
           headings: {
             id: `⏳ Deadline H-2: ${opp.title}`,
             en: `⏳ Deadline in 2 Days: ${opp.title}`,
@@ -134,10 +138,25 @@ export async function GET(request) {
         });
 
         const data = await response.json();
-        results.push({ id: opp.id, status: response.status, data });
+        results.push({ id: opp.id, pushStatus: response.status, pushData: data });
         if (response.ok) sentCount++;
       } catch (e) {
-        results.push({ id: opp.id, error: e.message });
+        results.push({ id: opp.id, pushError: e.message });
+      }
+
+      // 5b. Email Notification Resend
+      if (process.env.RESEND_API_KEY && notificationEmail) {
+        try {
+          const emailRes = await sendDeadlineReminderEmail({
+            to: notificationEmail,
+            opportunity: opp,
+            targetDate: dateStr,
+            siteUrl,
+          });
+          if (emailRes.success) emailSentCount++;
+        } catch (e) {
+          console.warn("Gagal mengirim email pengingat:", e.message);
+        }
       }
     }
 
@@ -146,7 +165,8 @@ export async function GET(request) {
       message: `Cron job H-2 berhasil diproses untuk tanggal ${dateStr}.`,
       date: dateStr,
       totalOpportunities: opportunitiesToNotify.length,
-      totalSent: sentCount,
+      totalPushSent: sentCount,
+      totalEmailSent: emailSentCount,
       results,
     });
   } catch (error) {

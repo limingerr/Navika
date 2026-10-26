@@ -74,6 +74,12 @@ function AdminIcon({ name, size = 18 }) {
         <polyline points="20 6 9 17 4 12" />
       </svg>
     ),
+    bell: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+      </svg>
+    ),
   };
   return icons[name] || null;
 }
@@ -382,10 +388,38 @@ export function AdminPeluangTable() {
   const [selectedStatus, setSelectedStatus] = useState("Semua");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [toastMsg, setToastMsg] = useState("");
+  const [testingBroadcast, setTestingBroadcast] = useState(false);
 
   const showToast = (msg) => {
     setToastMsg(msg);
-    setTimeout(() => setToastMsg(""), 3000);
+    setTimeout(() => setToastMsg(""), 4000);
+  };
+
+  const handleTestBroadcast = async () => {
+    setTestingBroadcast(true);
+    try {
+      const res = await fetch("/api/notify/new-opportunity", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: "Uji Coba Siaran Notifikasi NAVIKA",
+          organization: "Tim Pengelola Navika",
+          category: "Beasiswa",
+          field: "Semua Jurusan",
+          slug: "djarum",
+        }),
+      });
+      const data = await res.json();
+      if (data.push?.sent || data.email?.sent) {
+        showToast("Notifikasi siaran berhasil dikirim ke perangkat mahasiswa & email!");
+      } else {
+        showToast("Permintaan notifikasi telah diproses oleh server.");
+      }
+    } catch {
+      showToast("Gagal mengirim notifikasi uji coba.");
+    } finally {
+      setTestingBroadcast(false);
+    }
   };
 
   const filteredItems = useMemo(() => {
@@ -431,6 +465,16 @@ export function AdminPeluangTable() {
           </p>
         </div>
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            className="admin-btn admin-btn-secondary"
+            onClick={handleTestBroadcast}
+            disabled={testingBroadcast}
+            title="Kirim notifikasi pengujian langsung ke semua perangkat mahasiswa dan email"
+          >
+            <AdminIcon name="bell" size={16} />
+            <span>{testingBroadcast ? "Menyiarkan..." : "Tes Siaran Notifikasi"}</span>
+          </button>
           <button type="button" className="admin-btn admin-btn-secondary" onClick={handleReset}>
             Reset Data Default
           </button>
@@ -627,6 +671,7 @@ export function AdminPeluangForm({ mode = "create", id = null }) {
   );
 
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAddReq = () => setRequirements([...requirements, ""]);
   const handleReqChange = (idx, val) => {
@@ -648,7 +693,7 @@ export function AdminPeluangForm({ mode = "create", id = null }) {
     setBenefits(benefits.filter((_, i) => i !== idx));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim() || !organization.trim()) {
       setErrorMessage("Judul peluang dan nama penyelenggara wajib diisi.");
@@ -658,6 +703,9 @@ export function AdminPeluangForm({ mode = "create", id = null }) {
       setErrorMessage("URL sumber resmi harus diawali dengan http:// atau https://.");
       return;
     }
+
+    setIsSubmitting(true);
+    setErrorMessage("");
 
     const payload = {
       title: title.trim(),
@@ -673,14 +721,18 @@ export function AdminPeluangForm({ mode = "create", id = null }) {
       benefits: benefits.map((b) => b.trim()).filter(Boolean),
     };
 
-    if (mode === "create") {
-      const slugId = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `opp-${Date.now()}`;
-      addOpportunity({ id: slugId, ...payload });
-    } else {
-      updateOpportunity(id, payload);
+    try {
+      if (mode === "create") {
+        const slugId = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `opp-${Date.now()}`;
+        await addOpportunity({ id: slugId, ...payload });
+      } else {
+        await updateOpportunity(id, payload);
+      }
+      router.push("/admin/peluang");
+    } catch {
+      setIsSubmitting(false);
+      setErrorMessage("Gagal menyimpan peluang. Silakan coba kembali.");
     }
-
-    router.push("/admin/peluang");
   };
 
   return (
@@ -909,8 +961,17 @@ export function AdminPeluangForm({ mode = "create", id = null }) {
 
             {/* Actions */}
             <div className="admin-form-section">
-              <button type="submit" className="admin-btn admin-btn-primary" style={{ width: "100%", justifyContent: "center", marginBottom: "10px" }}>
-                {mode === "create" ? "Terbitkan Peluang Baru" : "Simpan Perubahan"}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="admin-btn admin-btn-primary"
+                style={{ width: "100%", justifyContent: "center", marginBottom: "10px", opacity: isSubmitting ? 0.7 : 1 }}
+              >
+                {isSubmitting
+                  ? "Menyimpan & Menyiarkan Notifikasi..."
+                  : mode === "create"
+                  ? "Terbitkan Peluang Baru"
+                  : "Simpan Perubahan"}
               </button>
               <Link
                 href="/admin/peluang"

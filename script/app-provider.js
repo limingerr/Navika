@@ -162,7 +162,7 @@ export function AppProvider({ children }) {
         } catch {}
     };
 
-    const addOpportunity = (newOpp) => {
+    const addOpportunity = async (newOpp) => {
         const id = newOpp.id || ("opp-" + Date.now());
         const itemWithDefaults = {
             id,
@@ -194,22 +194,26 @@ export function AppProvider({ children }) {
         }
         if (itemWithDefaults.status === "Terbit" && typeof window !== "undefined") {
             try {
-                fetch("/api/notify/new-opportunity", {
+                await fetch("/api/notify/new-opportunity", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         title: itemWithDefaults.title,
                         organization: itemWithDefaults.organization,
                         category: itemWithDefaults.category,
+                        field: itemWithDefaults.field || "Umum",
                         slug: itemWithDefaults.id,
                     }),
-                }).catch(() => {});
-            } catch {}
+                    keepalive: true,
+                });
+            } catch (err) {
+                console.warn("Gagal menembak notifikasi baru:", err);
+            }
         }
         return itemWithDefaults;
     };
 
-    const updateOpportunity = (id, fields) => {
+    const updateOpportunity = async (id, fields) => {
         let latestOpps = opportunities;
         try {
             const raw = localStorage.getItem(oppsStorageKey);
@@ -236,17 +240,21 @@ export function AppProvider({ children }) {
         }
         if (fields.status === "Terbit" && previous && previous.status !== "Terbit" && typeof window !== "undefined") {
             try {
-                fetch("/api/notify/new-opportunity", {
+                await fetch("/api/notify/new-opportunity", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         title: updatedOpp.title,
                         organization: updatedOpp.organization,
                         category: updatedOpp.category,
+                        field: updatedOpp.field || "Umum",
                         slug: updatedOpp.id,
                     }),
-                }).catch(() => {});
-            } catch {}
+                    keepalive: true,
+                });
+            } catch (err) {
+                console.warn("Gagal menembak notifikasi update:", err);
+            }
         }
     };
 

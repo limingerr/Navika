@@ -95,10 +95,12 @@ export function AppProvider({ children }) {
                 if (calendarFilters.includes(parsed.calendarFilter))
                     setCalendarFilter(parsed.calendarFilter);
             }
+            let localOpps = initialOpportunities;
             const oppRaw = localStorage.getItem(oppsStorageKey);
             if (oppRaw) {
                 const parsedOpps = JSON.parse(oppRaw);
                 if (Array.isArray(parsedOpps) && parsedOpps.length > 0) {
+                    localOpps = parsedOpps;
                     setOpportunities(parsedOpps);
                 }
             }
@@ -108,11 +110,19 @@ export function AppProvider({ children }) {
                 setProfile(adminProfile);
             }
 
-            // Jika Supabase terkonfigurasi, sinkronkan data langsung dari database
+            // Jika Supabase terkonfigurasi, sinkronkan data langsung dari database dengan smart merge
             if (isSupabaseConfigured()) {
                 fetchOpportunitiesFromDb().then((dbOpps) => {
                     if (dbOpps && dbOpps.length > 0) {
-                        setOpportunities(dbOpps);
+                        // Pertahankan peluang buatan kustom yang belum ada di database Supabase
+                        const customCreated = localOpps.filter(
+                            (localItem) => !dbOpps.some((dbItem) => dbItem.id === localItem.id)
+                        );
+                        const merged = [...customCreated, ...dbOpps];
+                        setOpportunities(merged);
+                        try {
+                            localStorage.setItem(oppsStorageKey, JSON.stringify(merged));
+                        } catch {}
                     }
                 }).catch(() => {});
 
@@ -164,7 +174,20 @@ export function AppProvider({ children }) {
             requirements: Array.isArray(newOpp.requirements) ? newOpp.requirements : [],
             benefits: Array.isArray(newOpp.benefits) ? newOpp.benefits : [],
         };
-        const updated = [itemWithDefaults, ...opportunities];
+
+        // Ambil data terbaru dari localStorage atau state agar tidak tertimpa
+        let latestOpps = opportunities;
+        try {
+            const raw = localStorage.getItem(oppsStorageKey);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    latestOpps = parsed;
+                }
+            }
+        } catch {}
+
+        const updated = [itemWithDefaults, ...latestOpps.filter((item) => item.id !== id)];
         saveOpportunitiesState(updated);
         if (isSupabaseConfigured()) {
             adminSaveOpportunityToDb(itemWithDefaults).catch(() => {});
@@ -187,9 +210,20 @@ export function AppProvider({ children }) {
     };
 
     const updateOpportunity = (id, fields) => {
+        let latestOpps = opportunities;
+        try {
+            const raw = localStorage.getItem(oppsStorageKey);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    latestOpps = parsed;
+                }
+            }
+        } catch {}
+
         let updatedOpp = null;
-        const previous = opportunities.find((item) => item.id === id);
-        const updated = opportunities.map((item) => {
+        const previous = latestOpps.find((item) => item.id === id);
+        const updated = latestOpps.map((item) => {
             if (item.id === id) {
                 updatedOpp = { ...item, ...fields };
                 return updatedOpp;
@@ -217,7 +251,17 @@ export function AppProvider({ children }) {
     };
 
     const deleteOpportunity = (id) => {
-        const updated = opportunities.filter((item) => item.id !== id);
+        let latestOpps = opportunities;
+        try {
+            const raw = localStorage.getItem(oppsStorageKey);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    latestOpps = parsed;
+                }
+            }
+        } catch {}
+        const updated = latestOpps.filter((item) => item.id !== id);
         saveOpportunitiesState(updated);
         if (isSupabaseConfigured()) {
             adminArchiveOpportunityInDb(id).catch(() => {});

@@ -5,11 +5,19 @@ import { defaultProfile, isAdminIdentifier, verifyAdminCredentials } from "@/scr
  * Memeriksa apakah konfigurasi Supabase telah disetel di environment variables.
  */
 export function isSupabaseConfigured() {
-  return Boolean(
-    typeof window !== "undefined" &&
-      process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-  );
+  if (typeof window === "undefined") return false;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return false;
+  if (
+    url.includes("proyek-anda") ||
+    url.includes("your-project-id") ||
+    key.includes("kunci_anda") ||
+    key.includes("your-supabase")
+  ) {
+    return false;
+  }
+  return true;
 }
 
 /**

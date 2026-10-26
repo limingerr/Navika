@@ -167,11 +167,26 @@ export function AppProvider({ children }) {
         if (isSupabaseConfigured()) {
             adminSaveOpportunityToDb(itemWithDefaults).catch(() => {});
         }
+        if (itemWithDefaults.status === "Terbit" && typeof window !== "undefined") {
+            try {
+                fetch("/api/notify/new-opportunity", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        title: itemWithDefaults.title,
+                        organization: itemWithDefaults.organization,
+                        category: itemWithDefaults.category,
+                        slug: itemWithDefaults.id,
+                    }),
+                }).catch(() => {});
+            } catch {}
+        }
         return itemWithDefaults;
     };
 
     const updateOpportunity = (id, fields) => {
         let updatedOpp = null;
+        const previous = opportunities.find((item) => item.id === id);
         const updated = opportunities.map((item) => {
             if (item.id === id) {
                 updatedOpp = { ...item, ...fields };
@@ -182,6 +197,20 @@ export function AppProvider({ children }) {
         saveOpportunitiesState(updated);
         if (isSupabaseConfigured() && updatedOpp) {
             adminSaveOpportunityToDb(updatedOpp).catch(() => {});
+        }
+        if (fields.status === "Terbit" && previous && previous.status !== "Terbit" && typeof window !== "undefined") {
+            try {
+                fetch("/api/notify/new-opportunity", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        title: updatedOpp.title,
+                        organization: updatedOpp.organization,
+                        category: updatedOpp.category,
+                        slug: updatedOpp.id,
+                    }),
+                }).catch(() => {});
+            } catch {}
         }
     };
 

@@ -1,0 +1,202 @@
+.page-dashboard .opportunity-card,
+.page-peluang .opportunity-card,
+.page-tersimpan .opportunity-card {
+  background: #05a5d9;
+  color: #fff;
+  border-radius: 28px;
+  padding: 18px;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.page-dashboard .opportunity-card .card-badges,
+.page-peluang .opportunity-card .card-badges,
+.page-tersimpan .opportunity-card .card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  padding: 4px 0 10px;
+}
+
+.page-dashboard .opportunity-card .card-badges::-webkit-scrollbar,
+.page-peluang .opportunity-card .card-badges::-webkit-scrollbar,
+.page-tersimpan .opportunity-card .card-badges::-webkit-scrollbar {
+  display: none;
+}
+
+.page-dashboard .opportunity-card .badge,
+.page-peluang .opportunity-card .badge,
+.page-tersimpan .opportunity-card .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 28px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  box-shadow: 0 5px 7px rgba(0,0,0,.21);
+  font-size: .77rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  color: #fff;
+}
+
+.page-dashboard .opportunity-card .badge-blue,
+.page-peluang .opportunity-card .badge-blue,
+.page-tersimpan .opportunity-card .badge-blue,
+.page-dashboard .opportunity-card .badge-rekomendasi,
+.page-peluang .opportunity-card .badge-rekomendasi,
+.page-tersimpan .opportunity-card .badge-rekomendasi {
+  background: #0067a6;
+  border: 0;
+}
+
+.page-dashboard .opportunity-card .badge-tenggat,
+.page-peluang .opportunity-card .badge-tenggat,
+.page-tersimpan .opportunity-card .badge-tenggat,
+.page-dashboard .opportunity-card .badge-time,
+.page-peluang .opportunity-card .badge-time,
+.page-tersimpan .opportunity-card .badge-time {
+  margin-left: auto;
+  padding: 3px 9px;
+  border: 1.5px solid rgba(255,255,255,.75);
+  border-radius: 10px;
+  background: rgba(255,255,255,.15);
+  box-shadow: none;
+}
+
+.page-dashboard .opportunity-card .badge-tenggat.mendesak,
+.page-peluang .opportunity-card .badge-tenggat.mendesak,
+.page-tersimpan .opportunity-card .badge-tenggat.mendesak,
+.page-dashboard .opportunity-card .badge-time-urgent,
+.page-peluang .opportunity-card .badge-time-urgent,
+.page-tersimpan .opportunity-card .badge-time-urgent {
+  background: #ff0105;
+  border: 1.5px solid #ff7a80;
+  box-shadow: 0 5px 7px rgba(0,0,0,.21);
+}
+
+.page-dashboard .opportunity-card h3,
+.page-peluang .opportunity-card h3,
+.page-tersimpan .opportunity-card h3 {
+  margin: 14px 0 5px;
+  color: #fff;
+  font-family: Poppins, "Segoe UI", system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  line-height: 1.25;
+}
+
+.page-dashboard .opportunity-card .card-org,
+.page-peluang .opportunity-card .card-org,
+.page-tersimpan .opportunity-card .card-org {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: rgba(255,255,255,.85);
+  font-family: Poppins, "Segoe UI", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.page-dashboard .opportunity-card .card-actions,
+.page-peluang .opportunity-card .card-actions,
+.page-tersimpan .opportunity-card .card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.page-dashboard .opportunity-card .heart-button,
+.page-peluang .opportunity-card .heart-button,
+.page-tersimpan .opportunity-card .heart-button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -6px 0 -6px -10px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+
+.page-dashboard .opportunity-card .detail-pill,
+.page-peluang .opportunity-card .detail-pill,
+.page-tersimpan .opportunity-card .detail-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: 12px;
+  background: #fff;
+  color: #090909;
+  font-family: Poppins, "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(17,24,39,.2);
+}
+
+@media (hover: hover) {
+  .page-dashboard .opportunity-card:hover,
+  .page-peluang .opportunity-card:hover,
+  .page-tersimpan .opportunity-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(9,9,9,.2);
+  }
+
+  .page-dashboard .opportunity-card .heart-button:hover,
+  .page-peluang .opportunity-card .heart-button:hover,
+  .page-tersimpan .opportunity-card .heart-button:hover {
+    color: #98004a;
+  }
+}
+
+@media (min-width: 1000px) {
+  .page-dashboard .opportunity-card .card-badges,
+  .page-peluang .opportunity-card .card-badges,
+  .page-tersimpan .opportunity-card .card-badges {
+    gap: 5px;
+  }
+
+  .page-dashboard .opportunity-card .badge,
+  .page-peluang .opportunity-card .badge,
+  .page-tersimpan .opportunity-card .badge {
+    padding-inline: 8px;
+    font-size: .72rem;
+  }
+}
+
+:root[data-theme="dark"] .page-dashboard .opportunity-card,
+:root[data-theme="dark"] .page-peluang .opportunity-card,
+:root[data-theme="dark"] .page-tersimpan .opportunity-card {
+  background: #1e3a5f;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-dashboard .opportunity-card,
+  .page-peluang .opportunity-card,
+  .page-tersimpan .opportunity-card {
+    transition: none;
+  }
+
+  .page-dashboard .opportunity-card:hover,
+  .page-peluang .opportunity-card:hover,
+  .page-tersimpan .opportunity-card:hover {
+    transform: none;
+  }
+}

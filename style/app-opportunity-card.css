@@ -9,8 +9,13 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 0;
   transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.page-dashboard .opportunity-grid,
+.page-peluang .opportunity-grid,
+.page-tersimpan .saved-grid {
+  gap: 14px;
 }
 
 .page-dashboard .opportunity-card .card-badges,
@@ -149,6 +154,13 @@
   font-size: 14px;
   font-weight: 700;
   box-shadow: 0 4px 10px rgba(17,24,39,.2);
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.page-dashboard .opportunity-card .detail-pill svg,
+.page-peluang .opportunity-card .detail-pill svg,
+.page-tersimpan .opportunity-card .detail-pill svg {
+  transition: transform 200ms ease;
 }
 
 @media (hover: hover) {
@@ -164,9 +176,36 @@
   .page-tersimpan .opportunity-card .heart-button:hover {
     color: #98004a;
   }
+
+  .page-dashboard .opportunity-card .detail-pill:hover,
+  .page-peluang .opportunity-card .detail-pill:hover,
+  .page-tersimpan .opportunity-card .detail-pill:hover {
+    background: #0067a6;
+    color: #fff;
+  }
+
+  .page-dashboard .opportunity-card .detail-pill:hover svg,
+  .page-peluang .opportunity-card .detail-pill:hover svg,
+  .page-tersimpan .opportunity-card .detail-pill:hover svg {
+    transform: translateX(3px);
+  }
+}
+
+@media (min-width: 700px) {
+  .page-dashboard .opportunity-grid,
+  .page-peluang .opportunity-grid,
+  .page-tersimpan .saved-grid {
+    gap: 18px;
+  }
 }
 
 @media (min-width: 1000px) {
+  .page-dashboard .opportunity-grid,
+  .page-peluang .opportunity-grid,
+  .page-tersimpan .saved-grid {
+    gap: 20px;
+  }
+
   .page-dashboard .opportunity-card .card-badges,
   .page-peluang .opportunity-card .card-badges,
   .page-tersimpan .opportunity-card .card-badges {

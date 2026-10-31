@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useApp, useTr } from "@/script/app-provider";
 import { AppShell, DeadlineLabel, DemoNote, Icon, OpportunityCard, OpportunityList } from "@/script/ui";
@@ -91,25 +91,61 @@ function getDayAgenda(date, filter = "Semua", saved = [], profile = null, oppLis
     const key = formatKey(date);
     const staticItems = AGENDA_DATA[key] || [];
 
-    // Sertakan juga batas pendaftaran dari data peluang
-    const oppEvents = oppList
-        .filter((item) => item.status !== "Ditutup" && item.status !== "Diarsipkan")
-        .filter((item) => sameDay(demoDeadline(item.demoDays), date))
-        .map((item) => {
-            const catClass = item.category.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-");
-            return {
-                warna: catClass,
+    // Sertakan batas pendaftaran dan milestone dari data peluang aktif
+    const oppEvents = [];
+    const activeOpps = oppList.filter((item) => item.status !== "Ditutup" && item.status !== "Diarsipkan");
+
+    for (const item of activeOpps) {
+        const catClass = item.category.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-");
+        const deadline = demoDeadline(item.demoDays);
+        if (sameDay(deadline, date)) {
+            oppEvents.push({
+                warna: "merah",
                 judul: item.title,
                 jenis: "Batas pendaftaran",
                 id: item.id,
-                kategori: item.category
-            };
-        });
+                kategori: "Deadline",
+            });
+        }
+        // Milestone Buka Pendaftaran
+        const buka = demoDeadline(item.demoDays - 14);
+        if (sameDay(buka, date)) {
+            oppEvents.push({
+                warna: "hijau",
+                judul: item.title,
+                jenis: "Buka pendaftaran",
+                id: item.id,
+                kategori: item.category,
+            });
+        }
+        // Milestone Seleksi Berkas
+        const seleksi = demoDeadline(item.demoDays + 4);
+        if (sameDay(seleksi, date)) {
+            oppEvents.push({
+                warna: catClass,
+                judul: item.title,
+                jenis: "Seleksi berkas",
+                id: item.id,
+                kategori: item.category,
+            });
+        }
+        // Milestone Pengumuman
+        const pengumuman = demoDeadline(item.demoDays + 10);
+        if (sameDay(pengumuman, date)) {
+            oppEvents.push({
+                warna: "hitam",
+                judul: item.title,
+                jenis: "Pengumuman",
+                id: item.id,
+                kategori: "Umum",
+            });
+        }
+    }
 
     // Gabungkan tanpa duplikasi judul
     const allItems = [...staticItems];
     for (const opp of oppEvents) {
-        if (!allItems.some(it => it.judul.toLowerCase() === opp.judul.toLowerCase() || (it.id && it.id === opp.id))) {
+        if (!allItems.some(it => it.judul.toLowerCase() === opp.judul.toLowerCase() || (it.id && it.id === opp.id && it.jenis === opp.jenis))) {
             allItems.push(opp);
         }
     }
@@ -176,8 +212,10 @@ function CategoryTabs({ selected, onSelect }) {
 export function DashboardScreen() {
     const { profile, saved, locale, calendarFilter, setCalendarFilter, deadlineAlerts, opportunities = staticOpportunities } = useApp();
     const tr = useTr();
-    const [viewMonth, setViewMonth] = useState(new Date(2026, 9, 1));
-    const [selected, setSelected] = useState(new Date(2026, 9, 13));
+    const today = useMemo(() => new Date(), []);
+    const [viewMonth, setViewMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
+    const [selected, setSelected] = useState(() => new Date(today.getFullYear(), today.getMonth(), today.getDate()));
+    const selectedDayRef = useRef(null);
     const reminders = deadlineAlerts ? demoReminders(saved) : [];
     const displayName = profile.name === "Pengguna Demo" || profile.name === "Mahasiswa" || !profile.name ? tr("Mahasiswa", "Student") : profile.name.split(" ")[0];
 
@@ -194,10 +232,29 @@ export function DashboardScreen() {
         });
     };
 
+    const goToToday = () => {
+        const now = new Date();
+        setSelected(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
+        setViewMonth(new Date(now.getFullYear(), now.getMonth(), 1));
+    };
+
     const monthTitle = new Intl.DateTimeFormat(locale === "en" ? "en-US" : "id-ID", { month: "long", year: "numeric" }).format(viewMonth);
     const dayNames = locale === "en" ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] : ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
     const currentAgenda = getDayAgenda(selected, calendarFilter, saved, profile, opportunities);
+
+    useEffect(() => {
+        if (selectedDayRef.current) {
+            const timer = setTimeout(() => {
+                selectedDayRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    inline: "center",
+                    block: "nearest"
+                });
+            }, 60);
+            return () => clearTimeout(timer);
+        }
+    }, [selected, viewMonth]);
 
     const recommendedList = useMemo(() => {
         const active = opportunities.filter((item) => item.status !== "Ditutup" && item.status !== "Diarsipkan");
@@ -241,7 +298,12 @@ export function DashboardScreen() {
               <path d="m15 5-7 7 7 7" />
             </svg>
           </button>
-          <h2 className="judul-bulan" id="judul-bulan" aria-live="polite">{monthTitle}</h2>
+          <div className="judul-bulan-wrap">
+            <h2 className="judul-bulan" id="judul-bulan" aria-live="polite">{monthTitle}</h2>
+            <button type="button" className="tombol-hari-ini" onClick={goToToday} aria-label={tr("Kembali ke hari ini", "Go to today")}>
+              {tr("Hari Ini", "Today")}
+            </button>
+          </div>
           <Link className="ikon-bulan" href="/kalender" aria-label={tr("Buka kalender penuh", "Open full calendar")}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <rect x="3" y="5" width="18" height="16" rx="3" />
@@ -261,12 +323,14 @@ export function DashboardScreen() {
           {monthDays.map((day) => {
             const isFirst = day.getDate() === 1;
             const isSelected = sameDay(day, selected);
+            const isDayToday = sameDay(day, today);
             const dots = getDayDots(day, calendarFilter, saved, profile, opportunities);
             return (
               <li key={day.getTime()} className={isFirst ? "awal-bulan" : ""}>
                 <button
+                  ref={isSelected ? selectedDayRef : null}
                   type="button"
-                  className={`hari ${isSelected ? "terpilih selected" : ""}`}
+                  className={`hari ${isSelected ? "terpilih selected" : ""}${isDayToday && !isSelected ? " hari-ini today" : ""}`}
                   onClick={() => setSelected(day)}
                   aria-label={formatDate(day, locale)}
                   aria-current={isSelected ? "date" : undefined}
@@ -371,9 +435,9 @@ export function SavedScreen() {
 export function CalendarScreen() {
     const { saved, toggleSaved, locale, calendarFilter, setCalendarFilter, profile, opportunities = staticOpportunities } = useApp();
     const tr = useTr();
-    const today = new Date();
-    const [viewMonth, setViewMonth] = useState(new Date(2026, 9, 1));
-    const [selected, setSelected] = useState(new Date(2026, 9, 18));
+    const today = useMemo(() => new Date(), []);
+    const [viewMonth, setViewMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
+    const [selected, setSelected] = useState(() => new Date(today.getFullYear(), today.getMonth(), today.getDate()));
 
     const currentYear = viewMonth.getFullYear();
     const currentMonth = viewMonth.getMonth();
@@ -384,6 +448,12 @@ export function CalendarScreen() {
             setSelected(new Date(next.getFullYear(), next.getMonth(), 1));
             return next;
         });
+    };
+
+    const goToToday = () => {
+        const now = new Date();
+        setSelected(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
+        setViewMonth(new Date(now.getFullYear(), now.getMonth(), 1));
     };
 
     const selectDate = (date) => {
@@ -471,7 +541,12 @@ export function CalendarScreen() {
                                 <path d="m15 5-7 7 7 7" />
                             </svg>
                         </button>
-                        <h2 className="judul-bulan" id="bulan-kalender" aria-live="polite">{monthTitle}</h2>
+                        <div className="judul-bulan-wrap">
+                            <h2 className="judul-bulan" id="bulan-kalender" aria-live="polite">{monthTitle}</h2>
+                            <button type="button" className="tombol-hari-ini" onClick={goToToday} aria-label={tr("Kembali ke hari ini", "Go to today")}>
+                                {tr("Hari Ini", "Today")}
+                            </button>
+                        </div>
                         <button className="ikon-bulan" id="btn-next" type="button" onClick={() => shiftMonth(1)} aria-label={tr("Bulan berikutnya", "Next month")}>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                                 <path d="m9 5 7 7-7 7" />

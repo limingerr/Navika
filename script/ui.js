@@ -32,13 +32,42 @@ export function MainNav() {
     const pathname = usePathname();
     const tr = useTr();
     const items = [
-        { href: "/dashboard", label: tr("Home", "Home"), icon: "home" },
-        { href: "/tersimpan", label: tr("Tersimpan", "Saved"), icon: "bookmark" },
-        { href: "/profil", label: tr("Profil", "Profile"), icon: "profile" },
+        {
+            href: "/dashboard",
+            label: tr("Home", "Home"),
+            icon: "home",
+            svg: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+            ),
+        },
+        {
+            href: "/tersimpan",
+            label: tr("Tersimpan", "Saved"),
+            icon: "bookmark",
+            svg: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+                </svg>
+            ),
+        },
+        {
+            href: "/profil",
+            label: tr("Profil", "Profile"),
+            icon: "profile",
+            svg: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+            ),
+        },
     ];
     return <nav className="main-nav" aria-label={tr("Navigasi utama", "Main navigation")}>{items.map((item) => {
             const active = pathname === item.href || (item.href === "/dashboard" && (pathname.startsWith("/peluang") || pathname === "/kalender")) || (item.href === "/profil" && (pathname.startsWith("/profil/") || pathname.startsWith("/pengaturan")));
-            return <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={active ? "active" : ""}><span className={`nav-icon nav-icon-${item.icon}`} aria-hidden="true"/><span>{item.label}</span></Link>;
+            return <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={active ? "active" : ""}><span className={`nav-icon nav-icon-${item.icon}`} aria-hidden="true">{item.svg}</span><span>{item.label}</span></Link>;
         })}</nav>;
 }
 export function AppShell({ children, className = "" }) {

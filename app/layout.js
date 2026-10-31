@@ -1,5 +1,6 @@
 import Script from "next/script";
 import { AppProvider } from "@/script/app-provider";
+import "@/style/globals.css";
 
 export const metadata = {
     title: "NAVIKA — Temukan peluangmu",

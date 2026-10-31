@@ -28,7 +28,7 @@ html {
   margin: 0;
   color: var(--ink);
   background: #fff;
-  font-family: Arial,Helvetica,sans-serif;
+  font-family: var(--font);
   line-height: 1.5;
 }
 
@@ -126,44 +126,7 @@ html {
   cursor: pointer;
 }
 
-.page-profil .main-nav {
-  position: fixed;
-  z-index: 20;
-  left: 16px;
-  right: 16px;
-  bottom: 14px;
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 4px;
-  max-width: 700px;
-  margin-inline: auto;
-  padding: 8px;
-  background: rgba(255,255,255,.97);
-  border-radius: 28px;
-  box-shadow: 0 16px 36px rgba(0,0,0,.14);
-}
-
-.page-profil .main-nav a {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  min-height: 62px;
-  border-radius: 19px;
-  font-size: .85rem;
-  font-weight: 600;
-}
-
-.page-profil .main-nav a.active {
-  background: #b9dffe;
-  color: #00659b;
-}
-
-.page-profil .main-nav img {
-  width: 23px;
-  height: 23px;
-}
+/* main-nav diwarisi dari globals.css */
 
 .page-profil .profile-screen {
   padding-top: 28px;
@@ -314,49 +277,6 @@ html {
     padding-bottom: 50px;
   }
 
-  .page-profil .main-nav {
-    position: sticky;
-    top: 0;
-    bottom: auto;
-    left: auto;
-    right: auto;
-    grid-column: 1;
-    grid-row: 1;
-    align-self: start;
-    display: flex;
-    flex-direction: column;
-    width: auto;
-    height: 100vh;
-    max-width: none;
-    margin: 0;
-    padding: 32px 14px;
-    border-radius: 0;
-    border-right: 1px solid var(--line);
-    box-shadow: none;
-  }
-
-  .page-profil .main-nav:before {
-    content: "NAVIKA";
-    display: block;
-    padding: 10px 14px 34px;
-    color: var(--deep);
-    font-size: 1.5rem;
-    font-weight: 800;
-  }
-
-  .page-profil .main-nav a {
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 12px;
-    padding: 0 16px;
-    font-size: 1rem;
-  }
-
-  .page-profil .main-nav img {
-    width: 25px;
-    height: 25px;
-  }
-
   .page-profil .screen-main {
     width: min(100% - 56px,1100px);
   }
@@ -389,7 +309,6 @@ html {
   color: var(--ink);
 }
 
-:root[data-theme=dark] .page-profil .main-nav,
 :root[data-theme=dark] .page-profil .academic-list {
   background: var(--surface);
   color: var(--ink);
@@ -405,17 +324,11 @@ html {
   color: #b8e7fb;
 }
 
-:root[data-theme=dark] .page-profil .main-nav a.active {
-  background: #194b67;
-  color: #d8f3ff;
-}
-
 :root[data-theme=dark] .page-profil .academic-icon {
   background: #1d5473;
   color: #d8f3ff;
 }
 
-:root[data-theme=dark] .page-profil .main-nav img,
 :root[data-theme=dark] .page-profil .outline-icon img {
   filter: brightness(0) invert(1);
 }
@@ -436,7 +349,7 @@ html {
 .page-profil {
   background: var(--page);
   color: var(--ink);
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-family: var(--font);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -496,59 +409,6 @@ html {
   min-height: 44px;
 }
 
-.page-profil .main-nav {
-  bottom: calc(12px + env(safe-area-inset-bottom));
-  max-width: 700px;
-  padding: 9px;
-  border-radius: 28px;
-  background: var(--surface);
-  box-shadow: 0 14px 32px rgba(0,0,0,.15);
-}
-
-.page-profil .main-nav a {
-  min-height: 62px;
-  color: #1d242b;
-  transition: background .16s ease, color .16s ease;
-}
-
-.page-profil .main-nav a:hover {
-  background: #eef7fc;
-}
-
-.page-profil .main-nav a.active {
-  background: #bbdefb;
-  color: #0067a6;
-}
-
-.page-profil .nav-icon {
-  display: block;
-  flex: none;
-  width: 26px;
-  height: 26px;
-  background: currentColor;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-}
-
-.page-profil .nav-icon-home {
-  -webkit-mask-image: url("/asset/home%20copy.svg");
-  mask-image: url("/asset/home%20copy.svg");
-}
-
-.page-profil .nav-icon-bookmark {
-  -webkit-mask-image: url("/asset/tersimpan.svg");
-  mask-image: url("/asset/tersimpan.svg");
-}
-
-.page-profil .nav-icon-profile {
-  -webkit-mask-image: url("/asset/profile.svg");
-  mask-image: url("/asset/profile.svg");
-}
-
 .page-profil .action-icon {
   display: block;
   flex: none;
@@ -590,28 +450,10 @@ html {
   --gradient: linear-gradient(105deg, #00a5e0, #0065a3);
 }
 
-:root[data-theme=dark] .page-profil .main-nav,
 :root[data-theme=dark] .page-profil .academic-list {
   background: var(--surface);
   color: var(--ink);
   border-color: var(--line);
-}
-
-:root[data-theme=dark] .page-profil .main-nav {
-  background: #1d242b;
-}
-
-:root[data-theme=dark] .page-profil .main-nav a {
-  color: #85929e;
-}
-
-:root[data-theme=dark] .page-profil .main-nav a:hover {
-  background: #26353d;
-}
-
-:root[data-theme=dark] .page-profil .main-nav a.active {
-  background: #123140;
-  color: #3faae8;
 }
 
 :root[data-theme=dark] .page-profil .profile-hero {
@@ -646,17 +488,6 @@ html {
 }
 
 @media (min-width: 1000px) {
-  .page-profil .main-nav {
-    bottom: auto;
-    border-radius: 0;
-    box-shadow: none;
-    border-right: 1px solid var(--line);
-  }
-
-  .page-profil .main-nav:before {
-    color: var(--deep);
-  }
-
   .page-profil .app-content {
     padding-bottom: 48px;
   }
@@ -665,11 +496,6 @@ html {
 @media (max-width: 380px) {
   .page-profil .screen-main {
     width: calc(100% - 28px);
-  }
-
-  .page-profil .main-nav {
-    left: 8px;
-    right: 8px;
   }
 }
 

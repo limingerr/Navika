@@ -408,12 +408,60 @@ export function AdminPeluangTable() {
   const [selectedStatus, setSelectedStatus] = useState("Semua");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [toastMsg, setToastMsg] = useState("");
-  const [testingBroadcast, setTestingBroadcast] = useState(false);
   const [scraping, setScraping] = useState(false);
+  const [showBroadcastModal, setShowBroadcastModal] = useState(false);
+  const [broadcastType, setBroadcastType] = useState("new");
+  const [customTitle, setCustomTitle] = useState("");
+  const [customOrg, setCustomOrg] = useState("");
+  const [customCat, setCustomCat] = useState("Beasiswa");
+  const [broadcasting, setBroadcasting] = useState(false);
 
   const showToast = (msg) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(""), 4000);
+  };
+
+  const handleTriggerBroadcast = async (e) => {
+    if (e) e.preventDefault();
+    setBroadcasting(true);
+    showToast("Sedang menyiarkan notifikasi ke mahasiswa...");
+    try {
+      if (broadcastType === "new") {
+        const res = await fetch("/api/notify/new-opportunity", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: customTitle || "Beasiswa Baru Resmi Dibuka",
+            organization: customOrg || "Mitra NAVIKA",
+            category: customCat,
+            slug: "djarum",
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`Siaran notifikasi info baru terkirim! (Pop-up Push & Email terkirim)`);
+          setShowBroadcastModal(false);
+        } else {
+          showToast(data.error || "Gagal menyiarkan notifikasi.");
+        }
+      } else {
+        // Trigger deadline reminder
+        const res = await fetch("/api/cron/send-reminders?manual=true", {
+          method: "POST",
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`Pengingat deadline H-2 berhasil disiarkan! (${data.totalPushSent || 0} Push terkirim, ${data.totalEmailSent || 0} Email terkirim)`);
+          setShowBroadcastModal(false);
+        } else {
+          showToast(data.error || "Gagal memicu pengingat deadline.");
+        }
+      }
+    } catch {
+      showToast("Terjadi kendala saat mengirim notifikasi.");
+    } finally {
+      setBroadcasting(false);
+    }
   };
 
   const handleScrapeBeasiswa = async () => {
@@ -444,33 +492,6 @@ export function AdminPeluangTable() {
   const handleExtendDeadline = (id, extraDays = 7) => {
     updateOpportunity(id, { demoDays: extraDays, status: "Terbit" });
     showToast(`Tenggat program berhasil diperpanjang +${extraDays} hari dan kembali tampil bagi mahasiswa.`);
-  };
-
-  const handleTestBroadcast = async () => {
-    setTestingBroadcast(true);
-    try {
-      const res = await fetch("/api/notify/new-opportunity", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: "Uji Coba Siaran Notifikasi NAVIKA",
-          organization: "Tim Pengelola Navika",
-          category: "Beasiswa",
-          field: "Semua Jurusan",
-          slug: "djarum",
-        }),
-      });
-      const data = await res.json();
-      if (data.push?.sent || data.email?.sent) {
-        showToast("Notifikasi siaran berhasil dikirim ke perangkat mahasiswa & email!");
-      } else {
-        showToast("Permintaan notifikasi telah diproses oleh server.");
-      }
-    } catch {
-      showToast("Gagal mengirim notifikasi uji coba.");
-    } finally {
-      setTestingBroadcast(false);
-    }
   };
 
   const filteredItems = useMemo(() => {
@@ -542,12 +563,11 @@ export function AdminPeluangTable() {
           <button
             type="button"
             className="admin-btn admin-btn-secondary"
-            onClick={handleTestBroadcast}
-            disabled={testingBroadcast}
-            title="Kirim notifikasi pengujian langsung ke semua perangkat mahasiswa dan email"
+            onClick={() => setShowBroadcastModal(true)}
+            title="Buka panel siaran pop-up dan email ke seluruh mahasiswa"
           >
             <AdminIcon name="bell" size={16} />
-            <span>{testingBroadcast ? "Menyiarkan..." : "Tes Siaran Notifikasi"}</span>
+            <span>Siarkan Notifikasi</span>
           </button>
           <button type="button" className="admin-btn admin-btn-secondary" onClick={handleReset}>
             Reset Data Default
@@ -718,6 +738,117 @@ export function AdminPeluangTable() {
           </table>
         </div>
       </div>
+
+      {/* Modal Siaran Notifikasi Pop-up & Email */}
+      {showBroadcastModal && (
+        <div className="admin-modal-overlay">
+          <div className="admin-modal" style={{ maxWidth: "520px" }}>
+            <h2 className="admin-modal-title" style={{ fontSize: "1.25rem", margin: "0 0 8px" }}>
+              Pusat Siaran Notifikasi Mahasiswa
+            </h2>
+            <p className="admin-modal-desc" style={{ marginBottom: "18px" }}>
+              Kirimkan notifikasi langsung berupa <strong>Pop-up Web Push</strong> ke HP/browser serta <strong>Email</strong> kepada seluruh mahasiswa terdaftar.
+            </p>
+
+            <form onSubmit={handleTriggerBroadcast}>
+              <div className="admin-form-group" style={{ marginBottom: "14px" }}>
+                <label style={{ display: "block", marginBottom: "6px", fontWeight: 700, fontSize: "13px" }}>
+                  Pilih Jenis Siaran
+                </label>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button
+                    type="button"
+                    onClick={() => setBroadcastType("new")}
+                    className={`admin-btn admin-btn-sm ${broadcastType === "new" ? "admin-btn-primary" : "admin-btn-secondary"}`}
+                    style={{ flex: 1, justifyContent: "center" }}
+                  >
+                    📢 Info Peluang Baru
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBroadcastType("deadline")}
+                    className={`admin-btn admin-btn-sm ${broadcastType === "deadline" ? "admin-btn-primary" : "admin-btn-secondary"}`}
+                    style={{ flex: 1, justifyContent: "center" }}
+                  >
+                    ⏰ Pengingat Deadline (H-2)
+                  </button>
+                </div>
+              </div>
+
+              {broadcastType === "new" ? (
+                <>
+                  <div className="admin-form-group" style={{ marginBottom: "12px" }}>
+                    <label style={{ display: "block", marginBottom: "4px", fontSize: "13px", fontWeight: 600 }}>
+                      Judul Program / Peluang *
+                    </label>
+                    <input
+                      className="admin-input"
+                      placeholder="Contoh: Beasiswa Bank Indonesia 2026"
+                      value={customTitle}
+                      onChange={(e) => setCustomTitle(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="admin-form-group" style={{ marginBottom: "12px" }}>
+                    <label style={{ display: "block", marginBottom: "4px", fontSize: "13px", fontWeight: 600 }}>
+                      Penyelenggara / Mitra *
+                    </label>
+                    <input
+                      className="admin-input"
+                      placeholder="Contoh: Bank Indonesia"
+                      value={customOrg}
+                      onChange={(e) => setCustomOrg(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="admin-form-group" style={{ marginBottom: "16px" }}>
+                    <label style={{ display: "block", marginBottom: "4px", fontSize: "13px", fontWeight: 600 }}>
+                      Kategori Peluang
+                    </label>
+                    <select
+                      className="admin-select"
+                      style={{ width: "100%" }}
+                      value={customCat}
+                      onChange={(e) => setCustomCat(e.target.value)}
+                    >
+                      <option value="Beasiswa">Beasiswa</option>
+                      <option value="Magang">Magang</option>
+                      <option value="Bootcamp">Bootcamp</option>
+                    </select>
+                  </div>
+                </>
+              ) : (
+                <div style={{ background: "#f8fafc", padding: "14px", borderRadius: "10px", border: "1px solid #e2e8f0", marginBottom: "16px" }}>
+                  <p style={{ margin: "0 0 8px", fontSize: "13px", color: "var(--teks)" }}>
+                    Sistem akan memindai seluruh katalog peluang aktif dan mengirimkan notifikasi <strong>Pop-up & Email Pengingat Deadline</strong> kepada mahasiswa untuk program yang batas pendaftarannya ditutup dalam <strong>2 hari ke depan (H-2)</strong>.
+                  </p>
+                  <small style={{ color: "#ea580c", fontWeight: 600 }}>
+                    💡 Notifikasi ini juga berjalan otomatis setiap hari via server cron.
+                  </small>
+                </div>
+              )}
+
+              <div className="admin-modal-actions" style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                <button
+                  type="button"
+                  className="admin-btn admin-btn-secondary"
+                  onClick={() => setShowBroadcastModal(false)}
+                  disabled={broadcasting}
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="admin-btn admin-btn-primary"
+                  disabled={broadcasting}
+                >
+                  {broadcasting ? "Mengirimkan Siaran..." : "Kirimkan Notifikasi Sekarang"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {deleteTarget && (

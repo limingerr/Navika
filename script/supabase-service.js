@@ -239,7 +239,7 @@ export async function fetchOpportunitiesFromDb() {
         const today = new Date();
         const diffTime = deadlineDate.getTime() - today.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        calculatedDemoDays = diffDays >= 0 ? diffDays : 0;
+        calculatedDemoDays = diffDays;
       }
 
       return {

@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useApp, useTr } from "@/script/app-provider";
-import { categories, categoryLabel, demoDeadline, formatDate, opportunities as staticOpportunities } from "@/script/opportunities";
+import { categories, categoryLabel, demoDeadline, formatDate, isOpportunityVisibleForStudent, isOpportunityInGracePeriod, isOpportunityExpiredOverWeek, opportunities as staticOpportunities } from "@/script/opportunities";
 
 /* ============================================================
    Icons for Admin Shell
@@ -246,13 +246,14 @@ export function AdminOverview() {
 
   const stats = useMemo(() => {
     const total = opportunities.length;
-    const active = opportunities.filter((o) => o.status !== "Ditutup" && o.status !== "Diarsipkan").length;
-    const urgent = opportunities.filter((o) => o.demoDays <= 7 && o.status !== "Ditutup").length;
+    const active = opportunities.filter((o) => isOpportunityVisibleForStudent(o)).length;
+    const gracePeriod = opportunities.filter((o) => isOpportunityInGracePeriod(o)).length;
+    const urgent = opportunities.filter((o) => o.demoDays <= 7 && o.demoDays > 0 && o.status !== "Ditutup").length;
     const beasiswa = opportunities.filter((o) => o.category === "Beasiswa").length;
     const magang = opportunities.filter((o) => o.category === "Magang").length;
     const bootcamp = opportunities.filter((o) => o.category === "Bootcamp").length;
 
-    return { total, active, urgent, beasiswa, magang, bootcamp };
+    return { total, active, gracePeriod, urgent, beasiswa, magang, bootcamp };
   }, [opportunities]);
 
   const recentItems = opportunities.slice(0, 6);
@@ -282,18 +283,18 @@ export function AdminOverview() {
             <span className="admin-stat-icon"><AdminIcon name="catalog" /></span>
           </div>
           <div className="admin-stat-number">{stats.total}</div>
-          <div className="admin-stat-desc">{stats.active} sedang berstatus aktif/terbit</div>
+          <div className="admin-stat-desc">{stats.active} aktif &bull; {stats.gracePeriod} masa tenggang</div>
         </div>
 
         <div className="admin-stat-card">
           <div className="admin-stat-header">
-            <span className="admin-stat-label">Deadline &le; 7 Hari</span>
-            <span className="admin-stat-icon" style={{ background: "var(--merah-bg)", color: "var(--merah)" }}>
+            <span className="admin-stat-label">Masa Tenggang (2-7 Hari)</span>
+            <span className="admin-stat-icon" style={{ background: "rgba(234, 88, 12, 0.12)", color: "#ea580c" }}>
               <AdminIcon name="clock" />
             </span>
           </div>
-          <div className="admin-stat-number">{stats.urgent}</div>
-          <div className="admin-stat-desc">Perlu dipantau jadwal penutupannya</div>
+          <div className="admin-stat-number">{stats.gracePeriod}</div>
+          <div className="admin-stat-desc">Lewat deadline &bull; Tersimpan 1 minggu di admin</div>
         </div>
 
         <div className="admin-stat-card">
@@ -389,10 +390,41 @@ export function AdminPeluangTable() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [toastMsg, setToastMsg] = useState("");
   const [testingBroadcast, setTestingBroadcast] = useState(false);
+  const [scraping, setScraping] = useState(false);
 
   const showToast = (msg) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(""), 4000);
+  };
+
+  const handleScrapeBeasiswa = async () => {
+    setScraping(true);
+    showToast("Sedang menarik data beasiswa terbaru dari Indbeasiswa.com...");
+    try {
+      const res = await fetch("/api/scrape/beasiswa", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ limit: 10 }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Berhasil menarik ${data.scrapedCount} beasiswa terbaru! Memperbarui tampilan...`);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1200);
+      } else {
+        showToast(data.error || "Gagal menarik data beasiswa.");
+      }
+    } catch {
+      showToast("Terjadi kendala saat menghubungi service scraper.");
+    } finally {
+      setScraping(false);
+    }
+  };
+
+  const handleExtendDeadline = (id, extraDays = 7) => {
+    updateOpportunity(id, { demoDays: extraDays, status: "Terbit" });
+    showToast(`Tenggat program berhasil diperpanjang +${extraDays} hari dan kembali tampil bagi mahasiswa.`);
   };
 
   const handleTestBroadcast = async () => {
@@ -428,7 +460,19 @@ export function AdminPeluangTable() {
         `${item.title} ${item.organization} ${item.id}`.toLowerCase().includes(query.trim().toLowerCase());
       const matchCat = selectedCat === "Semua" || item.category === selectedCat;
       const itemStatus = item.status || "Terbit";
-      const matchStatus = selectedStatus === "Semua" || itemStatus === selectedStatus;
+
+      let matchStatus = true;
+      if (selectedStatus === "Semua") {
+        matchStatus = true;
+      } else if (selectedStatus === "Aktif") {
+        matchStatus = isOpportunityVisibleForStudent(item);
+      } else if (selectedStatus === "MasaTenggang") {
+        matchStatus = isOpportunityInGracePeriod(item);
+      } else if (selectedStatus === "Kedaluwarsa") {
+        matchStatus = isOpportunityExpiredOverWeek(item);
+      } else {
+        matchStatus = itemStatus === selectedStatus;
+      }
 
       return matchQuery && matchCat && matchStatus;
     });
@@ -465,6 +509,17 @@ export function AdminPeluangTable() {
           </p>
         </div>
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            className="admin-btn admin-btn-secondary"
+            onClick={handleScrapeBeasiswa}
+            disabled={scraping}
+            style={{ borderColor: "#10b981", color: "#065f46", background: "rgba(16, 185, 129, 0.08)" }}
+            title="Tarik 10 beasiswa terbaru otomatis dari portal Indbeasiswa.com"
+          >
+            <AdminIcon name="plus" size={16} />
+            <span>{scraping ? "Sedang Menarik..." : "Tarik Beasiswa Terbaru (Scrape)"}</span>
+          </button>
           <button
             type="button"
             className="admin-btn admin-btn-secondary"
@@ -512,11 +567,14 @@ export function AdminPeluangTable() {
               onChange={(e) => setSelectedStatus(e.target.value)}
               aria-label="Filter status"
             >
-              <option value="Semua">Semua Status</option>
-              <option value="Terbit">Terbit</option>
-              <option value="Draft">Draft</option>
-              <option value="Ditutup">Ditutup</option>
-              <option value="Diarsipkan">Diarsipkan</option>
+              <option value="Semua">Semua Status & Tenggat</option>
+              <option value="Aktif">Aktif (Tampil Mahasiswa)</option>
+              <option value="MasaTenggang">Masa Tenggang (Lewat 2-7 Hari)</option>
+              <option value="Kedaluwarsa">Kedaluwarsa (&gt; 1 Minggu)</option>
+              <option value="Terbit">Status: Terbit</option>
+              <option value="Draft">Status: Draft</option>
+              <option value="Ditutup">Status: Ditutup</option>
+              <option value="Diarsipkan">Status: Diarsipkan</option>
             </select>
           </div>
           <span style={{ fontSize: "13px", color: "var(--teks-sekunder)" }}>
@@ -560,9 +618,28 @@ export function AdminPeluangTable() {
                         <span className={`admin-badge admin-badge-${catClass}`}>{item.category}</span>
                       </td>
                       <td>
-                        <span className={`admin-badge ${isUrgent ? "admin-badge-urgent" : "admin-badge-default"}`}>
-                          {item.demoDays} Hari lagi
-                        </span>
+                        {item.demoDays > 0 ? (
+                          <span className={`admin-badge ${isUrgent ? "admin-badge-urgent" : "admin-badge-default"}`}>
+                            {item.demoDays} Hari lagi
+                          </span>
+                        ) : item.demoDays === 0 ? (
+                          <span className="admin-badge admin-badge-urgent">
+                            Batas Hari Ini
+                          </span>
+                        ) : isOpportunityInGracePeriod(item) ? (
+                          <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+                            <span className="admin-badge admin-badge-urgent" style={{ background: "#fef2f2", color: "#991b1b", border: "1px solid #fecaca" }}>
+                              Tutup {Math.abs(item.demoDays)}h lalu
+                            </span>
+                            <small style={{ fontSize: "11px", color: "#ea580c", fontWeight: 600 }}>
+                              Masa tenggang sisa {7 - Math.abs(item.demoDays)}h
+                            </small>
+                          </div>
+                        ) : (
+                          <span className="admin-badge admin-badge-default" style={{ opacity: 0.65 }}>
+                            Lewat {Math.abs(item.demoDays)}h lalu
+                          </span>
+                        )}
                       </td>
                       <td>
                         <select
@@ -579,6 +656,17 @@ export function AdminPeluangTable() {
                       </td>
                       <td>
                         <div className="admin-table-actions">
+                          {item.demoDays <= 2 && (
+                            <button
+                              type="button"
+                              className="admin-btn admin-btn-sm"
+                              onClick={() => handleExtendDeadline(item.id, 7)}
+                              title="Perpanjang deadline +7 hari agar kembali aktif untuk mahasiswa"
+                              style={{ background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0", fontWeight: 700 }}
+                            >
+                              +7h
+                            </button>
+                          )}
                           <Link
                             href={`/admin/peluang/${item.id}/edit`}
                             className="admin-btn admin-btn-secondary admin-btn-sm"

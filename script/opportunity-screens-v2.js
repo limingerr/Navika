@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useApp, useTr } from "@/script/app-provider";
 import { AppShell, DeadlineLabel, DemoNote, Icon, OpportunityCard, OpportunityList } from "@/script/ui";
-import { calendarFilterLabel, calendarFilters, categories, categoryLabel, demoDeadline, demoReminders, fieldLabel, filterCalendarOpportunities, formatDate, hasCategory, isOpportunityRecommended, opportunities as staticOpportunities } from "@/script/opportunities";
+import { calendarFilterLabel, calendarFilters, categories, categoryLabel, demoDeadline, demoReminders, fieldLabel, filterCalendarOpportunities, formatDate, hasCategory, isOpportunityRecommended, isOpportunityVisibleForStudent, opportunities as staticOpportunities } from "@/script/opportunities";
 const AGENDA_DATA = {
     "2026-09-08": [
         { warna: "hijau", judul: "Djarum Beasiswa Plus", jenis: "Buka pendaftaran", id: "djarum", kategori: "Beasiswa" }
@@ -93,7 +93,7 @@ function getDayAgenda(date, filter = "Semua", saved = [], profile = null, oppLis
 
     // Sertakan batas pendaftaran dan milestone dari data peluang aktif
     const oppEvents = [];
-    const activeOpps = oppList.filter((item) => item.status !== "Ditutup" && item.status !== "Diarsipkan");
+    const activeOpps = oppList.filter((item) => isOpportunityVisibleForStudent(item) && item.status !== "Ditutup" && item.status !== "Diarsipkan");
 
     for (const item of activeOpps) {
         const catClass = item.category.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-");
@@ -257,7 +257,7 @@ export function DashboardScreen() {
     }, [selected, viewMonth]);
 
     const recommendedList = useMemo(() => {
-        const active = opportunities.filter((item) => item.status !== "Ditutup" && item.status !== "Diarsipkan");
+        const active = opportunities.filter((item) => isOpportunityVisibleForStudent(item) && item.status !== "Ditutup" && item.status !== "Diarsipkan");
         const matches = active.filter((item) => isOpportunityRecommended(item, profile.major));
         const others = active.filter((item) => !matches.includes(item));
         return [...matches, ...others].slice(0, 8);
@@ -398,7 +398,7 @@ export function CatalogScreen() {
     const fields = ["Semua bidang", ...Array.from(new Set(opportunities.map((item) => item.field)))];
     const filtered = useMemo(() => {
         const list = opportunities
-            .filter((item) => item.status !== "Ditutup" && item.status !== "Diarsipkan")
+            .filter((item) => isOpportunityVisibleForStudent(item) && item.status !== "Ditutup" && item.status !== "Diarsipkan")
             .filter((item) => {
                 const text = `${item.title} ${item.organization} ${item.summary} ${item.summaryEn}`.toLocaleLowerCase();
                 return (category === "Semua" || hasCategory(item, category)) && (field === "Semua bidang" || item.field === field) && text.includes(query.trim().toLocaleLowerCase());
@@ -418,6 +418,25 @@ export function DetailScreen({ id }) {
     const item = opportunities.find((opportunity) => opportunity.id === id);
     if (!item)
         return <AppShell><main className="screen-main empty-state"><h1>{tr("Peluang tidak ditemukan", "Opportunity not found")}</h1><Link href="/peluang" className="primary-button">{tr("Kembali ke daftar", "Back to list")}</Link></main></AppShell>;
+    
+    if (!isOpportunityVisibleForStudent(item)) {
+        return (
+            <AppShell>
+                <main className="screen-main empty-state" style={{ padding: "60px 16px", textAlign: "center" }}>
+                    <div style={{ fontSize: "2.8rem", marginBottom: "14px" }} aria-hidden="true">⏳</div>
+                    <h1 style={{ fontSize: "1.6rem", fontWeight: 800 }}>{tr("Pendaftaran Telah Ditutup", "Registration Closed")}</h1>
+                    <p style={{ margin: "10px auto 24px", maxWidth: "440px", color: "var(--teks-redup)", lineHeight: 1.5 }}>
+                        {tr(
+                            "Program ini telah melewati batas waktu pendaftaran lebih dari 2 hari yang lalu dan tidak lagi aktif bagi pendaftar baru.",
+                            "This opportunity has passed its application deadline by more than 2 days and is no longer active for new applicants."
+                        )}
+                    </p>
+                    <Link href="/peluang" className="primary-button">{tr("Cari Peluang Lainnya", "Find Other Opportunities")}</Link>
+                </main>
+            </AppShell>
+        );
+    }
+
     const isSaved = saved.includes(id);
     const handleSave = () => toggleSaved(id);
     const isRecommended = isOpportunityRecommended(item, profile?.major);
@@ -429,7 +448,7 @@ export function SavedScreen() {
     const tr = useTr();
     const [category, setCategory] = useState("Semua");
     const [query, setQuery] = useState("");
-    const items = opportunities.filter((item) => saved.includes(item.id) && (category === "Semua" || hasCategory(item, category)) && `${item.title} ${item.organization}`.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
+    const items = opportunities.filter((item) => saved.includes(item.id) && isOpportunityVisibleForStudent(item) && (category === "Semua" || hasCategory(item, category)) && `${item.title} ${item.organization}`.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
     return <AppShell><header className="top-header title-header"><h1>{tr("Tersimpan", "Saved")}</h1><label className="saved-search"><span className="sr-only">{tr("Cari peluang tersimpan", "Search saved opportunities")}</span><Icon name="search.svg"/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={tr("Cari", "Search")}/></label></header><main className="screen-main"><DemoNote /><CategoryTabs selected={category} onSelect={setCategory}/>{items.length ? <div className="saved-grid">{items.map((item) => <OpportunityCard key={item.id} opportunity={item} displayCategory={category === "Semua" ? undefined : category}/>)}</div> : <div className="empty-state"><h2>{tr("Belum ada peluang tersimpan", "No Saved Opportunities")}</h2><p>{tr("Simpan peluang dari daftar untuk melihatnya di sini.", "Save an opportunity from the list to see it here.")}</p><Link className="primary-button" href="/peluang">{tr("Cari peluang", "Find Opportunities")}</Link></div>}</main></AppShell>;
 }
 export function CalendarScreen() {

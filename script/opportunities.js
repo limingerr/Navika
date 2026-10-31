@@ -1843,16 +1843,55 @@ export function hasCategory(opportunity, category) {
     return opportunity.category === category || opportunity.alsoCategories?.includes(category) === true;
 }
 
+/**
+ * Mengecek apakah peluang layak tampil di sisi mahasiswa:
+ * - Tidak berstatus "Diarsipkan" atau "Draft"
+ * - Belum melewati deadline lebih dari 2 hari (demoDays >= -2)
+ */
+export function isOpportunityVisibleForStudent(opportunity) {
+    if (!opportunity) return false;
+    if (opportunity.status === "Diarsipkan" || opportunity.status === "Draft") {
+        return false;
+    }
+    if (typeof opportunity.demoDays === "number" && opportunity.demoDays < -2) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Mengecek apakah peluang berada dalam masa tenggang admin (lewat 2 s/d 7 hari)
+ */
+export function isOpportunityInGracePeriod(opportunity) {
+    if (!opportunity) return false;
+    if (typeof opportunity.demoDays === "number") {
+        return opportunity.demoDays < -2 && opportunity.demoDays >= -7;
+    }
+    return false;
+}
+
+/**
+ * Mengecek apakah peluang sudah kedaluwarsa lebih dari 1 minggu
+ */
+export function isOpportunityExpiredOverWeek(opportunity) {
+    if (!opportunity) return false;
+    if (typeof opportunity.demoDays === "number") {
+        return opportunity.demoDays < -7;
+    }
+    return false;
+}
+
 export function filterCalendarOpportunities(filter, saved, base = new Date(), profile = null) {
+    const visibleList = opportunities.filter(isOpportunityVisibleForStudent);
     if (filter === "Semua")
-        return opportunities;
+        return visibleList;
     if (filter === "Rekomendasi")
-        return opportunities.filter((item) => profile?.major ? isOpportunityRecommended(item, profile.major) : item.recommended);
+        return visibleList.filter((item) => profile?.major ? isOpportunityRecommended(item, profile.major) : item.recommended);
     if (filter === "Disimpan")
-        return opportunities.filter((item) => saved.includes(item.id));
+        return visibleList.filter((item) => saved.includes(item.id));
     if (filter === "Deadline")
-        return opportunities.filter((item) => item.demoDays <= 7 && demoDeadline(item.demoDays, base) >= new Date(base.getFullYear(), base.getMonth(), base.getDate()));
-    return opportunities.filter((item) => hasCategory(item, filter));
+        return visibleList.filter((item) => item.demoDays <= 7 && demoDeadline(item.demoDays, base) >= new Date(base.getFullYear(), base.getMonth(), base.getDate()));
+    return visibleList.filter((item) => hasCategory(item, filter));
 }
 
 export function demoReminders(saved) {

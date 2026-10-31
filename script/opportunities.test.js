@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { demoDeadline, demoReminders, filterCalendarOpportunities, hasCategory, opportunities } from "./opportunities.js";
+import { demoDeadline, demoReminders, filterCalendarOpportunities, hasCategory, isOpportunityVisibleForStudent, isOpportunityInGracePeriod, isOpportunityExpiredOverWeek, opportunities } from "./opportunities.js";
 import { normalizeGpa } from "./profile.js";
 import { resolveTheme } from "./i18n.js";
 
@@ -38,4 +38,24 @@ test("tema sistem mengikuti perangkat dan pilihan manual mengabaikannya", () => 
   assert.equal(resolveTheme("system", true), "dark");
   assert.equal(resolveTheme("system", false), "light");
   assert.equal(resolveTheme("light", true), "light");
+});
+
+test("siklus hidup peluang: hilang di mahasiswa setelah lewat 2 hari, masa tenggang admin 7 hari", () => {
+  // Masih aktif sebelum deadline
+  assert.equal(isOpportunityVisibleForStudent({ status: "Terbit", demoDays: 5 }), true);
+  // Hari deadline
+  assert.equal(isOpportunityVisibleForStudent({ status: "Terbit", demoDays: 0 }), true);
+  // Lewat 1 hari (masih toleransi)
+  assert.equal(isOpportunityVisibleForStudent({ status: "Terbit", demoDays: -1 }), true);
+  // Lewat 2 hari (hari terakhir toleransi)
+  assert.equal(isOpportunityVisibleForStudent({ status: "Terbit", demoDays: -2 }), true);
+  // Lewat 3 hari (otomatis HILANG dari mahasiswa)
+  assert.equal(isOpportunityVisibleForStudent({ status: "Terbit", demoDays: -3 }), false);
+  // Masuk masa tenggang admin (lewat 3-7 hari)
+  assert.equal(isOpportunityInGracePeriod({ status: "Terbit", demoDays: -3 }), true);
+  assert.equal(isOpportunityInGracePeriod({ status: "Terbit", demoDays: -7 }), true);
+  assert.equal(isOpportunityInGracePeriod({ status: "Terbit", demoDays: -1 }), false);
+  // Lewat lebih dari 1 minggu (> 7 hari)
+  assert.equal(isOpportunityExpiredOverWeek({ status: "Terbit", demoDays: -8 }), true);
+  assert.equal(isOpportunityInGracePeriod({ status: "Terbit", demoDays: -8 }), false);
 });

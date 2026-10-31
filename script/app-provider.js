@@ -73,6 +73,8 @@ export function AppProvider({ children }) {
     const [locale, setLocale] = useState("id");
     const [theme, setTheme] = useState("light");
     const [deadlineAlerts, setDeadlineAlerts] = useState(true);
+    const [emailAlerts, setEmailAlerts] = useState(false);
+    const [emailConsentDecided, setEmailConsentDecided] = useState(false);
     const [calendarFilter, setCalendarFilter] = useState("Semua");
     const [opportunities, setOpportunities] = useState(initialOpportunities);
     const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -92,6 +94,10 @@ export function AppProvider({ children }) {
                     setTheme(parsed.theme);
                 if (typeof parsed.deadlineAlerts === "boolean")
                     setDeadlineAlerts(parsed.deadlineAlerts);
+                if (typeof parsed.emailAlerts === "boolean")
+                    setEmailAlerts(parsed.emailAlerts);
+                if (typeof parsed.emailConsentDecided === "boolean")
+                    setEmailConsentDecided(parsed.emailConsentDecided);
                 if (calendarFilters.includes(parsed.calendarFilter))
                     setCalendarFilter(parsed.calendarFilter);
             }
@@ -148,12 +154,12 @@ export function AppProvider({ children }) {
         if (!ready)
             return;
         try {
-            localStorage.setItem(storageKey, JSON.stringify({ profile, saved, locale, theme, deadlineAlerts, calendarFilter }));
+            localStorage.setItem(storageKey, JSON.stringify({ profile, saved, locale, theme, deadlineAlerts, emailAlerts, emailConsentDecided, calendarFilter }));
         }
         catch {
             // Penyimpanan browser mungkin nonaktif; sesi saat ini tetap berjalan.
         }
-    }, [profile, saved, locale, theme, deadlineAlerts, calendarFilter, ready]);
+    }, [profile, saved, locale, theme, deadlineAlerts, emailAlerts, emailConsentDecided, calendarFilter, ready]);
 
     const saveOpportunitiesState = (updatedList) => {
         setOpportunities(updatedList);
@@ -486,6 +492,10 @@ export function AppProvider({ children }) {
       setTheme,
       deadlineAlerts,
       setDeadlineAlerts,
+      emailAlerts,
+      setEmailAlerts,
+      emailConsentDecided,
+      setEmailConsentDecided,
       calendarFilter,
       setCalendarFilter,
       clearDemo,

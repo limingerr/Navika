@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useApp, useTr } from "@/script/app-provider";
 import { AppShell, DeadlineLabel, DemoNote, Icon, OpportunityCard, OpportunityList } from "@/script/ui";
+import { EmailConsentModal } from "@/script/email-consent-modal";
 import { calendarFilterLabel, calendarFilters, categories, categoryLabel, demoDeadline, demoReminders, fieldLabel, filterCalendarOpportunities, formatDate, hasCategory, isOpportunityRecommended, isOpportunityVisibleForStudent, opportunities as staticOpportunities } from "@/script/opportunities";
 const AGENDA_DATA = {
     "2026-09-08": [
@@ -264,6 +265,7 @@ export function DashboardScreen() {
     }, [opportunities, profile.major]);
 
     return <AppShell>
+    <EmailConsentModal />
     <header className="kepala top-header dashboard-header">
       <span className="avatar avatar-small" aria-hidden="true">{displayName.slice(0, 1).toUpperCase()}</span>
       <div className="identitas greeting">

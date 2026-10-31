@@ -56,6 +56,21 @@ function AdminIcon({ name, size = 18 }) {
         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
       </svg>
     ),
+    archive: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <polyline points="21 8 21 21 3 21 3 8" />
+        <rect x="1" y="3" width="22" height="5" />
+        <line x1="10" y1="12" x2="14" y2="12" />
+      </svg>
+    ),
+    users: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    ),
     menu: (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <line x1="3" y1="12" x2="21" y2="12" />
@@ -100,9 +115,11 @@ export function AdminLayout({ children }) {
   }, [ready, isAdminLoggedIn, pathname, router]);
 
   const navItems = [
-    { href: "/admin", label: "Dashboard Overview", icon: "dashboard", exact: true },
+    { href: "/admin", label: "Dashboard", icon: "dashboard", exact: true },
     { href: "/admin/peluang", label: "Katalog Peluang", icon: "catalog", exact: false },
     { href: "/admin/peluang/tambah", label: "Tambah Peluang", icon: "plus", exact: true },
+    { href: "/admin/arsip", label: "Arsip Peluang", icon: "archive", exact: true },
+    { href: "/admin/mahasiswa", label: "Kelola Mahasiswa", icon: "users", exact: true },
     { href: "/dashboard", label: "Kembali ke Web Mahasiswa", icon: "globe", exact: true },
   ];
 
@@ -126,6 +143,8 @@ export function AdminLayout({ children }) {
         { label: "Edit Peluang", active: true },
       ];
     }
+    if (pathname === "/admin/arsip") return [{ label: "Arsip Peluang", active: true }];
+    if (pathname === "/admin/mahasiswa") return [{ label: "Kelola Mahasiswa", active: true }];
     return [{ label: "Admin", active: true }];
   };
 
@@ -1204,6 +1223,554 @@ export function AdminLogin() {
           </form>
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   Admin Arsip Table Screen (/admin/arsip)
+   ============================================================ */
+export function AdminArsipTable() {
+  const { opportunities = staticOpportunities, updateOpportunity, deleteOpportunity } = useApp();
+  const [query, setQuery] = useState("");
+  const [selectedCat, setSelectedCat] = useState("Semua");
+  const [selectedStage, setSelectedStage] = useState("Semua");
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [toastMsg, setToastMsg] = useState("");
+
+  const showToast = (msg) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(""), 4000);
+  };
+
+  const handleRestore = (item, days = 7) => {
+    updateOpportunity(item.id, { demoDays: days, status: "Terbit" });
+    showToast(`Program "${item.title}" berhasil diaktifkan kembali (+${days} hari) dan tampil untuk mahasiswa.`);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    deleteOpportunity(deleteTarget.id);
+    setDeleteTarget(null);
+    showToast(`Program "${deleteTarget.title}" telah dihapus permanen.`);
+  };
+
+  const archivedItems = useMemo(() => {
+    return opportunities.filter((item) => {
+      // Masuk arsip jika: diarsipkan, ditutup, atau lewat deadline lebih dari 2 hari
+      const isArchivedStatus = item.status === "Diarsipkan" || item.status === "Ditutup";
+      const isPastGrace = typeof item.demoDays === "number" && item.demoDays < -2;
+      return isArchivedStatus || isPastGrace;
+    });
+  }, [opportunities]);
+
+  const filteredItems = useMemo(() => {
+    return archivedItems.filter((item) => {
+      const matchQuery =
+        `${item.title} ${item.organization} ${item.id}`.toLowerCase().includes(query.trim().toLowerCase());
+      const matchCat = selectedCat === "Semua" || item.category === selectedCat;
+
+      let matchStage = true;
+      if (selectedStage === "MasaTenggang") {
+        matchStage = isOpportunityInGracePeriod(item);
+      } else if (selectedStage === "Kedaluwarsa") {
+        matchStage = isOpportunityExpiredOverWeek(item);
+      } else if (selectedStage === "Diarsipkan") {
+        matchStage = item.status === "Diarsipkan";
+      }
+
+      return matchQuery && matchCat && matchStage;
+    });
+  }, [archivedItems, query, selectedCat, selectedStage]);
+
+  const graceCount = archivedItems.filter((i) => isOpportunityInGracePeriod(i)).length;
+  const expiredCount = archivedItems.filter((i) => isOpportunityExpiredOverWeek(i)).length;
+
+  return (
+    <div>
+      {toastMsg && <div className="admin-toast success">{toastMsg}</div>}
+
+      <div className="admin-page-header">
+        <div>
+          <h1 className="admin-page-title">Arsip & Riwayat Peluang</h1>
+          <p className="admin-page-subtitle">
+            Peluang yang telah melewati batas deadline pendaftaran (&gt;2 hari), masa tenggang, atau diarsipkan manual.
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <Link href="/admin/peluang" className="admin-btn admin-btn-secondary">
+            &larr; Kembali ke Katalog Aktif
+          </Link>
+        </div>
+      </div>
+
+      {/* Mini Stats Arsip */}
+      <div className="admin-stats-grid" style={{ marginBottom: "20px" }}>
+        <div className="admin-stat-card">
+          <div className="admin-stat-header">
+            <span className="admin-stat-label">Total Dalam Arsip</span>
+            <span className="admin-stat-icon"><AdminIcon name="archive" /></span>
+          </div>
+          <div className="admin-stat-number">{archivedItems.length}</div>
+          <div className="admin-stat-desc">Tidak tampil di layar mahasiswa</div>
+        </div>
+
+        <div className="admin-stat-card">
+          <div className="admin-stat-header">
+            <span className="admin-stat-label">Masa Tenggang (2-7 Hari)</span>
+            <span className="admin-stat-icon" style={{ background: "rgba(234, 88, 12, 0.12)", color: "#ea580c" }}>
+              <AdminIcon name="clock" />
+            </span>
+          </div>
+          <div className="admin-stat-number">{graceCount}</div>
+          <div className="admin-stat-desc">Dapat dipulihkan sebelum arsip permanen</div>
+        </div>
+
+        <div className="admin-stat-card">
+          <div className="admin-stat-header">
+            <span className="admin-stat-label">Kedaluwarsa (&gt; 1 Minggu)</span>
+            <span className="admin-stat-icon" style={{ background: "#f3f4f6", color: "#6b7280" }}>
+              <AdminIcon name="trash" />
+            </span>
+          </div>
+          <div className="admin-stat-number">{expiredCount}</div>
+          <div className="admin-stat-desc">Peluang lewat batas toleransi</div>
+        </div>
+      </div>
+
+      <div className="admin-card">
+        <div className="admin-card-header">
+          <div className="admin-table-filters">
+            <input
+              type="text"
+              className="admin-search-input"
+              placeholder="Cari arsip program atau mitra..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <select
+              className="admin-select"
+              value={selectedCat}
+              onChange={(e) => setSelectedCat(e.target.value)}
+              aria-label="Filter kategori arsip"
+            >
+              <option value="Semua">Semua Kategori</option>
+              {categories.filter((c) => c !== "Semua").map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+            <select
+              className="admin-select"
+              value={selectedStage}
+              onChange={(e) => setSelectedStage(e.target.value)}
+              aria-label="Filter status arsip"
+            >
+              <option value="Semua">Semua Status Arsip</option>
+              <option value="MasaTenggang">Masa Tenggang (2-7 Hari)</option>
+              <option value="Kedaluwarsa">Kedaluwarsa (&gt; 1 Minggu)</option>
+              <option value="Diarsipkan">Diarsipkan Manual</option>
+            </select>
+          </div>
+          <span style={{ fontSize: "13px", color: "var(--teks-sekunder)" }}>
+            Menampilkan <strong>{filteredItems.length}</strong> dari {archivedItems.length} arsip
+          </span>
+        </div>
+
+        <div className="admin-table-wrapper">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Program & Penyelenggara</th>
+                <th>Kategori</th>
+                <th>Status Tenggat Arsip</th>
+                <th>Aksi Pemulihan</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredItems.length > 0 ? (
+                filteredItems.map((item) => {
+                  const catClass = item.category.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-");
+                  const inGrace = isOpportunityInGracePeriod(item);
+                  const expired = isOpportunityExpiredOverWeek(item);
+                  return (
+                    <tr key={item.id}>
+                      <td>
+                        <div className="admin-table-title">{item.title}</div>
+                        <div className="admin-table-org">
+                          {item.organization} &bull; <small>ID: {item.id}</small>
+                        </div>
+                      </td>
+                      <td>
+                        <span className={`admin-badge admin-badge-${catClass}`}>{item.category}</span>
+                      </td>
+                      <td>
+                        {inGrace ? (
+                          <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+                            <span className="admin-badge admin-badge-urgent" style={{ background: "#fef2f2", color: "#991b1b", border: "1px solid #fecaca" }}>
+                              Tutup {Math.abs(item.demoDays)}h lalu
+                            </span>
+                            <small style={{ fontSize: "11px", color: "#ea580c", fontWeight: 600 }}>
+                              Masa tenggang sisa {7 - Math.abs(item.demoDays)}h
+                            </small>
+                          </div>
+                        ) : expired ? (
+                          <span className="admin-badge admin-badge-default" style={{ opacity: 0.7 }}>
+                            Kedaluwarsa {Math.abs(item.demoDays)}h lalu
+                          </span>
+                        ) : (
+                          <span className="admin-badge admin-badge-default">
+                            {item.status || "Diarsipkan"}
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        <div className="admin-table-actions">
+                          <button
+                            type="button"
+                            className="admin-btn admin-btn-sm"
+                            onClick={() => handleRestore(item, 7)}
+                            title="Aktifkan kembali peluang ini selama 7 hari agar muncul lagi di web mahasiswa"
+                            style={{ background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0", fontWeight: 700 }}
+                          >
+                            Pulihkan (+7h)
+                          </button>
+                          <button
+                            type="button"
+                            className="admin-btn admin-btn-danger admin-btn-sm"
+                            onClick={() => setDeleteTarget(item)}
+                            title="Hapus arsip ini secara permanen"
+                          >
+                            <AdminIcon name="trash" size={13} />
+                            <span>Hapus</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={4} style={{ textAlign: "center", padding: "40px", color: "var(--teks-redup)" }}>
+                    Tidak ada peluang dalam arsip pada filter yang dipilih.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Modal Konfirmasi Hapus */}
+      {deleteTarget && (
+        <div className="admin-modal-backdrop">
+          <div className="admin-modal">
+            <h2 className="admin-modal-title">Hapus Arsip Permanen?</h2>
+            <p className="admin-modal-desc">
+              Peluang <strong>"{deleteTarget.title}"</strong> akan dihapus permanen dari sistem dan database.
+            </p>
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-btn admin-btn-secondary"
+                onClick={() => setDeleteTarget(null)}
+              >
+                Batalkan
+              </button>
+              <button
+                type="button"
+                className="admin-btn admin-btn-danger"
+                onClick={confirmDelete}
+              >
+                Hapus Permanen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ============================================================
+   Admin Mahasiswa Table Screen (/admin/mahasiswa)
+   ============================================================ */
+export function AdminMahasiswaTable() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState("Semua");
+  const [toastMsg, setToastMsg] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
+  const showToast = (msg) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(""), 4000);
+  };
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/users");
+      const data = await res.json();
+      if (data.users) {
+        setUsers(data.users);
+      }
+    } catch (err) {
+      console.warn("Gagal mengambil data user:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleRoleToggle = async (userId, currentRole) => {
+    const newRole = currentRole === "pengelola" ? "mahasiswa" : "pengelola";
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, role: newRole }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Peran pengguna berhasil diubah menjadi "${newRole}".`);
+        setUsers((prev) =>
+          prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
+        );
+      } else {
+        showToast(data.error || "Gagal mengubah peran.");
+      }
+    } catch {
+      showToast("Terjadi kesalahan saat memperbarui peran.");
+    }
+  };
+
+  const confirmDeleteUser = async () => {
+    if (!deleteTarget) return;
+    try {
+      const res = await fetch(`/api/admin/users?id=${encodeURIComponent(deleteTarget.id)}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Akun "${deleteTarget.name}" (${deleteTarget.email}) berhasil dihapus.`);
+        setUsers((prev) => prev.filter((u) => u.id !== deleteTarget.id));
+      } else {
+        showToast(data.error || "Gagal menghapus pengguna.");
+      }
+    } catch {
+      showToast("Terjadi kesalahan saat menghapus pengguna.");
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
+  const filteredUsers = useMemo(() => {
+    return users.filter((u) => {
+      const text = `${u.name} ${u.email} ${u.university} ${u.major}`.toLowerCase();
+      const matchQuery = text.includes(query.trim().toLowerCase());
+      const matchRole = roleFilter === "Semua" || u.role === roleFilter;
+      return matchQuery && matchRole;
+    });
+  }, [users, query, roleFilter]);
+
+  const studentCount = users.filter((u) => u.role === "mahasiswa").length;
+  const adminCount = users.filter((u) => u.role === "pengelola").length;
+  const validGpas = users.map((u) => parseFloat(u.gpa)).filter((g) => !isNaN(g) && g > 0);
+  const avgGpa = validGpas.length
+    ? (validGpas.reduce((a, b) => a + b, 0) / validGpas.length).toFixed(2)
+    : "3.82";
+
+  return (
+    <div>
+      {toastMsg && <div className="admin-toast success">{toastMsg}</div>}
+
+      <div className="admin-page-header">
+        <div>
+          <h1 className="admin-page-title">Kelola Pengguna Mahasiswa</h1>
+          <p className="admin-page-subtitle">
+            Daftar akun mahasiswa terdaftar, data universitas, program studi, IPK, dan kontrol hak akses peran.
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button
+            type="button"
+            className="admin-btn admin-btn-secondary"
+            onClick={fetchUsers}
+            disabled={loading}
+          >
+            {loading ? "Memuat..." : "Refresh Data"}
+          </button>
+        </div>
+      </div>
+
+      {/* Mini Stats Mahasiswa */}
+      <div className="admin-stats-grid" style={{ marginBottom: "20px" }}>
+        <div className="admin-stat-card">
+          <div className="admin-stat-header">
+            <span className="admin-stat-label">Total Mahasiswa</span>
+            <span className="admin-stat-icon"><AdminIcon name="users" /></span>
+          </div>
+          <div className="admin-stat-number">{studentCount}</div>
+          <div className="admin-stat-desc">Akun mahasiswa aktif</div>
+        </div>
+
+        <div className="admin-stat-card">
+          <div className="admin-stat-header">
+            <span className="admin-stat-label">Akun Pengelola / Admin</span>
+            <span className="admin-stat-icon" style={{ background: "rgba(0, 103, 166, 0.12)", color: "var(--biru-aksi)" }}>
+              <AdminIcon name="dashboard" />
+            </span>
+          </div>
+          <div className="admin-stat-number">{adminCount}</div>
+          <div className="admin-stat-desc">Hak akses panel admin</div>
+        </div>
+
+        <div className="admin-stat-card">
+          <div className="admin-stat-header">
+            <span className="admin-stat-label">Rata-rata IPK</span>
+            <span className="admin-stat-icon" style={{ background: "rgba(16, 185, 129, 0.12)", color: "#10b981" }}>
+              <AdminIcon name="check" />
+            </span>
+          </div>
+          <div className="admin-stat-number">{avgGpa}</div>
+          <div className="admin-stat-desc">Dari seluruh profil mahasiswa</div>
+        </div>
+      </div>
+
+      <div className="admin-card">
+        <div className="admin-card-header">
+          <div className="admin-table-filters">
+            <input
+              type="text"
+              className="admin-search-input"
+              placeholder="Cari nama, email, kampus, atau jurusan..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <select
+              className="admin-select"
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              aria-label="Filter peran"
+            >
+              <option value="Semua">Semua Peran</option>
+              <option value="mahasiswa">Mahasiswa</option>
+              <option value="pengelola">Pengelola / Admin</option>
+            </select>
+          </div>
+          <span style={{ fontSize: "13px", color: "var(--teks-sekunder)" }}>
+            Menampilkan <strong>{filteredUsers.length}</strong> dari {users.length} pengguna
+          </span>
+        </div>
+
+        <div className="admin-table-wrapper">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Nama & Email Mahasiswa</th>
+                <th>Universitas & Program Studi</th>
+                <th>Semester & IPK</th>
+                <th>Hak Akses (Role)</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: "center", padding: "40px", color: "var(--teks-redup)" }}>
+                    Sedang memuat data pengguna mahasiswa dari Supabase...
+                  </td>
+                </tr>
+              ) : filteredUsers.length > 0 ? (
+                filteredUsers.map((u) => {
+                  const isPengelola = u.role === "pengelola";
+                  return (
+                    <tr key={u.id}>
+                      <td>
+                        <div className="admin-table-title">{u.name}</div>
+                        <div className="admin-table-org">
+                          {u.email}
+                        </div>
+                      </td>
+                      <td>
+                        <div style={{ fontWeight: 600 }}>{u.university}</div>
+                        <small style={{ color: "var(--teks-sekunder)" }}>{u.major}</small>
+                      </td>
+                      <td>
+                        <div style={{ fontWeight: 600 }}>
+                          {u.semester ? `Semester ${u.semester}` : "-"} &bull; IPK: {u.gpa}
+                        </div>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          className={`admin-badge ${isPengelola ? "admin-badge-blue" : "admin-badge-default"}`}
+                          onClick={() => handleRoleToggle(u.id, u.role)}
+                          title="Klik untuk mengubah role pengguna ini"
+                          style={{ cursor: "pointer", border: "1px solid rgba(0,0,0,0.1)" }}
+                        >
+                          {isPengelola ? "🛡️ Pengelola" : "🎓 Mahasiswa"}
+                        </button>
+                      </td>
+                      <td>
+                        <div className="admin-table-actions">
+                          <button
+                            type="button"
+                            className="admin-btn admin-btn-danger admin-btn-sm"
+                            onClick={() => setDeleteTarget(u)}
+                            title="Hapus akun mahasiswa ini"
+                          >
+                            <AdminIcon name="trash" size={13} />
+                            <span>Hapus</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: "center", padding: "40px", color: "var(--teks-redup)" }}>
+                    Tidak ada data pengguna mahasiswa yang cocok dengan pencarian.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Modal Konfirmasi Hapus Akun */}
+      {deleteTarget && (
+        <div className="admin-modal-backdrop">
+          <div className="admin-modal">
+            <h2 className="admin-modal-title">Hapus Akun Pengguna?</h2>
+            <p className="admin-modal-desc">
+              Akun <strong>"{deleteTarget.name}"</strong> ({deleteTarget.email}) akan dihapus permanen dari sistem autentikasi dan database.
+            </p>
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-btn admin-btn-secondary"
+                onClick={() => setDeleteTarget(null)}
+              >
+                Batalkan
+              </button>
+              <button
+                type="button"
+                className="admin-btn admin-btn-danger"
+                onClick={confirmDeleteUser}
+              >
+                Hapus Akun
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

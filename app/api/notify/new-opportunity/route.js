@@ -46,11 +46,15 @@ export async function broadcastNewOpportunity({ title, organization, category, f
     }
   }
 
-  // 2. Kirim Email Notifikasi via Resend
+  // 2. Kirim Email Notifikasi ke seluruh pengguna mahasiswa terdaftar di Supabase
   let emailResult = null;
   let recipientInfo = { emails: [], source: "none", count: 0 };
 
-  if (process.env.RESEND_API_KEY) {
+  const isEmailConfigured =
+    Boolean(process.env.RESEND_API_KEY) ||
+    Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+
+  if (isEmailConfigured) {
     recipientInfo = await getNotificationRecipients();
 
     if (recipientInfo.emails.length > 0) {

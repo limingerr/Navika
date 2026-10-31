@@ -146,8 +146,12 @@ export async function GET(request) {
         results.push({ id: opp.id, pushError: e.message });
       }
 
-      // 5b. Email Notification Resend ke user Supabase (penerima bookmark atau seluruh user)
-      if (process.env.RESEND_API_KEY) {
+      // 5b. Email Notification ke user Supabase (penerima bookmark atau seluruh user terdaftar)
+      const isEmailConfigured =
+        Boolean(process.env.RESEND_API_KEY) ||
+        Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+
+      if (isEmailConfigured) {
         try {
           const recipientInfo = await getNotificationRecipients({ opportunityId: opp.id });
           if (recipientInfo.emails.length > 0) {

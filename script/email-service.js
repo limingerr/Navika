@@ -56,21 +56,34 @@ export async function sendEmail({ to, subject, html }) {
         };
       }
 
-      // Jika banyak penerima, kirim menggunakan BCC agar privasi email terjaga
-      const info = await transporter.sendMail({
-        from: fromAddress,
-        to: emailUser,
-        bcc: validRecipients,
-        subject,
-        html,
-      });
+      // Kirim individual langsung (1-to-1) agar setiap mahasiswa mendapatkan email resmi langsung di Inbox Utama
+      const sendResults = await Promise.allSettled(
+        validRecipients.map((recipient) =>
+          transporter.sendMail({
+            from: fromAddress,
+            to: recipient,
+            subject,
+            html,
+          })
+        )
+      );
+
+      const successful = sendResults.filter((r) => r.status === "fulfilled");
+      const failed = sendResults.filter((r) => r.status === "rejected");
+
+      if (failed.length > 0) {
+        console.warn(
+          `Sebagian email gagal terkirim (${failed.length}/${validRecipients.length}):`,
+          failed.map((f) => f.reason?.message)
+        );
+      }
 
       return {
-        success: true,
-        id: info.messageId,
+        success: successful.length > 0,
         recipients: validRecipients,
-        totalSent: validRecipients.length,
-        provider: "nodemailer_bcc",
+        totalSent: successful.length,
+        failedCount: failed.length,
+        provider: "nodemailer_direct",
       };
     } catch (err) {
       console.warn("Gagal mengirim via Nodemailer Gmail:", err.message);

@@ -439,7 +439,11 @@ export function AdminPeluangTable() {
         });
         const data = await res.json();
         if (data.success) {
-          showToast(`Siaran notifikasi info baru terkirim! (Pop-up Push & Email terkirim)`);
+          if (data.email?.sent) {
+            showToast(`Siaran berhasil! Email terkirim langsung ke ${data.email.totalSent} mahasiswa.`);
+          } else {
+            showToast(`Siaran diproses. Notifikasi email: ${data.email?.error || "Cek kredensial di .env.local"}`);
+          }
           setShowBroadcastModal(false);
         } else {
           showToast(data.error || "Gagal menyiarkan notifikasi.");
@@ -451,7 +455,11 @@ export function AdminPeluangTable() {
         });
         const data = await res.json();
         if (data.success) {
-          showToast(`Pengingat deadline H-2 berhasil disiarkan! (${data.totalPushSent || 0} Push terkirim, ${data.totalEmailSent || 0} Email terkirim)`);
+          if (data.totalEmailSent > 0 || data.totalPushSent > 0) {
+            showToast(`Pengingat deadline H-2 berhasil disiarkan (${data.totalEmailSent || 0} Email & ${data.totalPushSent || 0} Push)!`);
+          } else {
+            showToast(`Pemeriksaan H-2 selesai: Tidak ada program deadline H-2 saat ini.`);
+          }
           setShowBroadcastModal(false);
         } else {
           showToast(data.error || "Gagal memicu pengingat deadline.");

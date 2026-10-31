@@ -86,6 +86,13 @@ export async function broadcastNewOpportunity({ title, organization, category, f
       recipientsSource: recipientInfo.source,
       totalRecipients: recipientInfo.count,
       totalSent: emailResult?.totalSent || (emailResult?.success ? 1 : 0),
+      error:
+        emailResult?.error ||
+        (!isEmailConfigured
+          ? "EMAIL_USER & EMAIL_PASS belum disetel"
+          : recipientInfo.count === 0
+          ? "Tidak ada penerima email terdaftar di database Supabase"
+          : undefined),
       result: emailResult,
     },
   };

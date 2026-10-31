@@ -7,8 +7,10 @@ import { getNotificationRecipients } from "@/lib/supabase/admin";
 export async function GET(request) {
   try {
     // 1. Verifikasi keamanan CRON_SECRET jika dikonfigurasi di Vercel
+    const { searchParams } = new URL(request.url);
+    const isManual = searchParams.get("manual") === "true";
     const authHeader = request.headers.get("authorization");
-    if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!isManual && process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       // Izinkan jika dijalankan di development / localhost
       const host = request.headers.get("host") || "";
       if (!host.includes("localhost") && !host.includes("127.0.0.1")) {
@@ -188,4 +190,8 @@ export async function GET(request) {
       { status: 500 }
     );
   }
+}
+
+export async function POST(request) {
+  return GET(request);
 }

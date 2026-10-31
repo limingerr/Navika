@@ -1,0 +1,331 @@
+/* ============================================================
+   NAVIKA - Global Design Tokens & Base Styles
+   Acuan: PRD-NAVIKA.md §2.6 (Font: Poppins) & WCAG AA Colors
+   ============================================================ */
+
+:root {
+  /* Tipografi Utama (PRD §2.6) */
+  --font: "Poppins", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  /* Token Warna Utama NAVIKA (WCAG AA compliant) */
+  --biru-utama:  #00A6E0;
+  --biru-kartu:  #05a5d9;
+  --biru-aksi:   #0067A6;
+  --biru-aktif:  #05a5d9;
+  --biru-teks:   #2F5F94;
+  --biru-lembut: #C7DDF8;
+  --biru-muda:   #EAF5FC;
+  --hijau:       #3E5145;
+  --merah:       #C33228;
+  --pink:        #D17AEF;
+  --oranye:      #FF8A3D;
+  --pink-tua:    #98004A;
+  --ungu:        #3217C9;
+  --hitam:       #090909;
+  --hitam-pekat: #080808;
+  --abu:         #D9D9D9;
+
+  --teks:        #090909;
+  --teks-redup:  #5B6470;
+  --garis:       #E5E7EB;
+  --garis-hari:  #E5E7EB;
+  --biru-hover:  #00527F;
+
+  /* Aliases token sekunder untuk kompatibilitas */
+  --blue:        var(--biru-kartu);
+  --deep:        var(--biru-aksi);
+  --ink:         var(--teks);
+  --muted:       var(--teks-redup);
+  --soft:        var(--biru-muda);
+  --line:        var(--garis);
+  --page:        #F0F4F8;
+  --surface:     #FFFFFF;
+
+  /* Elevation & Shadows */
+  --shadow-sm:   0 2px 8px rgba(13, 33, 53, 0.05);
+  --shadow-md:   0 6px 18px rgba(13, 33, 53, 0.08);
+  --shadow-lg:   0 14px 30px rgba(13, 33, 53, 0.12);
+  --shadow:      var(--shadow-md);
+
+  /* Radius & Spacing */
+  --radius-kartu: 24px;
+  --radius-sel:   12px;
+  --radius-tombol: 999px;
+  --radius-input: 16px;
+}
+
+:root[data-theme="dark"] {
+  --page:        #0B0F14;
+  --surface:     #161F28;
+  --teks:        #F3F4F6;
+  --teks-redup:  #94A3B8;
+  --garis:       #263342;
+  --garis-hari:  #263342;
+
+  --ink:         var(--teks);
+  --muted:       var(--teks-redup);
+  --soft:        #1A232E;
+  --line:        var(--garis);
+
+  --shadow-sm:   0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md:   0 8px 22px rgba(0, 0, 0, 0.4);
+  --shadow-lg:   0 16px 36px rgba(0, 0, 0, 0.5);
+  --shadow:      var(--shadow-md);
+
+  --biru-muda:   #1A2B3C;
+  --biru-lembut: #1E3A5F;
+}
+
+/* Global Reset & Base Element Styles */
+html {
+  scroll-behavior: smooth;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font);
+  color: var(--teks);
+  background: var(--page);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Scrollbar styling halus */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 103, 166, 0.2) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(0, 103, 166, 0.25);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Aksesibilitas keyboard: Focus Ring 3:1 contrast */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--biru-aksi);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Mikro-interaksi tombol & kartu */
+button, a {
+  transition: transform 180ms ease, background-color 180ms ease, color 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+button:active, a:active {
+  transform: scale(0.98);
+}
+
+/* ============================================================
+   MAIN NAVIGATION (Unified across Dashboard, Tersimpan, Profil, dll.)
+   ============================================================ */
+
+.main-nav,
+.nav-bawah {
+  position: fixed;
+  bottom: calc(14px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 28px);
+  max-width: 412px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 6px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--garis);
+  border-radius: 24px;
+  box-shadow: 0 10px 28px rgba(17, 24, 39, 0.12), 0 2px 6px rgba(17, 24, 39, 0.06);
+  z-index: 50;
+}
+
+.main-nav a,
+.nav-bawah a,
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--teks-redup);
+  text-decoration: none;
+  transition: all 180ms ease;
+  min-height: 52px;
+}
+
+.main-nav a:not(.active):hover,
+.nav-bawah a:not(.active):hover {
+  background: var(--biru-muda);
+  color: var(--biru-aksi);
+}
+
+.main-nav a.active,
+.nav-bawah a.active,
+.nav-item.aktif {
+  background: var(--biru-lembut);
+  color: var(--biru-aksi);
+  font-weight: 700;
+}
+
+.main-nav .nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+}
+
+.main-nav .nav-icon svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+}
+
+:root[data-theme="dark"] .main-nav,
+:root[data-theme="dark"] .nav-bawah {
+  background: rgba(22, 31, 40, 0.94);
+  border-color: #263342;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="dark"] .main-nav a.active,
+:root[data-theme="dark"] .nav-bawah a.active {
+  background: rgba(0, 166, 224, 0.2);
+  color: #3faae8;
+}
+
+:root[data-theme="dark"] .main-nav a:not(.active):hover,
+:root[data-theme="dark"] .nav-bawah a:not(.active):hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+/* Desktop Sidebar (>= 1000px) */
+@media (min-width: 1000px) {
+  .app-shell {
+    display: grid !important;
+    grid-template-columns: 220px minmax(0, 1fr) !important;
+    min-height: 100vh;
+  }
+
+  .app-content {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    padding-bottom: 50px !important;
+    min-width: 0;
+  }
+
+  .main-nav,
+  .nav-bawah {
+    position: sticky !important;
+    top: 0 !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    align-self: start !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 220px !important;
+    height: 100vh !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 32px 14px !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+    border-right: 1px solid var(--garis) !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+  }
+
+  :root[data-theme="dark"] .main-nav,
+  :root[data-theme="dark"] .nav-bawah {
+    background: #161f28 !important;
+    border-right-color: #263342 !important;
+  }
+
+  .main-nav:before,
+  .nav-bawah:before {
+    content: "NAVIKA";
+    display: block;
+    width: 100%;
+    padding: 8px 12px 28px;
+    color: var(--biru-aksi);
+    font-size: 1.55rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  :root[data-theme="dark"] .main-nav:before,
+  :root[data-theme="dark"] .nav-bawah:before {
+    color: #3faae8;
+  }
+
+  .main-nav a,
+  .nav-bawah a,
+  .nav-item {
+    flex: none !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-height: 48px !important;
+    padding: 10px 14px !important;
+    border-radius: 14px !important;
+    font-size: 0.95rem !important;
+  }
+
+  .main-nav a .nav-icon,
+  .nav-bawah a .nav-icon {
+    width: 20px;
+    height: 20px;
+  }
+}

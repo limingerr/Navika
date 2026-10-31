@@ -28,7 +28,7 @@ html {
   margin: 0;
   color: var(--ink);
   background: #fff;
-  font-family: Arial,Helvetica,sans-serif;
+  font-family: var(--font);
   line-height: 1.5;
 }
 
@@ -242,7 +242,7 @@ html {
 .page-pengaturan-privasi {
   background: var(--page);
   color: var(--ink);
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-family: var(--font);
   -webkit-font-smoothing: antialiased;
 }
 

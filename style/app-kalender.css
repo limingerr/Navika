@@ -175,8 +175,6 @@
 
 .page-kalender .judul-bulan,
 .page-kalender .calendar-heading h2 {
-  flex: 1;
-  min-width: 0;
   margin: 0;
   text-align: center;
   font-size: clamp(18px, 5vw, 22px);
@@ -186,6 +184,45 @@
   overflow: hidden;
   text-overflow: ellipsis;
   text-transform: capitalize;
+}
+
+.page-kalender .judul-bulan-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-kalender .tombol-hari-ini {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--biru-muda);
+  color: var(--biru-aksi);
+  border: 1px solid var(--biru-lembut);
+  cursor: pointer;
+  transition: all 180ms ease;
+  line-height: 1.4;
+}
+
+.page-kalender .tombol-hari-ini:hover {
+  background: var(--biru-aksi);
+  color: #fff;
+  border-color: var(--biru-aksi);
+}
+
+:root[data-theme=dark] .page-kalender .tombol-hari-ini {
+  background: rgba(0, 166, 224, 0.15);
+  color: #3faae8;
+  border-color: rgba(0, 166, 224, 0.3);
+}
+
+:root[data-theme=dark] .page-kalender .tombol-hari-ini:hover {
+  background: var(--biru-utama);
+  color: #0b0f14;
 }
 
 .page-kalender .ikon-bulan,
@@ -607,82 +644,7 @@
   }
 }
 
-/* ---- Navigasi bawah / AppShell ---- */
-
-.page-kalender .nav-bawah,
-.page-kalender .main-nav {
-  position: fixed;
-  bottom: calc(12px + env(safe-area-inset-bottom));
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 28px);
-  max-width: 412px;
-  display: flex;
-  gap: 6px;
-  padding: 10px 14px;
-  background: #fff;
-  border-radius: 24px;
-  box-shadow: 0 10px 26px rgba(17,24,39,.18), 0 2px 6px rgba(17,24,39,.08);
-  z-index: 50;
-}
-
-.page-kalender .nav-item,
-.page-kalender .main-nav a {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  padding: 8px 4px;
-  border-radius: 16px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--teks-redup);
-  transition: background-color 180ms ease, color 180ms ease;
-}
-
-@media (hover: hover) {
-  .page-kalender .nav-item:not(.aktif):hover,
-  .page-kalender .main-nav a:not(.active):hover {
-    background: #F2F4F7;
-  }
-}
-
-.page-kalender .nav-item.aktif,
-.page-kalender .main-nav a.active {
-  background: var(--biru-lembut);
-  color: var(--biru-teks);
-}
-
-.page-kalender .nav-icon {
-  display: block;
-  flex: none;
-  width: 22px;
-  height: 22px;
-  background: currentColor;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-}
-
-.page-kalender .nav-icon-home {
-  -webkit-mask-image: url("/asset/home%20copy.svg");
-  mask-image: url("/asset/home%20copy.svg");
-}
-
-.page-kalender .nav-icon-bookmark {
-  -webkit-mask-image: url("/asset/tersimpan.svg");
-  mask-image: url("/asset/tersimpan.svg");
-}
-
-.page-kalender .nav-icon-profile {
-  -webkit-mask-image: url("/asset/profile.svg");
-  mask-image: url("/asset/profile.svg");
-}
+/* main-nav diwarisi dari globals.css */
 
 /* ============================================================
    RESPONSIVE BREAKPOINTS
@@ -713,11 +675,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px;
   }
-
-  .page-kalender .nav-bawah,
-  .page-kalender .main-nav {
-    max-width: 500px;
-  }
 }
 
 /* Desktop (>= 1000px) */
@@ -731,59 +688,6 @@
     grid-column: 2;
     grid-row: 1;
     padding-bottom: 50px;
-  }
-
-  .page-kalender .nav-bawah,
-  .page-kalender .main-nav {
-    position: sticky;
-    top: 0;
-    bottom: auto;
-    left: auto;
-    right: auto;
-    transform: none;
-    grid-column: 1;
-    grid-row: 1;
-    align-self: start;
-    display: flex;
-    flex-direction: column;
-    width: auto;
-    height: 100vh;
-    max-width: none;
-    margin: 0;
-    padding: 32px 14px;
-    border-radius: 0;
-    border-right: 1px solid var(--garis);
-    box-shadow: none;
-    background: #fff;
-  }
-
-  .page-kalender .main-nav:before,
-  .page-kalender .nav-bawah:before {
-    content: "NAVIKA";
-    display: block;
-    padding: 10px 14px 34px;
-    color: var(--biru-aksi);
-    font-size: 1.5rem;
-    font-weight: 800;
-    font-family: var(--font);
-    letter-spacing: -0.5px;
-  }
-
-  .page-kalender .main-nav a,
-  .page-kalender .nav-item {
-    flex: none;
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 12px;
-    padding: 12px 16px;
-    font-size: 1rem;
-    border-radius: 16px;
-    min-height: 50px;
-  }
-
-  .page-kalender .main-nav a .nav-icon {
-    width: 24px;
-    height: 24px;
   }
 
   .page-kalender .screen-main,
@@ -832,9 +736,7 @@
 :root[data-theme=dark] .page-kalender .kepala,
 :root[data-theme=dark] .page-kalender .top-header,
 :root[data-theme=dark] .page-kalender .kartu-kalender,
-:root[data-theme=dark] .page-kalender .calendar-panel,
-:root[data-theme=dark] .page-kalender .nav-bawah,
-:root[data-theme=dark] .page-kalender .main-nav {
+:root[data-theme=dark] .page-kalender .calendar-panel {
   background: #1E293B;
   color: var(--teks);
   box-shadow: 0 4px 16px rgba(0,0,0,.3);
@@ -891,17 +793,6 @@
   color: #090909;
 }
 
-:root[data-theme=dark] .page-kalender .main-nav:before,
-:root[data-theme=dark] .page-kalender .nav-bawah:before {
-  color: #38BDF8;
-}
-
-:root[data-theme=dark] .page-kalender .main-nav a.active,
-:root[data-theme=dark] .page-kalender .nav-item.aktif {
-  background: #0369A1;
-  color: #F0F9FF;
-}
-
 :root[data-theme=dark] .page-kalender .demo-note {
   background: #19435a;
   color: #b8e7fb;
@@ -926,8 +817,6 @@
   .page-kalender .ikon-tombol,
   .page-kalender .icon-link,
   .page-kalender .ikon-bulan,
-  .page-kalender .main-nav a,
-  .page-kalender .nav-item,
   .page-kalender .chip,
   .page-kalender .calendar-chip,
   .page-kalender .chip span,

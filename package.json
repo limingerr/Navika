@@ -10,6 +10,7 @@
     "test": "node --test script/*.test.js"
   },
   "dependencies": {
+    "@microsoft/clarity": "^1.0.2",
     "@supabase/server": "^1.9.2",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",

@@ -5,6 +5,7 @@ import { calendarFilters, opportunities as initialOpportunities } from "@/script
 import {
     isSupabaseConfigured,
     signInUser,
+    fetchCurrentAccount,
     signOutUser,
     fetchUserProfile,
     saveUserProfile,
@@ -46,6 +47,7 @@ export function isAdminIdentifier(identifier) {
 }
 
 export function verifyAdminCredentials(identifier, password) {
+    if (process.env.NODE_ENV !== "development") return false;
     if (!identifier || !password) return false;
     const cleanId = identifier.trim().toLowerCase();
     const envToken = (process.env.NEXT_PUBLIC_ADMIN_TOKEN || SECRET_ADMIN_TOKEN || "NAV-SEC-9842-X7").trim().toLowerCase();
@@ -84,7 +86,7 @@ export function AppProvider({ children }) {
             const raw = localStorage.getItem(storageKey);
             if (raw) {
                 const parsed = JSON.parse(raw);
-                if (parsed.profile && typeof parsed.profile === "object")
+                if (!isSupabaseConfigured() && parsed.profile && typeof parsed.profile === "object")
                     setProfile({ ...demoProfile, ...parsed.profile });
                 if (Array.isArray(parsed.saved))
                     setSaved(parsed.saved.filter((id) => typeof id === "string"));
@@ -111,7 +113,7 @@ export function AppProvider({ children }) {
                 }
             }
             const adminRaw = localStorage.getItem(adminStorageKey);
-            if (adminRaw === "true") {
+            if (!isSupabaseConfigured() && process.env.NODE_ENV === "development" && adminRaw === "true") {
                 setIsAdminLoggedIn(true);
                 setProfile(adminProfile);
             }
@@ -132,11 +134,15 @@ export function AppProvider({ children }) {
                     }
                 }).catch(() => {});
 
-                if (adminRaw !== "true") {
-                    fetchUserProfile().then((p) => {
-                        if (p) setProfile((prev) => ({ ...prev, ...p }));
-                    }).catch(() => {});
-                }
+                fetchCurrentAccount().then((account) => {
+                    setIsAdminLoggedIn(Boolean(account?.isAdmin));
+                    setProfile(account?.isAdmin ? adminProfile : account?.profile || defaultProfile);
+                    localStorage.removeItem(adminStorageKey);
+                }).catch(() => {
+                    setIsAdminLoggedIn(false);
+                    setProfile(defaultProfile);
+                    localStorage.removeItem(adminStorageKey);
+                }).finally(() => setReady(true));
 
                 fetchSavedOpportunityIds().then((savedIds) => {
                     if (savedIds && savedIds.length > 0) {
@@ -147,8 +153,9 @@ export function AppProvider({ children }) {
         }
         catch {
             // Data demo yang rusak tidak boleh menghalangi aplikasi dibuka.
+            setReady(true);
         }
-        setReady(true);
+        if (!isSupabaseConfigured()) setReady(true);
     }, []);
     useEffect(() => {
         if (!ready)
@@ -367,8 +374,8 @@ export function AppProvider({ children }) {
             } else {
                 setIsAdminLoggedIn(false);
                 try { localStorage.removeItem(adminStorageKey); } catch {}
-                const p = await fetchUserProfile();
-                if (p) setProfile((prev) => ({ ...prev, ...p }));
+                const account = await fetchCurrentAccount();
+                setProfile(account?.profile || { ...defaultProfile, email: res.user?.email || identifier.trim() });
                 return { role: "mahasiswa" };
             }
         }
@@ -442,6 +449,10 @@ export function AppProvider({ children }) {
             signOutUser().catch(() => {});
         }
     };
+    const clearAdminSession = () => {
+        setIsAdminLoggedIn(false);
+        try { localStorage.removeItem(adminStorageKey); } catch {}
+    };
     useEffect(() => {
         document.documentElement.lang = locale;
         document.title = locale === "en" ? "NAVIKA — Find Your Opportunity" : "NAVIKA — Temukan peluangmu";
@@ -466,6 +477,7 @@ export function AppProvider({ children }) {
             saveUserProfile(newProfile).catch(() => {});
         }
     };
+    const setRegistrationProfile = (newProfile) => setProfile(newProfile);
     const clearDemo = () => {
         setProfile(demoProfile);
         setSaved([]);
@@ -484,6 +496,7 @@ export function AppProvider({ children }) {
       ready,
       profile,
       updateProfile,
+      setRegistrationProfile,
       saved,
       toggleSaved,
       locale,
@@ -508,6 +521,7 @@ export function AppProvider({ children }) {
       login,
       loginAdmin,
       logoutAdmin,
+      clearAdminSession,
     }}>
       {children}
     </AppContext.Provider>);

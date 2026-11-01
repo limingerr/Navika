@@ -42,6 +42,27 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 
+CREATE OR REPLACE FUNCTION public.initialize_student_account()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+    INSERT INTO public.user_roles (user_id, role) VALUES (NEW.id, 'mahasiswa')
+    ON CONFLICT (user_id) DO NOTHING;
+    INSERT INTO public.profiles (user_id, name)
+    VALUES (NEW.id, COALESCE(NULLIF(TRIM(NEW.raw_user_meta_data->>'name'), ''), NULLIF(TRIM(NEW.raw_user_meta_data->>'full_name'), ''), SPLIT_PART(NEW.email, '@', 1), 'Mahasiswa'))
+    ON CONFLICT (user_id) DO NOTHING;
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS initialize_student_account_on_signup ON auth.users;
+CREATE TRIGGER initialize_student_account_on_signup
+AFTER INSERT ON auth.users
+FOR EACH ROW EXECUTE FUNCTION public.initialize_student_account();
+
 -- ------------------------------------------------------------
 -- 4. TABEL KATALOG PELUANG (opportunities)
 -- ------------------------------------------------------------

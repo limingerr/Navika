@@ -53,7 +53,7 @@ export function LoginScreen() {
 }
 export function RegisterScreen() {
     const router = useRouter();
-    const { profile, updateProfile } = useApp();
+    const { setRegistrationProfile, clearAdminSession } = useApp();
     const tr = useTr();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -73,7 +73,8 @@ export function RegisterScreen() {
                 return;
             }
         }
-        updateProfile({ ...profile, name: name.trim(), email });
+        clearAdminSession();
+        setRegistrationProfile({ name: name.trim(), email: email.trim(), university: "", major: "", semester: "", gpa: "", interest: "" });
         setPassword("");
         setConfirm("");
         router.push("/verifikasi");

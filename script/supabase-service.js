@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 import { defaultProfile, isAdminIdentifier, verifyAdminCredentials } from "@/script/app-provider";
+import { resolveAccount } from "@/script/account-state";
 
 /**
  * Memeriksa apakah konfigurasi Supabase telah disetel di environment variables.
@@ -27,12 +28,25 @@ export function getSupabase() {
   return createClient();
 }
 
+export async function fetchCurrentAccount() {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+  if (authError || !authData?.user) return null;
+  const user = authData.user;
+  const [{ data: roleData }, { data: profileData }] = await Promise.all([
+    supabase.from("user_roles").select("role").eq("user_id", user.id).maybeSingle(),
+    supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle(),
+  ]);
+  return resolveAccount(user, roleData?.role, profileData);
+}
+
 /**
  * Autentikasi Pengguna (Mahasiswa atau Admin via ID/Token)
  */
 export async function signInUser(identifier, password) {
   // Cek token khusus admin (Plan B)
-  if (verifyAdminCredentials(identifier, password)) {
+  if (process.env.NODE_ENV === "development" && verifyAdminCredentials(identifier, password)) {
     return {
       success: true,
       role: "admin",
@@ -44,7 +58,7 @@ export async function signInUser(identifier, password) {
   }
 
   // Jika memasukkan format token admin tapi password salah, tolak dengan pesan umum
-  if (isAdminIdentifier(identifier) && !identifier.includes("@")) {
+  if (process.env.NODE_ENV === "development" && isAdminIdentifier(identifier) && !identifier.includes("@")) {
     return {
       success: false,
       error: "Email atau kata sandi tidak valid.",
@@ -116,8 +130,8 @@ export async function signUpUser(name, email, password) {
 
   // Inisialisasi profil mahasiswa di database jika pengguna langsung aktif
   if (data?.user) {
-    try {
-      await supabase.from("profiles").upsert({
+    if (data.session) {
+      const { error: profileError } = await supabase.from("profiles").upsert({
         user_id: data.user.id,
         name: name.trim(),
         university: "",
@@ -127,12 +141,8 @@ export async function signUpUser(name, email, password) {
         interests: [],
         updated_at: new Date().toISOString(),
       });
-
-      await supabase.from("user_roles").upsert({
-        user_id: data.user.id,
-        role: "mahasiswa",
-      });
-    } catch {}
+      if (profileError) return { success: false, error: "Profil gagal dibuat. Silakan coba lagi." };
+    }
   }
 
   return { success: true, user: data.user };

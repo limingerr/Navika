@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { resolveTheme, translate } from "@/script/i18n";
 import { calendarFilters, opportunities as initialOpportunities } from "@/script/opportunities";
+import { adminEmailForIdentifier } from "@/script/admin-identity";
 import {
     isSupabaseConfigured,
     signInUser,
@@ -37,33 +38,6 @@ export const adminProfile = {
     role: "admin",
 };
 
-export const SECRET_ADMIN_TOKEN = process.env.NEXT_PUBLIC_ADMIN_TOKEN || "NAV-SEC-9842-X7";
-
-export function isAdminIdentifier(identifier) {
-    if (!identifier) return false;
-    const clean = identifier.trim().toLowerCase();
-    const envToken = (process.env.NEXT_PUBLIC_ADMIN_TOKEN || SECRET_ADMIN_TOKEN || "NAV-SEC-9842-X7").trim().toLowerCase();
-    return clean === envToken || clean === "nav-sec-9842-x7" || clean === "admin@navika.id" || clean === "adm-navika";
-}
-
-export function verifyAdminCredentials(identifier, password) {
-    if (process.env.NODE_ENV !== "development") return false;
-    if (!identifier || !password) return false;
-    const cleanId = identifier.trim().toLowerCase();
-    const envToken = (process.env.NEXT_PUBLIC_ADMIN_TOKEN || SECRET_ADMIN_TOKEN || "NAV-SEC-9842-X7").trim().toLowerCase();
-    const envPass = (process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "NavikaAdmin2026!").trim();
-    const cleanPass = password.trim();
-
-    // 1. Verifikasi kredensial token unik
-    if ((cleanId === envToken || cleanId === "nav-sec-9842-x7") && (cleanPass === envPass || cleanPass === "NavikaAdmin2026!")) {
-        return true;
-    }
-    // 2. Verifikasi email/ID pengelola standar
-    if ((cleanId === "admin@navika.id" || cleanId === "adm-navika") && (cleanPass === "admin123" || cleanPass === envPass || cleanPass === "NavikaAdmin2026!")) {
-        return true;
-    }
-    return false;
-}
 const AppContext = createContext(null);
 const storageKey = "navika-demo-v1";
 const oppsStorageKey = "navika-opportunities-custom-v1";
@@ -112,12 +86,6 @@ export function AppProvider({ children }) {
                     setOpportunities(parsedOpps);
                 }
             }
-            const adminRaw = localStorage.getItem(adminStorageKey);
-            if (!isSupabaseConfigured() && process.env.NODE_ENV === "development" && adminRaw === "true") {
-                setIsAdminLoggedIn(true);
-                setProfile(adminProfile);
-            }
-
             // Jika Supabase terkonfigurasi, sinkronkan data langsung dari database dengan smart merge
             if (isSupabaseConfigured()) {
                 fetchOpportunitiesFromDb().then((dbOpps) => {
@@ -297,29 +265,8 @@ export function AppProvider({ children }) {
     };
 
     const loginAdmin = async (identifier, password) => {
-        // Mode verifikasi kredensial token / ID lokal
-        if (verifyAdminCredentials(identifier, password)) {
-            setIsAdminLoggedIn(true);
-            try {
-                localStorage.setItem(adminStorageKey, "true");
-            } catch {}
-            setProfile(adminProfile);
-            try {
-                localStorage.setItem(storageKey, JSON.stringify({
-                    profile: adminProfile,
-                    saved: [],
-                    locale: locale || "id",
-                    theme: theme || "light",
-                    deadlineAlerts: true,
-                    calendarFilter: "Semua"
-                }));
-            } catch {}
-            return { success: true, role: "admin" };
-        }
-
-        // Mode verifikasi Supabase
         if (isSupabaseConfigured()) {
-            const res = await signInUser(identifier, password);
+            const res = await signInUser(adminEmailForIdentifier(identifier) || identifier, password);
             if (res.success && res.role === "admin") {
                 setIsAdminLoggedIn(true);
                 try {
@@ -338,6 +285,7 @@ export function AppProvider({ children }) {
                 } catch {}
                 return { success: true, role: "admin" };
             }
+            if (res.success) await signOutUser();
             return {
                 success: false,
                 error: res.error || "Email/token atau kata sandi pengelola tidak valid."
@@ -381,26 +329,7 @@ export function AppProvider({ children }) {
         }
 
         // Mode fallback lokal
-        if (verifyAdminCredentials(identifier, password)) {
-            setIsAdminLoggedIn(true);
-            try {
-                localStorage.setItem(adminStorageKey, "true");
-            } catch {}
-            setProfile(adminProfile);
-            try {
-                localStorage.setItem(storageKey, JSON.stringify({
-                    profile: adminProfile,
-                    saved: [],
-                    locale: locale || "id",
-                    theme: theme || "light",
-                    deadlineAlerts: true,
-                    calendarFilter: "Semua"
-                }));
-            } catch {}
-            return { role: "admin" };
-        } else if (isAdminIdentifier(identifier)) {
-            return { error: "Kata sandi admin tidak valid." };
-        } else {
+        {
             setIsAdminLoggedIn(false);
             try {
                 localStorage.removeItem(adminStorageKey);

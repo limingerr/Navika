@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { sendNewOpportunityEmail } from "@/script/email-service";
 import { getNotificationRecipients } from "@/lib/supabase/admin";
+import { isAuthorizedAdmin } from "@/lib/supabase/require-admin";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -105,6 +106,7 @@ export async function broadcastNewOpportunity({ title, organization, category, f
 }
 
 export async function POST(request) {
+  if (!await isAuthorizedAdmin()) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
   try {
     const body = await request.json().catch(() => ({}));
     const { title, organization, category, field, slug, id } = body;

@@ -3,22 +3,22 @@ import { createClient } from "@supabase/supabase-js";
 import { opportunities as staticOpportunities } from "@/script/opportunities";
 import { sendDeadlineReminderEmail } from "@/script/email-service";
 import { getNotificationRecipients } from "@/lib/supabase/admin";
+import { isAuthorizedAdmin } from "@/lib/supabase/require-admin";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 export async function GET(request) {
   try {
-    // 1. Verifikasi keamanan CRON_SECRET jika dikonfigurasi di Vercel
+    // 1. Verifikasi permintaan manual atau jadwal otomatis
     const { searchParams } = new URL(request.url);
     const isManual = searchParams.get("manual") === "true";
     const authHeader = request.headers.get("authorization");
-    if (!isManual && process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      // Izinkan jika dijalankan di development / localhost
-      const host = request.headers.get("host") || "";
-      if (!host.includes("localhost") && !host.includes("127.0.0.1")) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
+    if (isManual) {
+      if (!await isAuthorizedAdmin()) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+    } else if (process.env.NODE_ENV !== "development" &&
+      (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const onesignalAppId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;

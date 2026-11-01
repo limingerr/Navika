@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import { scrapeIndbeasiswa, saveScrapedToSupabase } from "@/script/scrapers/indbeasiswa";
 import { broadcastNewOpportunity } from "@/app/api/notify/new-opportunity/route";
+import { isAuthorizedAdmin } from "@/lib/supabase/require-admin";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 export async function POST(request) {
+  if (!await isAuthorizedAdmin()) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
   try {
     const body = await request.json().catch(() => ({}));
     const limit = Number(body.limit) || 10;

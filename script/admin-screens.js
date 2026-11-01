@@ -1300,17 +1300,17 @@ export function AdminLogin() {
         <div className="admin-auth-form-card">
           <h2 className="admin-auth-form-title">Masuk ke Akun Admin</h2>
           <p className="admin-auth-form-desc">
-            Gunakan email dan kata sandi pengelola terdaftar.
+            Masukkan kode admin dan kata sandi akun pengelola.
           </p>
 
           <form className="admin-auth-form" onSubmit={handleSubmit}>
             <div className="admin-form-group">
-              <label htmlFor="admin-email">Email atau Token Pengelola</label>
+              <label htmlFor="admin-email">Kode atau Email Admin</label>
               <input
                 id="admin-email"
                 type="text"
                 className="admin-input admin-input-lg"
-                placeholder="admin@navika.id atau Token Unik"
+                placeholder="Kode admin"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -1336,7 +1336,6 @@ export function AdminLogin() {
                 autoComplete="current-password"
                 required
               />
-              <p className="form-hint">Kredensial pengelola: ID ADM-NAVIKA atau admin@navika.id / sandi admin123</p>
             </div>
 
             {error && (

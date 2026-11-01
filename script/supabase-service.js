@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import { defaultProfile, isAdminIdentifier, verifyAdminCredentials } from "@/script/app-provider";
+import { defaultProfile } from "@/script/app-provider";
 import { resolveAccount } from "@/script/account-state";
 
 /**
@@ -45,26 +45,6 @@ export async function fetchCurrentAccount() {
  * Autentikasi Pengguna (Mahasiswa atau Admin via ID/Token)
  */
 export async function signInUser(identifier, password) {
-  // Cek token khusus admin (Plan B)
-  if (process.env.NODE_ENV === "development" && verifyAdminCredentials(identifier, password)) {
-    return {
-      success: true,
-      role: "admin",
-      user: {
-        id: "admin-token-session",
-        email: "admin@navika.internal",
-      },
-    };
-  }
-
-  // Jika memasukkan format token admin tapi password salah, tolak dengan pesan umum
-  if (process.env.NODE_ENV === "development" && isAdminIdentifier(identifier) && !identifier.includes("@")) {
-    return {
-      success: false,
-      error: "Email atau kata sandi tidak valid.",
-    };
-  }
-
   const supabase = getSupabase();
   if (!supabase) {
     // Mode offline / mock

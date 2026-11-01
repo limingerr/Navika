@@ -1,16 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
-
-async function isAuthorizedAdmin() {
-  const supabase = await createClient();
-  if (!supabase) return false;
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error || !user) return false;
-  const { data: role, error: roleError } = await supabase.from("user_roles")
-    .select("role").eq("user_id", user.id).maybeSingle();
-  return !roleError && role?.role === "pengelola";
-}
+import { isAuthorizedAdmin } from "@/lib/supabase/require-admin";
 
 export async function GET() {
   if (!await isAuthorizedAdmin()) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });

@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { isAuthorizedAdmin } from "@/lib/supabase/require-admin";
 
 export async function POST(request) {
+  if (!await isAuthorizedAdmin()) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
   try {
     const admin = getSupabaseAdmin();
     if (!admin) {
@@ -147,6 +149,7 @@ export async function POST(request) {
 }
 
 export async function DELETE(request) {
+  if (!await isAuthorizedAdmin()) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
   try {
     const admin = getSupabaseAdmin();
     if (!admin) {

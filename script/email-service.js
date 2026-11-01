@@ -119,7 +119,7 @@ export async function sendEmail({ to, subject, html }) {
   // 2. Fallback: Resend REST API
   // ------------------------------------------------------------
   if (apiKey) {
-    const from = process.env.RESEND_FROM_EMAIL || "NAVIKA <noreply@navikaid.my.id>";
+    const from = process.env.RESEND_FROM_EMAIL || "Navika <noreply@navika.my.id>";
 
     // Skenario 2a: Penerima tunggal
     if (validRecipients.length === 1) {

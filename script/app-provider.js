@@ -103,14 +103,30 @@ export function AppProvider({ children }) {
                     }
                 }).catch(() => {});
 
+                const adminRaw = localStorage.getItem(adminStorageKey);
+                if (adminRaw === "true") {
+                    setIsAdminLoggedIn(true);
+                    setProfile(adminProfile);
+                }
+
                 fetchCurrentAccount().then((account) => {
-                    setIsAdminLoggedIn(Boolean(account?.isAdmin));
-                    setProfile(account?.isAdmin ? adminProfile : account?.profile || defaultProfile);
-                    localStorage.removeItem(adminStorageKey);
+                    if (account) {
+                        setIsAdminLoggedIn(Boolean(account.isAdmin));
+                        setProfile(account.isAdmin ? adminProfile : account.profile || defaultProfile);
+                        if (account.isAdmin) {
+                            try { localStorage.setItem(adminStorageKey, "true"); } catch {}
+                        } else {
+                            try { localStorage.removeItem(adminStorageKey); } catch {}
+                        }
+                    } else if (adminRaw !== "true") {
+                        setIsAdminLoggedIn(false);
+                        setProfile(defaultProfile);
+                    }
                 }).catch(() => {
-                    setIsAdminLoggedIn(false);
-                    setProfile(defaultProfile);
-                    localStorage.removeItem(adminStorageKey);
+                    if (adminRaw !== "true") {
+                        setIsAdminLoggedIn(false);
+                        setProfile(defaultProfile);
+                    }
                 }).finally(() => setReady(true));
 
                 fetchSavedOpportunityIds().then((savedIds) => {
@@ -266,9 +282,14 @@ export function AppProvider({ children }) {
     };
 
     const loginAdmin = async (identifier, password) => {
-        if (isSupabaseConfigured()) {
-            const res = await signInUser(adminEmailForIdentifier(identifier) || identifier, password);
-            if (res.success && res.role === "admin") {
+        try {
+            const res = await fetch("/api/admin/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ identifier, password: (password || "").trim() })
+            });
+            const data = await res.json();
+            if (data.success && data.role === "admin") {
                 setIsAdminLoggedIn(true);
                 try {
                     localStorage.setItem(adminStorageKey, "true");
@@ -286,24 +307,57 @@ export function AppProvider({ children }) {
                 } catch {}
                 return { success: true, role: "admin" };
             }
-            if (res.success) await signOutUser();
             return {
                 success: false,
-                error: res.error || "Email/token atau kata sandi pengelola tidak valid."
+                error: data.error || "Email/token atau kata sandi pengelola tidak valid."
+            };
+        } catch {
+            return {
+                success: false,
+                error: "Kendala komunikasi dengan server login admin."
             };
         }
-
-        return {
-            success: false,
-            error: "Email/token atau kata sandi pengelola tidak valid."
-        };
     };
 
     const login = async (identifier, password) => {
+        const cleanPass = (password || "").trim();
+
+        // 1. Jika pengguna memasukkan format token atau email admin, proses langsung lewat endpoint admin API
+        if (isAdminIdentifier(identifier)) {
+            try {
+                const res = await fetch("/api/admin/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ identifier, password: cleanPass })
+                });
+                const data = await res.json();
+                if (data.success && data.role === "admin") {
+                    setIsAdminLoggedIn(true);
+                    try { localStorage.setItem(adminStorageKey, "true"); } catch {}
+                    setProfile(adminProfile);
+                    try {
+                        localStorage.setItem(storageKey, JSON.stringify({
+                            profile: adminProfile,
+                            saved: [],
+                            locale: locale || "id",
+                            theme: theme || "light",
+                            deadlineAlerts: true,
+                            calendarFilter: "Semua"
+                        }));
+                    } catch {}
+                    return { role: "admin" };
+                } else {
+                    return { error: data.error || "Email/token atau kata sandi pengelola tidak valid." };
+                }
+            } catch {
+                return { error: "Kendala komunikasi dengan server login admin." };
+            }
+        }
+
         const targetIdentifier = adminEmailForIdentifier(identifier) || identifier;
 
         if (isSupabaseConfigured()) {
-            const res = await signInUser(targetIdentifier, password);
+            const res = await signInUser(targetIdentifier, cleanPass);
             if (!res.success) {
                 return { error: res.error || "Email/ID atau kata sandi tidak valid." };
             }

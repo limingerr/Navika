@@ -21,6 +21,6 @@ export const adminProfile = {
  */
 export function isAdminIdentifier(identifier) {
   if (!identifier) return false;
-  const clean = identifier.trim().toLowerCase();
+  const clean = identifier.trim().toLowerCase().replace(/[\u2010-\u2015\u2212]/g, "-");
   return clean === "nav-adm-9921-z4" || clean === "admin@navika.id";
 }

@@ -60,7 +60,7 @@ export async function signInUser(identifier, password) {
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email: identifier.trim(),
-    password: password,
+    password: (password || "").trim(),
   });
 
   if (error) {

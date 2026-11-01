@@ -47,23 +47,9 @@ export default function RootLayout({ children }) {
             window.OneSignalDeferred = window.OneSignalDeferred || [];
             window.OneSignalDeferred.push(async function(OneSignal) {
               await OneSignal.init({
-                appId: "${ONESIGNAL_APP_ID}",
-                safari_web_id: "web.onesignal.auto.58b504fd-a471-4836-bd65-020899577e4e",
-                notifyButton: {
-                  enable: true,
-                },
+                appId: "772b0572-55ce-4a28-aea9-a64695604c0e",
                 allowLocalhostAsSecureOrigin: true,
               });
-
-              try {
-                if (OneSignal.Slidedown && OneSignal.Slidedown.promptPush) {
-                  await OneSignal.Slidedown.promptPush({ force: true });
-                } else if (OneSignal.Notifications && OneSignal.Notifications.requestPermission) {
-                  await OneSignal.Notifications.requestPermission();
-                }
-              } catch (e) {
-                console.warn("OneSignal auto-prompt notice:", e);
-              }
             });
           `}
         </Script>

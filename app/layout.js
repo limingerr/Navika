@@ -48,6 +48,10 @@ export default function RootLayout({ children }) {
             window.OneSignalDeferred.push(async function(OneSignal) {
               await OneSignal.init({
                 appId: "${ONESIGNAL_APP_ID}",
+                safari_web_id: "web.onesignal.auto.58b504fd-a471-4836-bd65-020899577e4e",
+                notifyButton: {
+                  enable: true,
+                },
                 allowLocalhostAsSecureOrigin: true,
               });
 

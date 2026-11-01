@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { AdminLogin } from "@/script/admin-screens";
 
 export default function Page() {
-  redirect("/masuk");
+  return <AdminLogin />;
 }

@@ -1336,6 +1336,7 @@ export function AdminLogin() {
                 autoComplete="current-password"
                 required
               />
+              <p className="form-hint">Kredensial pengelola: Token NAV-SEC-9842-X7 (sandi NavikaAdmin2026!) atau admin@navika.id</p>
             </div>
 
             {error && (

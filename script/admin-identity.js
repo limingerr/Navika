@@ -1,5 +1,4 @@
 export function adminEmailForIdentifier(identifier) {
-  return identifier?.trim().toLowerCase() === "nav-sec-9842-x7"
-    ? "navika01112026@gmail.com"
-    : null;
+  const clean = identifier?.trim().toLowerCase();
+  return clean === "nav-adm-9921-z4" ? "admin@navika.id" : null;
 }

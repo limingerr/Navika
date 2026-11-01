@@ -30,15 +30,13 @@ export const demoProfile = defaultProfile;
 import {
   SECRET_ADMIN_TOKEN,
   adminProfile,
-  isAdminIdentifier,
-  verifyAdminCredentials
+  isAdminIdentifier
 } from "@/script/admin-auth";
 
 export {
   SECRET_ADMIN_TOKEN,
   adminProfile,
-  isAdminIdentifier,
-  verifyAdminCredentials
+  isAdminIdentifier
 };
 
 const AppContext = createContext(null);
@@ -268,26 +266,6 @@ export function AppProvider({ children }) {
     };
 
     const loginAdmin = async (identifier, password) => {
-        // Mode verifikasi kredensial token / ID lokal TERLEBIH DAHULU
-        if (verifyAdminCredentials(identifier, password)) {
-            setIsAdminLoggedIn(true);
-            try {
-                localStorage.setItem(adminStorageKey, "true");
-            } catch {}
-            setProfile(adminProfile);
-            try {
-                localStorage.setItem(storageKey, JSON.stringify({
-                    profile: adminProfile,
-                    saved: [],
-                    locale: locale || "id",
-                    theme: theme || "light",
-                    deadlineAlerts: true,
-                    calendarFilter: "Semua"
-                }));
-            } catch {}
-            return { success: true, role: "admin" };
-        }
-
         if (isSupabaseConfigured()) {
             const res = await signInUser(adminEmailForIdentifier(identifier) || identifier, password);
             if (res.success && res.role === "admin") {
@@ -322,32 +300,10 @@ export function AppProvider({ children }) {
     };
 
     const login = async (identifier, password) => {
-        // 1. Verifikasi kredensial token unik atau akun pengelola TERLEBIH DAHULU
-        if (verifyAdminCredentials(identifier, password)) {
-            setIsAdminLoggedIn(true);
-            try { localStorage.setItem(adminStorageKey, "true"); } catch {}
-            setProfile(adminProfile);
-            try {
-                localStorage.setItem(storageKey, JSON.stringify({
-                    profile: adminProfile,
-                    saved: [],
-                    locale: locale || "id",
-                    theme: theme || "light",
-                    deadlineAlerts: true,
-                    calendarFilter: "Semua"
-                }));
-            } catch {}
-            return { role: "admin" };
-        }
+        const targetIdentifier = adminEmailForIdentifier(identifier) || identifier;
 
-        // Jika memasukkan format token admin tapi password salah, tolak dengan pesan khusus
-        if (isAdminIdentifier(identifier) && !identifier.includes("@")) {
-            return { error: "Kata sandi admin tidak valid." };
-        }
-
-        // 2. Jika bukan admin lokal, baru periksa ke Supabase Auth
         if (isSupabaseConfigured()) {
-            const res = await signInUser(identifier, password);
+            const res = await signInUser(targetIdentifier, password);
             if (!res.success) {
                 return { error: res.error || "Email/ID atau kata sandi tidak valid." };
             }

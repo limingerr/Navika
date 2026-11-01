@@ -109,10 +109,10 @@ export function AdminLayout({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (ready && !isAdminLoggedIn && pathname !== "/admin/login") {
-      router.replace("/admin/login");
+    if (ready && !isAdminLoggedIn) {
+      router.replace("/masuk");
     }
-  }, [ready, isAdminLoggedIn, pathname, router]);
+  }, [ready, isAdminLoggedIn, router]);
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: "dashboard", exact: true },
@@ -125,7 +125,7 @@ export function AdminLayout({ children }) {
 
   const handleLogout = () => {
     logoutAdmin();
-    router.push("/admin/login");
+    router.push("/");
   };
 
   const getBreadcrumbs = () => {
@@ -147,10 +147,6 @@ export function AdminLayout({ children }) {
     if (pathname === "/admin/mahasiswa") return [{ label: "Kelola Mahasiswa", active: true }];
     return [{ label: "Admin", active: true }];
   };
-
-  if (pathname === "/admin/login") {
-    return <div className="admin-shell">{children}</div>;
-  }
 
   if (ready && !isAdminLoggedIn) {
     return null;
@@ -1231,138 +1227,6 @@ export function AdminPeluangForm({ mode = "create", id = null }) {
           </div>
         </div>
       </form>
-    </div>
-  );
-}
-
-/* ============================================================
-   Admin Login Screen (Harmonized with /masuk)
-   ============================================================ */
-export function AdminLogin() {
-  const router = useRouter();
-  const { loginAdmin } = useApp();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!email.trim() || !password.trim()) {
-      setError("Silakan masukkan email/token dan kata sandi pengelola.");
-      return;
-    }
-    setError("");
-    setLoading(true);
-    try {
-      const res = await loginAdmin(email, password);
-      if (res && res.success) {
-        router.push("/admin");
-      } else {
-        setError(res?.error || "Kredensial atau token pengelola tidak valid.");
-      }
-    } catch {
-      setError("Terjadi kendala autentikasi. Silakan periksa kredensial Anda.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="admin-auth-wrapper">
-      <header className="admin-auth-header">
-        <Link className="brand" href="/" aria-label="NAVIKA, beranda mahasiswa">
-          <img src="/asset/Logo%20Navika.png" alt="" />
-          <strong>NAVIKA</strong>
-        </Link>
-        <span className="admin-badge-role">Panel Admin</span>
-      </header>
-
-      <div className="admin-auth-layout">
-        <div className="admin-auth-intro-col">
-          <div className="admin-auth-hero">
-            <img
-              src="/asset/asset-ilustrasi-masuk.png"
-              alt="Ilustrasi pengelola katalog peluang"
-            />
-          </div>
-          <div className="admin-auth-intro">
-            <h1>Portal Masuk Pengelola Konten</h1>
-            <p>
-              Masuk untuk memelihara katalog beasiswa, magang, dan bootcamp mahasiswa Indonesia.
-            </p>
-            <div className="admin-auth-note">
-              Hak Akses: Pengelola Data & Tim Katalog
-            </div>
-          </div>
-        </div>
-
-        <div className="admin-auth-form-card">
-          <h2 className="admin-auth-form-title">Masuk ke Akun Admin</h2>
-          <p className="admin-auth-form-desc">
-            Masukkan kode admin dan kata sandi akun pengelola.
-          </p>
-
-          <form className="admin-auth-form" onSubmit={handleSubmit}>
-            <div className="admin-form-group">
-              <label htmlFor="admin-email">Kode atau Email Admin</label>
-              <input
-                id="admin-email"
-                type="text"
-                className="admin-input admin-input-lg"
-                placeholder="Kode admin"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setError("");
-                }}
-                autoComplete="username"
-                required
-              />
-            </div>
-
-            <div className="admin-form-group">
-              <label htmlFor="admin-pass">Kata Sandi</label>
-              <input
-                id="admin-pass"
-                type="password"
-                className="admin-input admin-input-lg"
-                placeholder="Kata sandi admin"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setError("");
-                }}
-                autoComplete="current-password"
-                required
-              />
-              <p className="form-hint">Kredensial pengelola: Token NAV-SEC-9842-X7 (sandi NavikaAdmin2026!) atau admin@navika.id</p>
-            </div>
-
-            {error && (
-              <div className="admin-form-error" role="alert">
-                {error}
-              </div>
-            )}
-
-            <button type="submit" className="admin-btn admin-btn-auth-primary" disabled={loading}>
-              {loading ? "Memverifikasi..." : "Masuk ke Dashboard Admin →"}
-            </button>
-
-            <div className="admin-auth-links">
-              <p>
-                Bukan pengelola?{" "}
-                <Link href="/masuk">Masuk sebagai Mahasiswa</Link>
-              </p>
-              <p>
-                <Link href="/dashboard" className="back-link">
-                  &larr; Kembali ke Beranda Utama
-                </Link>
-              </p>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
   );
 }

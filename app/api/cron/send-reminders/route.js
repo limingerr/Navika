@@ -194,6 +194,9 @@ export async function GET(request) {
           results.push({ id: opp.id, emailError: e.message });
         }
       }
+
+      // Berikan jeda 1 detik sebelum memproses program berikutnya agar koneksi SMTP tetap stabil
+      await new Promise((r) => setTimeout(r, 1000));
     }
 
     return NextResponse.json({

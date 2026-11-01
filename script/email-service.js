@@ -5,6 +5,8 @@
 
 import nodemailer from "nodemailer";
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export async function sendEmail({ to, subject, html }) {
   const rawList = Array.isArray(to) ? to : [to];
   const validRecipients = Array.from(
@@ -68,12 +70,13 @@ export async function sendEmail({ to, subject, html }) {
         };
       }
 
-      // Kirim individual langsung (1-to-1) secara berurutan pada pool koneksi agar setiap mahasiswa
-      // mendapatkan email personal di Inbox Utama tanpa memicu batasan koneksi konkuren Gmail SMTP.
+      // Kirim individual langsung (1-to-1) secara berurutan pada pool koneksi dengan jeda waktu aman
+      // agar setiap mahasiswa mendapatkan email personal di Inbox Utama tanpa memicu antrean spam throttling Google SMTP.
       const successful = [];
       const failed = [];
 
-      for (const recipient of validRecipients) {
+      for (let i = 0; i < validRecipients.length; i++) {
+        const recipient = validRecipients[i];
         try {
           const info = await transporter.sendMail({
             from: fromAddress,
@@ -85,6 +88,11 @@ export async function sendEmail({ to, subject, html }) {
         } catch (mailErr) {
           console.warn(`Gagal mengirim email ke ${recipient}:`, mailErr.message);
           failed.push({ recipient, error: mailErr.message });
+        }
+
+        // Berikan jeda 800ms antar pengiriman jika masih ada email berikutnya dalam antrean
+        if (i < validRecipients.length - 1) {
+          await sleep(800);
         }
       }
 

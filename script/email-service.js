@@ -29,11 +29,19 @@ export async function sendEmail({ to, subject, html }) {
   if (emailUser && emailPass) {
     try {
       const transporter = nodemailer.createTransport({
-        service: "gmail",
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        pool: true,
+        maxConnections: 3,
+        maxMessages: 100,
         auth: {
           user: emailUser,
           pass: emailPass,
         },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000,
       });
 
       const fromAddress = `"NAVIKA Peluang Mahasiswa" <${emailUser}>`;
@@ -47,46 +55,60 @@ export async function sendEmail({ to, subject, html }) {
           html,
         });
 
+        transporter.close();
+
         return {
           success: true,
           id: info.messageId,
           recipients: validRecipients,
+          sentRecipients: validRecipients,
+          failedRecipients: [],
           totalSent: 1,
           provider: "nodemailer",
         };
       }
 
-      // Kirim individual langsung (1-to-1) agar setiap mahasiswa mendapatkan email resmi langsung di Inbox Utama
-      const sendResults = await Promise.allSettled(
-        validRecipients.map((recipient) =>
-          transporter.sendMail({
+      // Kirim individual langsung (1-to-1) secara berurutan pada pool koneksi agar setiap mahasiswa
+      // mendapatkan email personal di Inbox Utama tanpa memicu batasan koneksi konkuren Gmail SMTP.
+      const successful = [];
+      const failed = [];
+
+      for (const recipient of validRecipients) {
+        try {
+          const info = await transporter.sendMail({
             from: fromAddress,
             to: recipient,
             subject,
             html,
-          })
-        )
-      );
+          });
+          successful.push({ recipient, messageId: info.messageId });
+        } catch (mailErr) {
+          console.warn(`Gagal mengirim email ke ${recipient}:`, mailErr.message);
+          failed.push({ recipient, error: mailErr.message });
+        }
+      }
 
-      const successful = sendResults.filter((r) => r.status === "fulfilled");
-      const failed = sendResults.filter((r) => r.status === "rejected");
+      transporter.close();
 
       if (failed.length > 0) {
         console.warn(
           `Sebagian email gagal terkirim (${failed.length}/${validRecipients.length}):`,
-          failed.map((f) => f.reason?.message)
+          failed.map((f) => `${f.recipient}: ${f.error}`).join("; ")
         );
       }
 
       return {
         success: successful.length > 0,
         recipients: validRecipients,
+        sentRecipients: successful.map((s) => s.recipient),
+        failedRecipients: failed.map((f) => f.recipient),
         totalSent: successful.length,
         failedCount: failed.length,
         provider: "nodemailer_direct",
+        detail: failed.length > 0 ? failed : undefined,
       };
     } catch (err) {
-      console.warn("Gagal mengirim via Nodemailer Gmail:", err.message);
+      console.warn("Gagal inisialisasi / mengirim via Nodemailer Gmail:", err.message);
       if (!apiKey) {
         return { success: false, error: `Nodemailer error: ${err.message}` };
       }
@@ -205,8 +227,13 @@ export async function sendEmail({ to, subject, html }) {
               success: true,
               id: fbData.id,
               recipients: [fallbackEmail],
+              sentRecipients: [fallbackEmail],
+              failedRecipients: validRecipients.filter((e) => e !== fallbackEmail.trim().toLowerCase()),
               totalSent: 1,
               provider: "resend_fallback",
+              warning:
+                "Batch Resend gagal (domain belum terverifikasi / sandbox tier). Notifikasi hanya terkirim ke alamat fallback: " +
+                fallbackEmail,
             };
           }
         } catch {}
@@ -216,6 +243,8 @@ export async function sendEmail({ to, subject, html }) {
         success: false,
         error: errors.join("; "),
         recipients: validRecipients,
+        sentRecipients: [],
+        failedRecipients: validRecipients,
         totalSent: 0,
       };
     }
@@ -224,6 +253,8 @@ export async function sendEmail({ to, subject, html }) {
       success: totalSent > 0,
       totalSent,
       recipients: validRecipients,
+      sentRecipients: validRecipients,
+      failedRecipients: [],
       ids,
       provider: "resend_batch",
       errors: errors.length > 0 ? errors : undefined,

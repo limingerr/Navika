@@ -440,7 +440,8 @@ export function AdminPeluangTable() {
         const data = await res.json();
         if (data.success) {
           if (data.email?.sent) {
-            showToast(`Siaran berhasil! Email terkirim langsung ke ${data.email.totalSent} mahasiswa.`);
+            const failInfo = data.email.failedRecipients?.length ? ` (${data.email.failedRecipients.length} gagal)` : "";
+            showToast(`Siaran berhasil! Email terkirim langsung ke ${data.email.totalSent} mahasiswa${failInfo}.`);
           } else {
             showToast(`Siaran diproses. Notifikasi email: ${data.email?.error || "Cek kredensial di .env.local"}`);
           }

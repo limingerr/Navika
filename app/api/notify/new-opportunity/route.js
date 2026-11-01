@@ -86,6 +86,9 @@ export async function broadcastNewOpportunity({ title, organization, category, f
       recipientsSource: recipientInfo.source,
       totalRecipients: recipientInfo.count,
       totalSent: emailResult?.totalSent || (emailResult?.success ? 1 : 0),
+      sentRecipients: emailResult?.sentRecipients || [],
+      failedRecipients: emailResult?.failedRecipients || [],
+      provider: emailResult?.provider,
       error:
         emailResult?.error ||
         (!isEmailConfigured

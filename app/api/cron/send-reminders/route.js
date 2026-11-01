@@ -20,12 +20,18 @@ export async function GET(request) {
 
     const onesignalAppId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
     const onesignalRestKey = process.env.ONESIGNAL_REST_API_KEY;
+    const isOneSignalConfigured = Boolean(onesignalAppId && onesignalRestKey);
 
-    if (!onesignalAppId || !onesignalRestKey) {
+    const isEmailConfigured =
+      Boolean(process.env.RESEND_API_KEY) ||
+      Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+
+    if (!isOneSignalConfigured && !isEmailConfigured) {
       return NextResponse.json(
         {
-          error: "Konfigurasi OneSignal belum lengkap.",
-          detail: "Pastikan NEXT_PUBLIC_ONESIGNAL_APP_ID dan ONESIGNAL_REST_API_KEY sudah diset di environment variables.",
+          error: "Konfigurasi pengiriman notifikasi belum lengkap.",
+          detail:
+            "Pastikan salah satu konfigurasi telah disetel: OneSignal (NEXT_PUBLIC_ONESIGNAL_APP_ID & ONESIGNAL_REST_API_KEY) atau Email (EMAIL_USER & EMAIL_PASS).",
         },
         { status: 500 }
       );
@@ -114,36 +120,44 @@ export async function GET(request) {
     const results = [];
 
     for (const opp of opportunitiesToNotify) {
-      // 5a. Push Notification OneSignal
-      try {
-        const payload = {
-          app_id: onesignalAppId,
-          included_segments: ["Total Subscriptions", "Subscribed Users"],
-          headings: {
-            id: `⏳ Deadline H-2: ${opp.title}`,
-            en: `⏳ Deadline in 2 Days: ${opp.title}`,
-          },
-          contents: {
-            id: `Pendaftaran ${opp.category} "${opp.title}" (${opp.organization}) ditutup dalam 2 hari. Segera lengkapi berkas pendaftaranmu!`,
-            en: `Registration for ${opp.category} "${opp.title}" closes in 2 days. Complete your application now!`,
-          },
-          url: `${siteUrl}/peluang/${opp.id}`,
-        };
+      // 5a. Push Notification OneSignal (jika dikonfigurasi)
+      if (isOneSignalConfigured) {
+        try {
+          const payload = {
+            app_id: onesignalAppId,
+            included_segments: ["Total Subscriptions", "Subscribed Users"],
+            headings: {
+              id: `⏳ Deadline H-2: ${opp.title}`,
+              en: `⏳ Deadline in 2 Days: ${opp.title}`,
+            },
+            contents: {
+              id: `Pendaftaran ${opp.category} "${opp.title}" (${opp.organization}) ditutup dalam 2 hari. Segera lengkapi berkas pendaftaranmu!`,
+              en: `Registration for ${opp.category} "${opp.title}" closes in 2 days. Complete your application now!`,
+            },
+            url: `${siteUrl}/peluang/${opp.id}`,
+          };
 
-        const response = await fetch("https://api.onesignal.com/notifications", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Key ${onesignalRestKey}`,
-          },
-          body: JSON.stringify(payload),
+          const response = await fetch("https://api.onesignal.com/notifications", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Key ${onesignalRestKey}`,
+            },
+            body: JSON.stringify(payload),
+          });
+
+          const data = await response.json();
+          results.push({ id: opp.id, pushStatus: response.status, pushData: data });
+          if (response.ok) sentCount++;
+        } catch (e) {
+          results.push({ id: opp.id, pushError: e.message });
+        }
+      } else {
+        results.push({
+          id: opp.id,
+          pushStatus: "skipped",
+          pushNotice: "OneSignal belum dikonfigurasi di environment variables",
         });
-
-        const data = await response.json();
-        results.push({ id: opp.id, pushStatus: response.status, pushData: data });
-        if (response.ok) sentCount++;
-      } catch (e) {
-        results.push({ id: opp.id, pushError: e.message });
       }
 
       // 5b. Email Notification ke user Supabase (penerima bookmark atau seluruh user terdaftar)
@@ -169,6 +183,9 @@ export async function GET(request) {
               emailStatus: emailRes.success ? 200 : 500,
               recipientsCount: recipientInfo.count,
               recipientsSource: recipientInfo.source,
+              sentRecipients: emailRes.sentRecipients || [],
+              failedRecipients: emailRes.failedRecipients || [],
+              provider: emailRes.provider,
               emailResult: emailRes,
             });
           }

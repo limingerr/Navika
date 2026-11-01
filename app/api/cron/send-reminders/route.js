@@ -4,6 +4,9 @@ import { opportunities as staticOpportunities } from "@/script/opportunities";
 import { sendDeadlineReminderEmail } from "@/script/email-service";
 import { getNotificationRecipients } from "@/lib/supabase/admin";
 
+export const maxDuration = 60;
+export const dynamic = "force-dynamic";
+
 export async function GET(request) {
   try {
     // 1. Verifikasi keamanan CRON_SECRET jika dikonfigurasi di Vercel

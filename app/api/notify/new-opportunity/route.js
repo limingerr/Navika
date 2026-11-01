@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { sendNewOpportunityEmail } from "@/script/email-service";
 import { getNotificationRecipients } from "@/lib/supabase/admin";
 
+export const maxDuration = 60;
+export const dynamic = "force-dynamic";
+
 export async function broadcastNewOpportunity({ title, organization, category, field, slug, id }) {
   const onesignalAppId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
   const onesignalRestKey = process.env.ONESIGNAL_REST_API_KEY;

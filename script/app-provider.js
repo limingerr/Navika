@@ -27,6 +27,7 @@ export const defaultProfile = {
 };
 export const demoProfile = defaultProfile;
 
+import { BookmarkNotification } from "@/script/bookmark-notification";
 import {
   SECRET_ADMIN_TOKEN,
   adminProfile,
@@ -55,6 +56,7 @@ export function AppProvider({ children }) {
     const [calendarFilter, setCalendarFilter] = useState("Semua");
     const [opportunities, setOpportunities] = useState(initialOpportunities);
     const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+    const [bookmarkNotice, setBookmarkNotice] = useState(null);
     const [ready, setReady] = useState(false);
     useEffect(() => {
         try {
@@ -487,7 +489,19 @@ export function AppProvider({ children }) {
     }, [profile, isAdminLoggedIn]);
     const toggleSaved = (id) => {
         const isCurrentlySaved = saved.includes(id);
+        const willBeSaved = !isCurrentlySaved;
         setSaved((current) => isCurrentlySaved ? current.filter((item) => item !== id) : [...current, id]);
+
+        const noticeMsg = willBeSaved
+            ? (locale === "en" ? "Opportunity saved to Bookmarks" : "Peluang berhasil disimpan ke Bookmark")
+            : (locale === "en" ? "Opportunity removed from Bookmarks" : "Peluang dihapus dari Bookmark");
+
+        setBookmarkNotice({
+            id: Date.now(),
+            message: noticeMsg,
+            type: willBeSaved ? "save" : "remove",
+        });
+
         if (typeof window !== "undefined" && typeof window.clarity === "function") {
             try {
                 window.clarity("event", isCurrentlySaved ? "unfavorite_opportunity" : "favorite_opportunity");
@@ -546,6 +560,8 @@ export function AppProvider({ children }) {
       setRegistrationProfile,
       saved,
       toggleSaved,
+      bookmarkNotice,
+      setBookmarkNotice,
       locale,
       setLocale,
       theme,
@@ -572,6 +588,7 @@ export function AppProvider({ children }) {
       clearAdminSession,
     }}>
       {children}
+      <BookmarkNotification notice={bookmarkNotice} onDismiss={() => setBookmarkNotice(null)} />
     </AppContext.Provider>);
 }
 export function useApp() {

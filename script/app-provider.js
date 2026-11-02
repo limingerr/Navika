@@ -381,6 +381,15 @@ export function AppProvider({ children }) {
                 try { localStorage.removeItem(adminStorageKey); } catch {}
                 const account = await fetchCurrentAccount();
                 setProfile(account?.profile || { ...defaultProfile, email: res.user?.email || identifier.trim() });
+                if (typeof window !== "undefined" && window.OneSignalDeferred) {
+                    window.OneSignalDeferred.push(async function(OneSignal) {
+                        try {
+                            if (res.user?.id || res.user?.email) {
+                                await OneSignal.login(res.user.id || res.user.email);
+                            }
+                        } catch {}
+                    });
+                }
                 try {
                     const savedFromDb = await fetchSavedOpportunityIds();
                     if (savedFromDb && savedFromDb.length > 0) {

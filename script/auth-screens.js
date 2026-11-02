@@ -82,8 +82,107 @@ export function RegisterScreen() {
     return <main className="auth-page page-width"><Brand /><div className="auth-layout"><div><AuthHero kind="register"/><div className="auth-intro"><h1>{tr("Buat akun NAVIKA", "Create a NAVIKA Profile")}</h1><p>{tr("Gratis, hanya butuh satu menit.", "Free and takes just a minute.")}</p><DemoNote /></div></div><div className="auth-controls"><form className="auth-form" onSubmit={handleSubmit}><label htmlFor="name">{tr("Nama Lengkap", "Full Name")}</label><input id="name" placeholder={tr("Nama lengkap Anda", "Your full name")} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" required/><label htmlFor="email">Email</label><input id="email" type="email" placeholder="nama@email.com" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required/><label htmlFor="password">{tr("Kata Sandi", "Password")}</label><input id="password" type="password" minLength={8} placeholder={tr("Minimal 8 karakter", "At least 8 characters")} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" required/><label htmlFor="confirm">{tr("Konfirmasi Kata Sandi", "Confirm Password")}</label><input id="confirm" type="password" minLength={8} placeholder={tr("Ulangi kata sandi", "Repeat the password")} value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="new-password" required/>{error && <p className="form-error" role="alert">{error}</p>}<label className="checkbox-label"><input type="checkbox" required/><span>{tr("Saya menyetujui syarat & ketentuan layanan NAVIKA.", "I agree to the NAVIKA terms of service.")}</span></label><button className="primary-button" type="submit">{tr("Daftar Sekarang", "Create Profile")}</button></form><GoogleAuthLink action="signup"/><p className="auth-switch">{tr("Sudah punya akun?", "Already have an account?")} <Link href="/masuk">{tr("Masuk", "Sign In")}</Link></p></div></div></main>;
 }
 export function VerificationScreen() {
-    const { profile } = useApp();
+    const router = useRouter();
+    const { profile, setEmailAlerts, setDeadlineAlerts, setEmailConsentDecided, updateProfile } = useApp();
     const tr = useTr();
+    const [loading, setLoading] = useState(false);
+    const [notifGranted, setNotifGranted] = useState(false);
+
     const userName = profile.name && profile.name !== "Pengguna Demo" && profile.name !== "Mahasiswa" ? profile.name : "";
-    return <main className="verify-page page-width"><Brand /><div className="verify-content"><img src="/asset/verifikasi.png" alt=""/><h1>{tr("Akun Siap Digunakan", "Your Profile Is Ready")}</h1><p>{tr("Selamat datang", "Welcome")}{userName ? `, ${userName}` : ""}! {tr("Lanjutkan untuk menjelajahi peluang.", "Continue to explore opportunities.")}</p><p className="info-box">{tr("Akun Anda telah aktif dan terverifikasi secara resmi.", "Your account is active and verified.")}</p><Link className="primary-button" href="/dashboard">{tr("Lanjut ke Beranda", "Continue to Dashboard")}</Link></div></main>;
+
+    const handleEnableNotifications = async () => {
+        setLoading(true);
+        if (setEmailAlerts) setEmailAlerts(true);
+        if (setDeadlineAlerts) setDeadlineAlerts(true);
+        if (setEmailConsentDecided) setEmailConsentDecided(true);
+
+        if (updateProfile && profile) {
+            try {
+                updateProfile({ ...profile, emailAlerts: true, deadlineAlerts: true });
+            } catch {}
+        }
+
+        if (typeof window !== "undefined" && window.OneSignalDeferred) {
+            window.OneSignalDeferred.push(async function(OneSignal) {
+                try {
+                    if (OneSignal.Notifications && OneSignal.Notifications.requestPermission) {
+                        await OneSignal.Notifications.requestPermission();
+                    } else if (OneSignal.Slidedown && OneSignal.Slidedown.promptPush) {
+                        await OneSignal.Slidedown.promptPush();
+                    }
+                    if (profile?.id || profile?.email) {
+                        await OneSignal.login(profile.id || profile.email);
+                    }
+                } catch (pushErr) {
+                    console.warn("OneSignal permission notice:", pushErr);
+                }
+            });
+        }
+
+        setNotifGranted(true);
+        setTimeout(() => {
+            router.push("/dashboard");
+        }, 900);
+    };
+
+    return (
+        <main className="verify-page page-width">
+            <Brand />
+            <div className="verify-content">
+                <img src="/asset/verifikasi.png" alt=""/>
+                <h1>{tr("Akun Siap Digunakan", "Your Profile Is Ready")}</h1>
+                <p>{tr("Selamat datang", "Welcome")}{userName ? `, ${userName}` : ""}! {tr("Lanjutkan untuk menjelajahi peluang.", "Continue to explore opportunities.")}</p>
+                <p className="info-box">{tr("Akun Anda telah aktif dan terverifikasi secara resmi.", "Your account is active and verified.")}</p>
+
+                {/* Card Izin Notifikasi Langsung Saat Pertama Daftar */}
+                <div style={{
+                    margin: "24px 0 20px",
+                    padding: "22px 20px",
+                    borderRadius: "22px",
+                    background: "linear-gradient(135deg, #f0f9ff, #e0f2fe)",
+                    border: "1.5px solid #bae6fd",
+                    textAlign: "center",
+                    boxShadow: "0 8px 24px rgba(2, 169, 223, 0.12)"
+                }}>
+                    <div style={{ fontSize: "2rem", marginBottom: "8px" }} aria-hidden="true">🔔</div>
+                    <h3 style={{ fontSize: "1.15rem", fontWeight: 800, margin: "0 0 6px", color: "var(--biru-aksi, #0067a6)" }}>
+                        {tr("Aktifkan Pengingat Deadline & Peluang?", "Enable Deadline & Opportunity Alerts?")}
+                    </h3>
+                    <p style={{ fontSize: "0.92rem", color: "var(--teks-sekunder, #475569)", margin: "0 0 16px", lineHeight: 1.55 }}>
+                        {tr("Dapatkan pengingat otomatis di browser dan email saat ada beasiswa/magang baru dan batas pendaftaran mendekati H-3.", "Get automatic browser and email alerts when new opportunities open or application deadlines approach within 3 days.")}
+                    </p>
+
+                    <button
+                        type="button"
+                        onClick={handleEnableNotifications}
+                        disabled={loading}
+                        className="primary-button"
+                        style={{
+                            width: "100%",
+                            marginBottom: "12px",
+                            boxShadow: "0 6px 18px rgba(0, 103, 166, 0.28)",
+                            cursor: "pointer",
+                            fontSize: "0.98rem"
+                        }}
+                    >
+                        {loading ? tr("Mengaktifkan...", "Enabling...") : notifGranted ? tr("✓ Notifikasi Diaktifkan!", "✓ Notifications Enabled!") : tr("✓ Izinkan Notifikasi & Masuk", "✓ Allow Notifications & Enter")}
+                    </button>
+
+                    <div>
+                        <Link
+                            href="/dashboard"
+                            style={{
+                                fontSize: "0.88rem",
+                                color: "var(--teks-redup, #64748b)",
+                                textDecoration: "underline",
+                                fontWeight: 600
+                            }}
+                        >
+                            {tr("Lanjut ke Beranda tanpa notifikasi", "Continue to Dashboard without alerts")}
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        </main>
+    );
 }

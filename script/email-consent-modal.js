@@ -9,6 +9,8 @@ export function EmailConsentModal() {
     emailConsentDecided,
     setEmailConsentDecided,
     setEmailAlerts,
+    setDeadlineAlerts,
+    updateProfile,
     profile,
   } = useApp();
   const tr = useTr();
@@ -53,25 +55,40 @@ export function EmailConsentModal() {
     setEmailAlerts(granted);
 
     if (granted) {
+      if (setDeadlineAlerts) setDeadlineAlerts(true);
       setToastMsg(
         tr(
-          "✓ Notifikasi email berhasil diaktifkan untuk peluang & deadline!",
-          "✓ Email notifications successfully activated for opportunities & deadlines!"
+          "✓ Notifikasi berhasil diaktifkan untuk info peluang & pengingat deadline!",
+          "✓ Notifications successfully activated for opportunities & deadline alerts!"
         )
       );
       setTimeout(() => setToastMsg(""), 4500);
 
-      // Simpan consent ke backend jika user memiliki email/sesi
-      if (profile?.email && profile.email.includes("@")) {
+      // 1. Minta izin Web Push OneSignal di browser
+      if (typeof window !== "undefined" && window.OneSignalDeferred) {
+        window.OneSignalDeferred.push(async function (OneSignal) {
+          try {
+            if (OneSignal.Notifications && OneSignal.Notifications.requestPermission) {
+              await OneSignal.Notifications.requestPermission();
+            } else if (OneSignal.Slidedown && OneSignal.Slidedown.promptPush) {
+              await OneSignal.Slidedown.promptPush();
+            }
+            if (profile?.id || profile?.email) {
+              await OneSignal.login(profile.id || profile.email);
+            }
+          } catch (pushErr) {
+            console.warn("OneSignal permission request notice:", pushErr);
+          }
+        });
+      }
+
+      // 2. Simpan status notifikasi ke profil pengguna di Supabase
+      if (updateProfile && profile) {
         try {
-          await fetch("/api/admin/users", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              userId: profile.id,
-              email: profile.email,
-              emailAlerts: true,
-            }),
+          updateProfile({
+            ...profile,
+            emailAlerts: true,
+            deadlineAlerts: true,
           });
         } catch {}
       }

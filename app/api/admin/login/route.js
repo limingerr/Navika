@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { generateAdminSessionToken } from "@/lib/supabase/admin-session";
 
 export async function POST(request) {
   try {
@@ -76,7 +77,10 @@ export async function POST(request) {
       );
     }
 
-    return NextResponse.json({
+    // 4. Generate token sesi admin terenkripsi HMAC SHA-256
+    const sessionToken = generateAdminSessionToken(user.id, user.email);
+
+    const response = NextResponse.json({
       success: true,
       role: "admin",
       user: {
@@ -84,6 +88,17 @@ export async function POST(request) {
         email: user.email,
       },
     });
+
+    // 5. Simpan ke HttpOnly secure cookie
+    response.cookies.set("navika_admin_session", sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24, // 24 jam
+    });
+
+    return response;
   } catch (err) {
     return NextResponse.json(
       { success: false, error: err.message || "Terjadi kesalahan saat memproses login." },

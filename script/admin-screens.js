@@ -95,6 +95,23 @@ function AdminIcon({ name, size = 18 }) {
         <path d="M13.73 21a2 2 0 0 1-3.46 0" />
       </svg>
     ),
+    shield: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </svg>
+    ),
+    eye: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+    ),
+    close: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    ),
   };
   return icons[name] || null;
 }
@@ -111,8 +128,28 @@ export function AdminLayout({ children }) {
   useEffect(() => {
     if (ready && !isAdminLoggedIn) {
       router.replace("/masuk");
+      return;
     }
-  }, [ready, isAdminLoggedIn, router]);
+
+    // Verifikasi keamanan ganda ke backend server
+    if (ready && isAdminLoggedIn) {
+      let active = true;
+      fetch("/api/admin/auth/check")
+        .then((r) => r.json())
+        .then((data) => {
+          if (active && (!data || !data.authorized)) {
+            logoutAdmin();
+            router.replace("/masuk?error=unauthorized");
+          }
+        })
+        .catch(() => {
+          // Tangani kemungkinan offline / dev fallback
+        });
+      return () => {
+        active = false;
+      };
+    }
+  }, [ready, isAdminLoggedIn, router, logoutAdmin]);
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: "dashboard", exact: true },
@@ -120,10 +157,14 @@ export function AdminLayout({ children }) {
     { href: "/admin/peluang/tambah", label: "Tambah Peluang", icon: "plus", exact: true },
     { href: "/admin/arsip", label: "Arsip Peluang", icon: "archive", exact: true },
     { href: "/admin/mahasiswa", label: "Kelola Mahasiswa", icon: "users", exact: true },
+    { href: "/admin/peran", label: "Kelola Peran & Akses", icon: "shield", exact: true },
     { href: "/dashboard", label: "Kembali ke Web Mahasiswa", icon: "globe", exact: true },
   ];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+    } catch {}
     logoutAdmin();
     router.push("/");
   };
@@ -145,6 +186,7 @@ export function AdminLayout({ children }) {
     }
     if (pathname === "/admin/arsip") return [{ label: "Arsip Peluang", active: true }];
     if (pathname === "/admin/mahasiswa") return [{ label: "Kelola Mahasiswa", active: true }];
+    if (pathname === "/admin/peran") return [{ label: "Kelola Peran & Akses", active: true }];
     return [{ label: "Admin", active: true }];
   };
 
@@ -1502,9 +1544,9 @@ export function AdminMahasiswaTable() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [roleFilter, setRoleFilter] = useState("Semua");
   const [toastMsg, setToastMsg] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
   const showToast = (msg) => {
     setToastMsg(msg);
@@ -1530,28 +1572,6 @@ export function AdminMahasiswaTable() {
     fetchUsers();
   }, []);
 
-  const handleRoleToggle = async (userId, currentRole) => {
-    const newRole = currentRole === "pengelola" ? "mahasiswa" : "pengelola";
-    try {
-      const res = await fetch("/api/admin/users", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, role: newRole }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        showToast(`Peran pengguna berhasil diubah menjadi "${newRole}".`);
-        setUsers((prev) =>
-          prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
-        );
-      } else {
-        showToast(data.error || "Gagal mengubah peran.");
-      }
-    } catch {
-      showToast("Terjadi kesalahan saat memperbarui peran.");
-    }
-  };
-
   const confirmDeleteUser = async () => {
     if (!deleteTarget) return;
     try {
@@ -1562,6 +1582,9 @@ export function AdminMahasiswaTable() {
       if (data.success) {
         showToast(`Akun "${deleteTarget.name}" (${deleteTarget.email}) berhasil dihapus.`);
         setUsers((prev) => prev.filter((u) => u.id !== deleteTarget.id));
+        if (selectedStudent?.id === deleteTarget.id) {
+          setSelectedStudent(null);
+        }
       } else {
         showToast(data.error || "Gagal menghapus pengguna.");
       }
@@ -1572,21 +1595,42 @@ export function AdminMahasiswaTable() {
     }
   };
 
-  const filteredUsers = useMemo(() => {
-    return users.filter((u) => {
-      const text = `${u.name} ${u.email} ${u.university} ${u.major}`.toLowerCase();
-      const matchQuery = text.includes(query.trim().toLowerCase());
-      const matchRole = roleFilter === "Semua" || u.role === roleFilter;
-      return matchQuery && matchRole;
-    });
-  }, [users, query, roleFilter]);
+  // Khusus akun mahasiswa untuk menu Kelola Mahasiswa
+  const students = useMemo(() => {
+    return users.filter((u) => u.role === "mahasiswa");
+  }, [users]);
 
-  const studentCount = users.filter((u) => u.role === "mahasiswa").length;
-  const adminCount = users.filter((u) => u.role === "pengelola").length;
-  const validGpas = users.map((u) => parseFloat(u.gpa)).filter((g) => !isNaN(g) && g > 0);
+  const filteredStudents = useMemo(() => {
+    return students.filter((u) => {
+      const text = `${u.name} ${u.email} ${u.university} ${u.major}`.toLowerCase();
+      return text.includes(query.trim().toLowerCase());
+    });
+  }, [students, query]);
+
+  const totalSavedCount = students.reduce((acc, curr) => acc + (curr.saved_count || 0), 0);
+  const validGpas = students.map((u) => parseFloat(u.gpa)).filter((g) => !isNaN(g) && g > 0);
   const avgGpa = validGpas.length
     ? (validGpas.reduce((a, b) => a + b, 0) / validGpas.length).toFixed(2)
     : "3.82";
+
+  const getApplicationStatusLabel = (status) => {
+    switch (status) {
+      case "tertarik":
+        return { label: "Tertarik", badgeClass: "status-tertarik" };
+      case "sedang_disiapkan":
+        return { label: "Sedang Disiapkan", badgeClass: "status-disiapkan" };
+      case "sudah_mendaftar":
+        return { label: "Sudah Mendaftar", badgeClass: "status-terdaftar" };
+      case "diterima":
+        return { label: "Diterima 🎉", badgeClass: "status-diterima" };
+      case "ditolak":
+        return { label: "Ditolak", badgeClass: "status-ditolak" };
+      case "tidak_dilanjutkan":
+        return { label: "Tidak Dilanjutkan", badgeClass: "status-ditolak" };
+      default:
+        return { label: status || "Disimpan", badgeClass: "status-tertarik" };
+    }
+  };
 
   return (
     <div>
@@ -1594,9 +1638,9 @@ export function AdminMahasiswaTable() {
 
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title">Kelola Pengguna Mahasiswa</h1>
+          <h1 className="admin-page-title">Kelola Mahasiswa</h1>
           <p className="admin-page-subtitle">
-            Daftar akun mahasiswa terdaftar, data universitas, program studi, IPK, dan kontrol hak akses peran.
+            Daftar akun mahasiswa terdaftar, data profil akademik, serta pantauan peluang yang diambil atau disimpan.
           </p>
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
@@ -1615,33 +1659,33 @@ export function AdminMahasiswaTable() {
       <div className="admin-stats-grid" style={{ marginBottom: "20px" }}>
         <div className="admin-stat-card">
           <div className="admin-stat-header">
-            <span className="admin-stat-label">Total Mahasiswa</span>
+            <span className="admin-stat-label">Total Mahasiswa Terdaftar</span>
             <span className="admin-stat-icon"><AdminIcon name="users" /></span>
           </div>
-          <div className="admin-stat-number">{studentCount}</div>
+          <div className="admin-stat-number">{students.length}</div>
           <div className="admin-stat-desc">Akun mahasiswa aktif</div>
         </div>
 
         <div className="admin-stat-card">
           <div className="admin-stat-header">
-            <span className="admin-stat-label">Akun Pengelola / Admin</span>
+            <span className="admin-stat-label">Peluang Diambil / Disimpan</span>
             <span className="admin-stat-icon" style={{ background: "rgba(0, 103, 166, 0.12)", color: "var(--biru-aksi)" }}>
-              <AdminIcon name="dashboard" />
+              <AdminIcon name="catalog" />
             </span>
           </div>
-          <div className="admin-stat-number">{adminCount}</div>
-          <div className="admin-stat-desc">Hak akses panel admin</div>
+          <div className="admin-stat-number">{totalSavedCount}</div>
+          <div className="admin-stat-desc">Total pelacakan aktif oleh mahasiswa</div>
         </div>
 
         <div className="admin-stat-card">
           <div className="admin-stat-header">
-            <span className="admin-stat-label">Rata-rata IPK</span>
+            <span className="admin-stat-label">Rata-rata IPK Mahasiswa</span>
             <span className="admin-stat-icon" style={{ background: "rgba(16, 185, 129, 0.12)", color: "#10b981" }}>
               <AdminIcon name="check" />
             </span>
           </div>
           <div className="admin-stat-number">{avgGpa}</div>
-          <div className="admin-stat-desc">Dari seluruh profil mahasiswa</div>
+          <div className="admin-stat-desc">Dari seluruh data profil terisi</div>
         </div>
       </div>
 
@@ -1651,23 +1695,14 @@ export function AdminMahasiswaTable() {
             <input
               type="text"
               className="admin-search-input"
-              placeholder="Cari nama, email, kampus, atau jurusan..."
+              placeholder="Cari nama mahasiswa, email, kampus, atau jurusan..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              style={{ minWidth: "320px" }}
             />
-            <select
-              className="admin-select"
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              aria-label="Filter peran"
-            >
-              <option value="Semua">Semua Peran</option>
-              <option value="mahasiswa">Mahasiswa</option>
-              <option value="pengelola">Pengelola / Admin</option>
-            </select>
           </div>
           <span style={{ fontSize: "13px", color: "var(--teks-sekunder)" }}>
-            Menampilkan <strong>{filteredUsers.length}</strong> dari {users.length} pengguna
+            Menampilkan <strong>{filteredStudents.length}</strong> dari {students.length} mahasiswa
           </span>
         </div>
 
@@ -1678,7 +1713,7 @@ export function AdminMahasiswaTable() {
                 <th>Nama & Email Mahasiswa</th>
                 <th>Universitas & Program Studi</th>
                 <th>Semester & IPK</th>
-                <th>Hak Akses (Role)</th>
+                <th>Peluang Diambil</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -1686,19 +1721,17 @@ export function AdminMahasiswaTable() {
               {loading ? (
                 <tr>
                   <td colSpan={5} style={{ textAlign: "center", padding: "40px", color: "var(--teks-redup)" }}>
-                    Sedang memuat data pengguna mahasiswa dari Supabase...
+                    Sedang memuat data akun mahasiswa...
                   </td>
                 </tr>
-              ) : filteredUsers.length > 0 ? (
-                filteredUsers.map((u) => {
-                  const isPengelola = u.role === "pengelola";
+              ) : filteredStudents.length > 0 ? (
+                filteredStudents.map((u) => {
+                  const savedCount = u.saved_count || (u.saved_opportunities ? u.saved_opportunities.length : 0);
                   return (
                     <tr key={u.id}>
                       <td>
                         <div className="admin-table-title">{u.name}</div>
-                        <div className="admin-table-org">
-                          {u.email}
-                        </div>
+                        <div className="admin-table-org">{u.email}</div>
                       </td>
                       <td>
                         <div style={{ fontWeight: 600 }}>{u.university}</div>
@@ -1712,16 +1745,25 @@ export function AdminMahasiswaTable() {
                       <td>
                         <button
                           type="button"
-                          className={`admin-badge ${isPengelola ? "admin-badge-blue" : "admin-badge-default"}`}
-                          onClick={() => handleRoleToggle(u.id, u.role)}
-                          title="Klik untuk mengubah role pengguna ini"
-                          style={{ cursor: "pointer", border: "1px solid rgba(0,0,0,0.1)" }}
+                          className="admin-badge admin-badge-blue"
+                          onClick={() => setSelectedStudent(u)}
+                          title="Klik untuk melihat daftar peluang yang diambil mahasiswa ini"
+                          style={{ cursor: "pointer", border: "none" }}
                         >
-                          {isPengelola ? "🛡️ Pengelola" : "🎓 Mahasiswa"}
+                          {savedCount} Peluang Diambil
                         </button>
                       </td>
                       <td>
                         <div className="admin-table-actions">
+                          <button
+                            type="button"
+                            className="admin-btn admin-btn-secondary admin-btn-sm"
+                            onClick={() => setSelectedStudent(u)}
+                            title="Lihat data profil dan peluang mahasiswa ini"
+                          >
+                            <AdminIcon name="eye" size={14} />
+                            <span>Detail</span>
+                          </button>
                           <button
                             type="button"
                             className="admin-btn admin-btn-danger admin-btn-sm"
@@ -1739,7 +1781,7 @@ export function AdminMahasiswaTable() {
               ) : (
                 <tr>
                   <td colSpan={5} style={{ textAlign: "center", padding: "40px", color: "var(--teks-redup)" }}>
-                    Tidak ada data pengguna mahasiswa yang cocok dengan pencarian.
+                    Tidak ada data mahasiswa yang cocok dengan pencarian.
                   </td>
                 </tr>
               )}
@@ -1748,9 +1790,159 @@ export function AdminMahasiswaTable() {
         </div>
       </div>
 
+      {/* Modal Detail Profil & Peluang Mahasiswa */}
+      {selectedStudent && (
+        <div className="admin-modal-overlay" onClick={() => setSelectedStudent(null)}>
+          <div
+            className="admin-modal admin-modal-lg"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: "780px", maxHeight: "90vh", overflowY: "auto" }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
+                  <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>{selectedStudent.name}</h2>
+                  <span className="admin-badge admin-badge-default">🎓 Mahasiswa</span>
+                </div>
+                <div style={{ color: "var(--teks-sekunder)", fontSize: "14px" }}>{selectedStudent.email}</div>
+              </div>
+              <button
+                type="button"
+                className="admin-btn admin-btn-secondary admin-btn-sm"
+                onClick={() => setSelectedStudent(null)}
+                aria-label="Tutup detail mahasiswa"
+                style={{ padding: "6px 10px" }}
+              >
+                <AdminIcon name="close" size={16} />
+              </button>
+            </div>
+
+            {/* Grid Informasi Profil Mahasiswa */}
+            <div style={{ marginBottom: "24px" }}>
+              <h3 style={{ fontSize: "15px", fontWeight: 600, margin: "0 0 12px", color: "var(--teks-utama)" }}>
+                Data Profil Akademik
+              </h3>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+                  gap: "12px",
+                  background: "var(--admin-bg)",
+                  padding: "16px",
+                  borderRadius: "12px",
+                  border: "1px solid var(--border-halus)",
+                }}
+              >
+                <div>
+                  <span style={{ fontSize: "12px", color: "var(--teks-redup)", display: "block" }}>Universitas</span>
+                  <strong style={{ fontSize: "14px" }}>{selectedStudent.university}</strong>
+                </div>
+                <div>
+                  <span style={{ fontSize: "12px", color: "var(--teks-redup)", display: "block" }}>Program Studi / Jurusan</span>
+                  <strong style={{ fontSize: "14px" }}>{selectedStudent.major}</strong>
+                </div>
+                <div>
+                  <span style={{ fontSize: "12px", color: "var(--teks-redup)", display: "block" }}>Semester</span>
+                  <strong style={{ fontSize: "14px" }}>{selectedStudent.semester ? `Semester ${selectedStudent.semester}` : "-"}</strong>
+                </div>
+                <div>
+                  <span style={{ fontSize: "12px", color: "var(--teks-redup)", display: "block" }}>Indeks Prestasi Kumulatif (IPK)</span>
+                  <strong style={{ fontSize: "14px", color: "#10b981" }}>{selectedStudent.gpa}</strong>
+                </div>
+              </div>
+
+              {selectedStudent.interests && selectedStudent.interests.length > 0 && (
+                <div style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                  <span style={{ fontSize: "12px", color: "var(--teks-redup)" }}>Minat Kategori:</span>
+                  {selectedStudent.interests.map((int, idx) => (
+                    <span key={idx} className="admin-badge admin-badge-default" style={{ fontSize: "12px" }}>
+                      {int}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Seksi Peluang yang Diambil */}
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                <h3 style={{ fontSize: "15px", fontWeight: 600, margin: 0, color: "var(--teks-utama)" }}>
+                  Peluang yang Diambil & Dipantau ({selectedStudent.saved_opportunities?.length || 0})
+                </h3>
+              </div>
+
+              {selectedStudent.saved_opportunities && selectedStudent.saved_opportunities.length > 0 ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {selectedStudent.saved_opportunities.map((opp, idx) => {
+                    const statusInfo = getApplicationStatusLabel(opp.application_status);
+                    return (
+                      <div
+                        key={idx}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          padding: "14px 16px",
+                          background: "var(--admin-surface)",
+                          borderRadius: "10px",
+                          border: "1px solid var(--border-halus)",
+                          gap: "12px",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <div style={{ flex: 1, minWidth: "220px" }}>
+                          <div style={{ fontWeight: 600, fontSize: "14px", color: "var(--teks-utama)", marginBottom: "3px" }}>
+                            {opp.title}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "var(--teks-sekunder)" }}>
+                            Penyelenggara: <strong>{opp.provider}</strong> &bull; Kategori: <strong>{opp.category}</strong>
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                          <span className={`admin-app-status-badge ${statusInfo.badgeClass}`}>
+                            {statusInfo.label}
+                          </span>
+                          <span style={{ fontSize: "12px", color: "var(--teks-redup)", whiteSpace: "nowrap" }}>
+                            Deadline: {opp.deadline || "-"}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div
+                  style={{
+                    padding: "30px",
+                    textAlign: "center",
+                    background: "var(--admin-bg)",
+                    borderRadius: "10px",
+                    color: "var(--teks-redup)",
+                    fontSize: "14px",
+                  }}
+                >
+                  Mahasiswa ini belum mengambil atau menyimpan peluang apa pun di NAVIKA.
+                </div>
+              )}
+            </div>
+
+            <div style={{ marginTop: "24px", display: "flex", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                className="admin-btn admin-btn-secondary"
+                onClick={() => setSelectedStudent(null)}
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal Konfirmasi Hapus Akun */}
       {deleteTarget && (
-        <div className="admin-modal-backdrop">
+        <div className="admin-modal-overlay">
           <div className="admin-modal">
             <h2 className="admin-modal-title">Hapus Akun Pengguna?</h2>
             <p className="admin-modal-desc">
@@ -1770,6 +1962,317 @@ export function AdminMahasiswaTable() {
                 onClick={confirmDeleteUser}
               >
                 Hapus Akun
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ============================================================
+   Admin Role Management Screen (/admin/peran)
+   ============================================================ */
+export function AdminRoleManagement() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("pengelola"); // "pengelola" | "mahasiswa"
+  const [query, setQuery] = useState("");
+  const [toastMsg, setToastMsg] = useState("");
+  const [roleChangeTarget, setRoleChangeTarget] = useState(null); // { user, newRole }
+
+  const showToast = (msg) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(""), 4000);
+  };
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/users");
+      const data = await res.json();
+      if (data.users) {
+        setUsers(data.users);
+      }
+    } catch (err) {
+      console.warn("Gagal mengambil data user:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const confirmRoleChange = async () => {
+    if (!roleChangeTarget) return;
+    const { user, newRole } = roleChangeTarget;
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id, role: newRole }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Hak akses akun "${user.name}" berhasil diubah menjadi "${newRole}".`);
+        setUsers((prev) =>
+          prev.map((u) => (u.id === user.id ? { ...u, role: newRole } : u))
+        );
+      } else {
+        showToast(data.error || "Gagal memperbarui peran.");
+      }
+    } catch {
+      showToast("Terjadi kendala saat mengubah hak akses pengguna.");
+    } finally {
+      setRoleChangeTarget(null);
+    }
+  };
+
+  const admins = useMemo(() => users.filter((u) => u.role === "pengelola"), [users]);
+  const students = useMemo(() => users.filter((u) => u.role === "mahasiswa"), [users]);
+
+  const displayedUsers = useMemo(() => {
+    const baseList = activeTab === "pengelola" ? admins : students;
+    return baseList.filter((u) => {
+      const text = `${u.name} ${u.email} ${u.university || ""} ${u.major || ""}`.toLowerCase();
+      return text.includes(query.trim().toLowerCase());
+    });
+  }, [activeTab, admins, students, query]);
+
+  return (
+    <div>
+      {toastMsg && <div className="admin-toast success">{toastMsg}</div>}
+
+      <div className="admin-page-header">
+        <div>
+          <h1 className="admin-page-title">Kelola Peran & Akses</h1>
+          <p className="admin-page-subtitle">
+            Pantau dan kontrol hak akses akun pengelola (admin) dan mahasiswa secara terpisah, serta ubah perannya bila diperlukan.
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button
+            type="button"
+            className="admin-btn admin-btn-secondary"
+            onClick={fetchUsers}
+            disabled={loading}
+          >
+            {loading ? "Memuat..." : "Refresh Data"}
+          </button>
+        </div>
+      </div>
+
+      {/* Mini Stats Peran */}
+      <div className="admin-stats-grid" style={{ marginBottom: "20px" }}>
+        <div className="admin-stat-card">
+          <div className="admin-stat-header">
+            <span className="admin-stat-label">Akun Pengelola (Admin)</span>
+            <span className="admin-stat-icon" style={{ background: "rgba(0, 103, 166, 0.12)", color: "var(--biru-aksi)" }}>
+              <AdminIcon name="shield" />
+            </span>
+          </div>
+          <div className="admin-stat-number">{admins.length}</div>
+          <div className="admin-stat-desc">Akses penuh panel admin</div>
+        </div>
+
+        <div className="admin-stat-card">
+          <div className="admin-stat-header">
+            <span className="admin-stat-label">Akun Mahasiswa</span>
+            <span className="admin-stat-icon" style={{ background: "rgba(16, 185, 129, 0.12)", color: "#10b981" }}>
+              <AdminIcon name="users" />
+            </span>
+          </div>
+          <div className="admin-stat-number">{students.length}</div>
+          <div className="admin-stat-desc">Pengguna reguler portal NAVIKA</div>
+        </div>
+
+        <div className="admin-stat-card">
+          <div className="admin-stat-header">
+            <span className="admin-stat-label">Total Akun Terdaftar</span>
+            <span className="admin-stat-icon"><AdminIcon name="dashboard" /></span>
+          </div>
+          <div className="admin-stat-number">{users.length}</div>
+          <div className="admin-stat-desc">Seluruh identitas di database</div>
+        </div>
+      </div>
+
+      {/* Tab Switcher: Akun Pengelola vs Akun Mahasiswa */}
+      <div className="admin-card">
+        <div className="admin-role-tabs">
+          <button
+            type="button"
+            className={`admin-role-tab ${activeTab === "pengelola" ? "active" : ""}`}
+            onClick={() => setActiveTab("pengelola")}
+          >
+            <AdminIcon name="shield" size={16} />
+            <span>Akun Pengelola ({admins.length})</span>
+          </button>
+          <button
+            type="button"
+            className={`admin-role-tab ${activeTab === "mahasiswa" ? "active" : ""}`}
+            onClick={() => setActiveTab("mahasiswa")}
+          >
+            <AdminIcon name="users" size={16} />
+            <span>Akun Mahasiswa ({students.length})</span>
+          </button>
+        </div>
+
+        <div className="admin-card-header">
+          <div className="admin-table-filters">
+            <input
+              type="text"
+              className="admin-search-input"
+              placeholder={`Cari nama atau email akun ${activeTab}...`}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              style={{ minWidth: "300px" }}
+            />
+          </div>
+          <span style={{ fontSize: "13px", color: "var(--teks-sekunder)" }}>
+            Menampilkan <strong>{displayedUsers.length}</strong> akun {activeTab}
+          </span>
+        </div>
+
+        <div className="admin-table-wrapper">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Nama & Email</th>
+                <th>{activeTab === "pengelola" ? "Instansi / Departemen" : "Universitas & Jurusan"}</th>
+                <th>Status Hak Akses</th>
+                <th>Terdaftar & Aktivitas</th>
+                <th>Tindakan Peran</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: "center", padding: "40px", color: "var(--teks-redup)" }}>
+                    Sedang memuat data akun {activeTab}...
+                  </td>
+                </tr>
+              ) : displayedUsers.length > 0 ? (
+                displayedUsers.map((u) => {
+                  const isPrimaryAdmin =
+                    u.email === "admin@navika.id" ||
+                    u.email === "limingerr681@gmail.com" ||
+                    u.email === "navika01112026@gmail.com";
+
+                  return (
+                    <tr key={u.id}>
+                      <td>
+                        <div className="admin-table-title">{u.name}</div>
+                        <div className="admin-table-org">{u.email}</div>
+                      </td>
+                      <td>
+                        {activeTab === "pengelola" ? (
+                          <div style={{ fontWeight: 600 }}>{u.university || "Pusat Pengelola NAVIKA"}</div>
+                        ) : (
+                          <div>
+                            <div style={{ fontWeight: 600 }}>{u.university}</div>
+                            <small style={{ color: "var(--teks-sekunder)" }}>{u.major}</small>
+                          </div>
+                        )}
+                      </td>
+                      <td>
+                        {u.role === "pengelola" ? (
+                          <span className="admin-badge admin-badge-blue">🛡️ Pengelola / Admin</span>
+                        ) : (
+                          <span className="admin-badge admin-badge-default">🎓 Mahasiswa</span>
+                        )}
+                      </td>
+                      <td>
+                        <div style={{ fontSize: "13px" }}>
+                          Dibuat: {u.created_at ? new Date(u.created_at).toLocaleDateString("id-ID") : "-"}
+                        </div>
+                        <small style={{ color: "var(--teks-redup)" }}>
+                          Login: {u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString("id-ID") : "-"}
+                        </small>
+                      </td>
+                      <td>
+                        {activeTab === "pengelola" ? (
+                          isPrimaryAdmin ? (
+                            <span
+                              className="admin-badge"
+                              style={{ background: "rgba(0,0,0,0.06)", color: "var(--teks-redup)" }}
+                              title="Akun admin utama dilindungi"
+                            >
+                              🔒 Akun Utama Dilindungi
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              className="admin-btn admin-btn-secondary admin-btn-sm"
+                              onClick={() => setRoleChangeTarget({ user: u, newRole: "mahasiswa" })}
+                              title="Turunkan hak akses akun ini menjadi mahasiswa"
+                            >
+                              <span>Turunkan ke Mahasiswa</span>
+                            </button>
+                          )
+                        ) : (
+                          <button
+                            type="button"
+                            className="admin-btn admin-btn-primary admin-btn-sm"
+                            onClick={() => setRoleChangeTarget({ user: u, newRole: "pengelola" })}
+                            title="Promosikan akun ini menjadi pengelola panel admin"
+                          >
+                            <AdminIcon name="shield" size={14} />
+                            <span>Jadikan Pengelola</span>
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: "center", padding: "40px", color: "var(--teks-redup)" }}>
+                    Tidak ada akun {activeTab} yang cocok dengan pencarian.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Modal Konfirmasi Ubah Peran */}
+      {roleChangeTarget && (
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
+            <h2 className="admin-modal-title">
+              {roleChangeTarget.newRole === "pengelola"
+                ? "Promosikan Jadi Pengelola?"
+                : "Turunkan Jadi Mahasiswa?"}
+            </h2>
+            <p className="admin-modal-desc">
+              {roleChangeTarget.newRole === "pengelola" ? (
+                <>
+                  Akun <strong>"{roleChangeTarget.user.name}"</strong> ({roleChangeTarget.user.email}) akan diberikan hak akses penuh ke Panel Admin NAVIKA untuk mengelola katalog peluang, arsip, dan akun pengguna.
+                </>
+              ) : (
+                <>
+                  Akun <strong>"{roleChangeTarget.user.name}"</strong> ({roleChangeTarget.user.email}) tidak akan dapat lagi mengakses Panel Admin NAVIKA dan hak aksesnya akan diubah menjadi akun mahasiswa biasa.
+                </>
+              )}
+            </p>
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-btn admin-btn-secondary"
+                onClick={() => setRoleChangeTarget(null)}
+              >
+                Batalkan
+              </button>
+              <button
+                type="button"
+                className={`admin-btn ${roleChangeTarget.newRole === "pengelola" ? "admin-btn-primary" : "admin-btn-danger"}`}
+                onClick={confirmRoleChange}
+              >
+                {roleChangeTarget.newRole === "pengelola" ? "Ya, Jadikan Pengelola" : "Ya, Turunkan Peran"}
               </button>
             </div>
           </div>

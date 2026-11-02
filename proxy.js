@@ -3,9 +3,22 @@ import { NextResponse } from "next/server";
 
 /**
  * Next.js 16 Proxy (Konvensi baru menggantikan middleware.js).
- * Memperbarui cookie sesi autentikasi Supabase secara transparan di setiap request.
+ * Memperbarui cookie sesi autentikasi Supabase secara transparan di setiap request,
+ * dan menegakkan proteksi keamanan ketat untuk rute /admin/*.
  */
 export async function proxy(request) {
+  // 1. Proteksi ketat rute /admin/* di level server sebelum merender halaman
+  if (request.nextUrl.pathname.startsWith("/admin")) {
+    const adminSession = request.cookies.get("navika_admin_session")?.value;
+    const hasSbCookie = request.cookies.getAll().some((c) => c.name.startsWith("sb-") && c.value);
+
+    if (!adminSession && !hasSbCookie) {
+      const loginUrl = new URL("/masuk", request.url);
+      loginUrl.searchParams.set("redirect", request.nextUrl.pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,

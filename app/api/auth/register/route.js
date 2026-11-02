@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { sendEmail } from "@/script/email-service";
+import { isAllowedRegistrationEmail } from "@/script/account-state";
 
 export async function POST(request) {
   try {
@@ -21,6 +22,13 @@ export async function POST(request) {
     if (!cleanEmail || !cleanEmail.includes("@")) {
       return NextResponse.json(
         { success: false, error: "Alamat email tidak valid." },
+        { status: 400 }
+      );
+    }
+
+    if (!isAllowedRegistrationEmail(cleanEmail)) {
+      return NextResponse.json(
+        { success: false, error: "Pendaftaran hanya mendukung email @gmail.com atau email kampus (.ac.id)." },
         { status: 400 }
       );
     }

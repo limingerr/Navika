@@ -13,3 +13,17 @@ export function resolveAccount(user, role, profile) {
     },
   };
 }
+
+/**
+ * Validasi domain email saat pendaftaran akun baru.
+ * Hanya mengizinkan akun @gmail.com atau domain akademik kampus Indonesia (.ac.id)
+ * untuk mencegah penggunaan temporary email (disposable emails).
+ */
+export function isAllowedRegistrationEmail(email) {
+  if (!email || typeof email !== "string") return false;
+  const clean = email.trim().toLowerCase();
+  const atIndex = clean.lastIndexOf("@");
+  if (atIndex === -1) return false;
+  const domain = clean.slice(atIndex + 1);
+  return domain === "gmail.com" || domain === "ac.id" || domain.endsWith(".ac.id");
+}

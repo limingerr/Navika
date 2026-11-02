@@ -263,20 +263,96 @@ html {
 }
 
 .page-peluang-detail .detail-hero {
-  padding: 26px 24px;
-  border-radius: 28px;
-  background: var(--blue);
-  color: #fff;
+  padding: 26px 28px !important;
+  border-radius: 28px !important;
+  background: var(--biru-kartu, #5AA4D8) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08) !important;
 }
 
-.page-peluang-detail .detail-hero h1 {
-  font-size: clamp(1.8rem,4vw,2.65rem);
-  line-height: 1.15;
-  margin: 30px 0 18px;
+.page-peluang-detail .detail-hero h1,
+.page-peluang-detail .detail-hero-title {
+  font-family: Poppins, "Segoe UI", system-ui, sans-serif !important;
+  font-size: clamp(1.8rem, 3.6vw, 2.5rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.2 !important;
+  color: #ffffff !important;
+  margin: 16px 0 10px !important;
 }
 
-.page-peluang-detail .detail-hero>p:last-child {
-  margin: 24px 0 0;
+.page-peluang-detail .detail-hero .card-org {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  font-family: Poppins, "Segoe UI", system-ui, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  margin: 0 0 16px 0 !important;
+}
+
+.page-peluang-detail .detail-hero .card-org svg {
+  flex-shrink: 0 !important;
+  color: #ffffff !important;
+}
+
+.page-peluang-detail .detail-deadline-row {
+  margin-top: 14px !important;
+  padding-top: 14px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
+  font-size: 14.5px !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.page-peluang-detail .detail-deadline-row strong {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.page-peluang-detail .detail-save-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: 44px !important;
+  padding: 8px 18px !important;
+  border-radius: 999px !important;
+  background: #ffffff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  color: var(--ink, #111827) !important;
+  font-family: Poppins, "Segoe UI", system-ui, sans-serif !important;
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.page-peluang-detail .detail-save-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.page-peluang-detail .detail-save-btn.saved {
+  background: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+  color: #e11d48 !important;
+}
+
+:root[data-theme="dark"] .page-peluang-detail .detail-hero {
+  background: #1e3a5f !important;
+}
+
+:root[data-theme="dark"] .page-peluang-detail .detail-save-btn {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .page-peluang-detail .detail-save-btn.saved {
+  background: rgba(225, 29, 72, 0.15) !important;
+  border-color: rgba(225, 29, 72, 0.3) !important;
+  color: #fb7185 !important;
 }
 
 .page-peluang-detail .detail-body {

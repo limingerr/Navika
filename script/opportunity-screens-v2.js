@@ -257,6 +257,28 @@ export function DashboardScreen() {
         }
     }, [selected, viewMonth]);
 
+    // Minta izin notifikasi OneSignal di dashboard jika belum diizinkan
+    useEffect(() => {
+        if (typeof window !== "undefined" && window.OneSignalDeferred) {
+            window.OneSignalDeferred.push(async function(OneSignal) {
+                try {
+                    const isSupported = OneSignal.Notifications && OneSignal.Notifications.isPushSupported();
+                    const hasPerm = OneSignal.Notifications && OneSignal.Notifications.hasPermission();
+                    if (isSupported && !hasPerm) {
+                        if (OneSignal.Slidedown && OneSignal.Slidedown.promptPush) {
+                            await OneSignal.Slidedown.promptPush();
+                        }
+                    }
+                    if (profile?.id || profile?.email) {
+                        await OneSignal.login(profile.id || profile.email);
+                    }
+                } catch (err) {
+                    console.warn("OneSignal dashboard prompt notice:", err);
+                }
+            });
+        }
+    }, [profile]);
+
     const recommendedList = useMemo(() => {
         const active = opportunities.filter((item) => isOpportunityVisibleForStudent(item) && item.status !== "Ditutup" && item.status !== "Diarsipkan");
         const matches = active.filter((item) => isOpportunityRecommended(item, profile.major));

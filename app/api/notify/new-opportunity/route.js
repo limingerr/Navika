@@ -22,7 +22,7 @@ export async function broadcastNewOpportunity({ title, organization, category, f
     try {
       const payload = {
         app_id: onesignalAppId,
-        included_segments: ["Total Subscriptions", "Subscribed Users"],
+        included_segments: ["Total Subscriptions"],
         headings: {
           id: `📢 Info Terbaru: ${title.trim()}`,
           en: `📢 New Opportunity: ${title.trim()}`,

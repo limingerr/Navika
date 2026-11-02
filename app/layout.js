@@ -73,6 +73,25 @@ export default function RootLayout({ children }) {
               await OneSignal.init({
                 appId: "${ONESIGNAL_APP_ID}",
                 allowLocalhostAsSecureOrigin: true,
+                promptOptions: {
+                  slidedown: {
+                    prompts: [
+                      {
+                        type: "push",
+                        autoPrompt: true,
+                        text: {
+                          actionMessage: "Dapatkan update beasiswa & pengingat deadline pendaftaran langsung di layarmu.",
+                          acceptButton: "Izinkan",
+                          cancelButton: "Nanti Saja"
+                        },
+                        delay: {
+                          pageViews: 1,
+                          timeDelay: 1
+                        }
+                      }
+                    ]
+                  }
+                }
               });
             });
           `}

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { isAuthorizedAdmin } from "@/lib/supabase/require-admin";
+import { broadcastNewOpportunity } from "@/app/api/notify/new-opportunity/route";
 
 export async function POST(request) {
   if (!await isAuthorizedAdmin()) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
@@ -137,6 +138,20 @@ export async function POST(request) {
       },
       { onConflict: "opportunity_id" }
     );
+
+    // 5. Siarkan notifikasi Push OneSignal & Email otomatis jika status terbit
+    if (pubStatus === "terbit") {
+      broadcastNewOpportunity({
+        title: savedOpp.title,
+        organization: organization || "Mitra NAVIKA",
+        category: catName,
+        field: field || "Semua Jurusan",
+        slug: savedOpp.slug,
+        id: savedOpp.id,
+      }).catch((broadcastErr) => {
+        console.warn("Pemberitahuan otomatis saat admin tambah peluang gagal:", broadcastErr?.message || broadcastErr);
+      });
+    }
 
     return NextResponse.json({
       success: true,

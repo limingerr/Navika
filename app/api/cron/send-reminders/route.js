@@ -128,7 +128,7 @@ export async function GET(request) {
         try {
           const payload = {
             app_id: onesignalAppId,
-            included_segments: ["Total Subscriptions", "Subscribed Users"],
+            included_segments: ["Total Subscriptions"],
             headings: {
               id: `⏳ Deadline H-2: ${opp.title}`,
               en: `⏳ Deadline in 2 Days: ${opp.title}`,

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Eye, EyeClosed } from "iconoir-react";
 import { useApp, useTr } from "@/script/app-provider";
 import { Brand, DemoNote } from "@/script/ui";
 import { isSupabaseConfigured, signUpUser } from "@/script/supabase-service";
@@ -30,6 +31,7 @@ export function LoginScreen() {
     const tr = useTr();
     const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -49,7 +51,7 @@ export function LoginScreen() {
             router.push("/dashboard");
         }
     };
-    return <main className="auth-page page-width"><Brand /><div className="auth-layout"><div><AuthHero kind="login"/><div className="auth-intro"><h1>{tr("Temukan peluang yang sesuai untukmu", "Find opportunities that suit you")}</h1><p>{tr("Masuk untuk melanjutkan ke akun NAVIKA.", "Sign in to continue to your NAVIKA account.")}</p><DemoNote /></div></div><div className="auth-controls"><form className="auth-form" onSubmit={handleSubmit}><label htmlFor="identifier">{tr("Email", "Email")}</label><input id="identifier" type="text" placeholder="nama@email.com" value={identifier} onChange={(e) => { setIdentifier(e.target.value); setError(""); }} autoComplete="username" required/><label htmlFor="password">{tr("Kata Sandi", "Password")}</label><input id="password" type="password" placeholder={tr("Masukkan kata sandi", "Enter password")} value={password} onChange={(e) => { setPassword(e.target.value); setError(""); }} autoComplete="current-password" required/>{error && <p className="form-error" role="alert">{error}</p>}<button className="primary-button" type="submit">{tr("Masuk", "Sign In")}</button></form><GoogleAuthLink action="login"/><p className="auth-switch">{tr("Belum punya akun?", "No account yet?")} <Link href="/daftar">{tr("Daftar", "Sign Up")}</Link></p></div></div></main>;
+    return <main className="auth-page page-width"><Brand /><div className="auth-layout"><div><AuthHero kind="login"/><div className="auth-intro"><h1>{tr("Temukan peluang yang sesuai untukmu", "Find opportunities that suit you")}</h1><p>{tr("Masuk untuk melanjutkan ke akun NAVIKA.", "Sign in to continue to your NAVIKA account.")}</p><DemoNote /></div></div><div className="auth-controls"><form className="auth-form" onSubmit={handleSubmit}><label htmlFor="identifier">{tr("Email", "Email")}</label><input id="identifier" type="text" placeholder="nama@email.com" value={identifier} onChange={(e) => { setIdentifier(e.target.value); setError(""); }} autoComplete="username" required/><label htmlFor="password">{tr("Kata Sandi", "Password")}</label><div className="password-field"><input id="password" type={showPassword ? "text" : "password"} placeholder={tr("Masukkan kata sandi", "Enter password")} value={password} onChange={(e) => { setPassword(e.target.value); setError(""); }} autoComplete="current-password" required/><button type="button" className="password-toggle" onClick={() => setShowPassword((shown) => !shown)} aria-label={showPassword ? tr("Sembunyikan kata sandi", "Hide password") : tr("Lihat kata sandi", "Show password")} aria-pressed={showPassword}>{showPassword ? <EyeClosed aria-hidden="true" /> : <Eye aria-hidden="true" />}</button></div>{error && <p className="form-error" role="alert">{error}</p>}<button className="primary-button" type="submit">{tr("Masuk", "Sign In")}</button></form><GoogleAuthLink action="login"/><p className="auth-switch">{tr("Belum punya akun?", "No account yet?")} <Link href="/daftar">{tr("Daftar", "Sign Up")}</Link></p></div></div></main>;
 }
 export function RegisterScreen() {
     const router = useRouter();

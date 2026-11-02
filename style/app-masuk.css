@@ -475,3 +475,36 @@ html {
   height: 20px;
   flex: none;
 }
+
+.page-masuk .password-field {
+  position: relative;
+}
+
+.page-masuk .auth-form .password-field input {
+  padding-right: 64px;
+}
+
+.page-masuk .password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink);
+}
+
+.page-masuk .password-toggle:focus-visible {
+  outline: 2px solid var(--deep);
+  outline-offset: 2px;
+}
+
+.page-masuk .password-toggle svg {
+  width: 22px;
+  height: 22px;
+}

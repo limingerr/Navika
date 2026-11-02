@@ -458,9 +458,33 @@ export function AppProvider({ children }) {
         media.addEventListener("change", apply);
         return () => media.removeEventListener("change", apply);
     }, [theme]);
+    // Sinkronisasi data identitas dan peran user ke Microsoft Clarity
+    useEffect(() => {
+        if (typeof window !== "undefined" && typeof window.clarity === "function") {
+            try {
+                if (isAdminLoggedIn) {
+                    window.clarity("set", "user_role", "pengelola");
+                    window.clarity("identify", "admin-navika", undefined, undefined, "Pengelola Navika");
+                } else if (profile?.email) {
+                    window.clarity("set", "user_role", "mahasiswa");
+                    window.clarity("identify", profile.email, undefined, undefined, profile.name || profile.email);
+                    if (profile.university) window.clarity("set", "university", profile.university);
+                    if (profile.major) window.clarity("set", "major", profile.major);
+                    if (profile.semester) window.clarity("set", "semester", String(profile.semester));
+                    if (profile.gpa) window.clarity("set", "gpa", String(profile.gpa));
+                }
+            } catch {}
+        }
+    }, [profile, isAdminLoggedIn]);
     const toggleSaved = (id) => {
         const isCurrentlySaved = saved.includes(id);
         setSaved((current) => isCurrentlySaved ? current.filter((item) => item !== id) : [...current, id]);
+        if (typeof window !== "undefined" && typeof window.clarity === "function") {
+            try {
+                window.clarity("event", isCurrentlySaved ? "unfavorite_opportunity" : "favorite_opportunity");
+                window.clarity("set", "last_opportunity", id);
+            } catch {}
+        }
         if (isSupabaseConfigured()) {
             toggleBookmarkInDb(id, isCurrentlySaved).catch(() => {});
         }

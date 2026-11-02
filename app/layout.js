@@ -1,5 +1,6 @@
 import Script from "next/script";
 import { AppProvider } from "@/script/app-provider";
+import { ClarityTracker } from "@/script/clarity-tracker";
 import "@/style/globals.css";
 
 export const metadata = {
@@ -19,6 +20,7 @@ export default function RootLayout({ children }) {
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
       </head>
       <body>
+        <ClarityTracker />
         <AppProvider>{children}</AppProvider>
         {CLARITY_PROJECT_ID && (
           <Script id="microsoft-clarity" strategy="afterInteractive">

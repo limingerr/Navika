@@ -1,20 +1,28 @@
 "use client";
 
-import { useEffect } from "react";
-import Clarity from "@microsoft/clarity";
+/**
+ * Utilitas Microsoft Clarity Analytics & Event Helper.
+ * Skrip utama diinisialisasi melalui Next.js Script di app/layout.js.
+ */
 
-const CLARITY_PROJECT_ID = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID || "z6b213a2fj";
+export function trackClarityEvent(eventName) {
+  if (typeof window !== "undefined" && typeof window.clarity === "function") {
+    window.clarity("event", eventName);
+  }
+}
+
+export function setClarityTag(key, value) {
+  if (typeof window !== "undefined" && typeof window.clarity === "function") {
+    window.clarity("set", key, value);
+  }
+}
+
+export function identifyClarityUser(customId, session, page, friendlyName) {
+  if (typeof window !== "undefined" && typeof window.clarity === "function") {
+    window.clarity("identify", customId, session, page, friendlyName);
+  }
+}
 
 export function ClarityTracker() {
-  useEffect(() => {
-    if (typeof window !== "undefined" && CLARITY_PROJECT_ID) {
-      try {
-        Clarity.init(CLARITY_PROJECT_ID);
-      } catch (err) {
-        console.warn("Microsoft Clarity initialization notice:", err);
-      }
-    }
-  }, []);
-
   return null;
 }

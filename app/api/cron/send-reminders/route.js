@@ -15,7 +15,7 @@ export async function GET(request) {
     const isManual = searchParams.get("manual") === "true";
     const authHeader = request.headers.get("authorization");
     if (isManual) {
-      if (!await isAuthorizedAdmin()) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+      if (!await isAuthorizedAdmin(request)) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
     } else if (process.env.NODE_ENV !== "development" &&
       (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

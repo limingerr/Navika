@@ -475,14 +475,16 @@ export function AppProvider({ children }) {
             try {
                 if (isAdminLoggedIn) {
                     window.clarity("set", "user_role", "pengelola");
-                    window.clarity("identify", "admin-navika", undefined, undefined, "Pengelola Navika");
+                    window.clarity("identify", "admin-navika", "", "", "Pengelola Navika");
+                    window.clarity("upgrade", "admin_session");
                 } else if (profile?.email) {
                     window.clarity("set", "user_role", "mahasiswa");
-                    window.clarity("identify", profile.email, undefined, undefined, profile.name || profile.email);
+                    window.clarity("identify", profile.email, "", "", profile.name || profile.email);
                     if (profile.university) window.clarity("set", "university", profile.university);
                     if (profile.major) window.clarity("set", "major", profile.major);
                     if (profile.semester) window.clarity("set", "semester", String(profile.semester));
                     if (profile.gpa) window.clarity("set", "gpa", String(profile.gpa));
+                    window.clarity("upgrade", "student_session");
                 }
             } catch {}
         }

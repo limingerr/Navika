@@ -106,7 +106,7 @@ export async function broadcastNewOpportunity({ title, organization, category, f
 }
 
 export async function POST(request) {
-  if (!await isAuthorizedAdmin()) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+  if (!await isAuthorizedAdmin(request)) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
   try {
     const body = await request.json().catch(() => ({}));
     const { title, organization, category, field, slug, id } = body;

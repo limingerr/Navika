@@ -483,3 +483,37 @@ html {
   height: 20px;
   flex: none;
 }
+
+
+.page-daftar .password-field {
+  position: relative;
+}
+
+.page-daftar .auth-form .password-field input {
+  padding-right: 64px;
+}
+
+.page-daftar .password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink);
+}
+
+.page-daftar .password-toggle:focus-visible {
+  outline: 2px solid var(--deep);
+  outline-offset: 2px;
+}
+
+.page-daftar .password-toggle svg {
+  width: 22px;
+  height: 22px;
+}

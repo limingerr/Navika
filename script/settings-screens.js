@@ -14,7 +14,7 @@ function SettingsRow({ href, icon, title, detail, danger = false }) {
 }
 export function SettingsScreen() {
     const router = useRouter();
-    const { profile, locale, theme, clearDemo, isAdminLoggedIn } = useApp();
+    const { profile, locale, theme, clearDemo, logoutUser, isAdminLoggedIn } = useApp();
     const tr = useTr();
     const displayName = isAdminLoggedIn
         ? tr("Pengelola Navika", "Navika Administrator")
@@ -22,10 +22,14 @@ export function SettingsScreen() {
     const initials = isAdminLoggedIn
         ? "AD"
         : (profile.name || "M").split(" ").filter(Boolean).slice(0, 3).map((word) => word[0].toUpperCase()).join("");
-    const handleLogout = () => {
+    const handleLogout = async () => {
         if (!window.confirm(tr("Apakah Anda yakin ingin keluar dari akun?", "Are you sure you want to sign out?")))
             return;
-        clearDemo();
+        if (logoutUser) {
+            await logoutUser();
+        } else {
+            clearDemo();
+        }
         router.push("/");
     };
     return <SettingsLayout title={tr("Pengaturan", "Settings")} subtitle={tr("Kelola akun dan preferensimu.", "Manage your profile and preferences.")} back="/profil">

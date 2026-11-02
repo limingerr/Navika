@@ -117,6 +117,12 @@ export function AppProvider({ children }) {
                             try { localStorage.setItem(adminStorageKey, "true"); } catch {}
                         } else {
                             try { localStorage.removeItem(adminStorageKey); } catch {}
+                            // Sinkronkan daftar bookmark milik akun mahasiswa ini dari Supabase
+                            fetchSavedOpportunityIds().then((savedIds) => {
+                                if (savedIds && Array.isArray(savedIds)) {
+                                    setSaved(savedIds);
+                                }
+                            }).catch(() => {});
                         }
                     } else if (adminRaw !== "true") {
                         setIsAdminLoggedIn(false);
@@ -128,12 +134,6 @@ export function AppProvider({ children }) {
                         setProfile(defaultProfile);
                     }
                 }).finally(() => setReady(true));
-
-                fetchSavedOpportunityIds().then((savedIds) => {
-                    if (savedIds && savedIds.length > 0) {
-                        setSaved(savedIds);
-                    }
-                }).catch(() => {});
             }
         }
         catch {
@@ -381,6 +381,12 @@ export function AppProvider({ children }) {
                 try { localStorage.removeItem(adminStorageKey); } catch {}
                 const account = await fetchCurrentAccount();
                 setProfile(account?.profile || { ...defaultProfile, email: res.user?.email || identifier.trim() });
+                try {
+                    const savedFromDb = await fetchSavedOpportunityIds();
+                    if (savedFromDb && savedFromDb.length > 0) {
+                        setSaved((prev) => Array.from(new Set([...(prev || []), ...savedFromDb])));
+                    }
+                } catch {}
                 return { role: "mahasiswa" };
             }
         }
@@ -466,6 +472,26 @@ export function AppProvider({ children }) {
         }
     };
     const setRegistrationProfile = (newProfile) => setProfile(newProfile);
+    const logoutUser = async () => {
+        setIsAdminLoggedIn(false);
+        try { localStorage.removeItem(adminStorageKey); } catch {}
+        if (isSupabaseConfigured()) {
+            try { await signOutUser(); } catch {}
+        }
+        setProfile(demoProfile);
+        setSaved([]);
+        try {
+            localStorage.setItem(storageKey, JSON.stringify({
+                profile: demoProfile,
+                saved: [],
+                locale: locale || "id",
+                theme: theme || "light",
+                deadlineAlerts: true,
+                calendarFilter: "Semua"
+            }));
+        } catch {}
+    };
+
     const clearDemo = () => {
         setProfile(demoProfile);
         setSaved([]);
@@ -500,6 +526,7 @@ export function AppProvider({ children }) {
       calendarFilter,
       setCalendarFilter,
       clearDemo,
+      logoutUser,
       opportunities,
       addOpportunity,
       updateOpportunity,

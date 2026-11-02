@@ -258,8 +258,10 @@ export async function fetchOpportunitiesFromDb() {
   }
 }
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /**
- * Mengambil Daftar Peluang yang Dibookmark Pengguna
+ * Mengambil Daftar Peluang yang Dibookmark Pengguna dari Supabase
  */
 export async function fetchSavedOpportunityIds() {
   const supabase = getSupabase();
@@ -267,7 +269,17 @@ export async function fetchSavedOpportunityIds() {
 
   try {
     const { data: authData } = await supabase.auth.getUser();
-    if (!authData?.user) return null;
+    if (!authData?.user) {
+      // Coba periksa via server API route
+      try {
+        const res = await fetch("/api/bookmarks");
+        const apiData = await res.json();
+        if (apiData?.success && Array.isArray(apiData.saved)) {
+          return apiData.saved;
+        }
+      } catch {}
+      return null;
+    }
 
     const { data, error } = await supabase
       .from("saved_opportunities")
@@ -276,49 +288,101 @@ export async function fetchSavedOpportunityIds() {
 
     if (error || !Array.isArray(data)) return null;
 
-    return data.map((item) => item.opportunity?.slug || item.opportunity_id);
-  } catch {
+    return data.map((item) => {
+      const opp = Array.isArray(item.opportunity) ? item.opportunity[0] : item.opportunity;
+      return opp?.slug || item.opportunity_id;
+    });
+  } catch (err) {
+    console.warn("Gagal mengambil data bookmark dari Supabase:", err);
     return null;
   }
 }
 
 /**
- * Toggle Simpan / Hapus Bookmark
+ * Toggle Simpan / Hapus Bookmark di Database Supabase
  */
 export async function toggleBookmarkInDb(opportunitySlugOrId, isSaved) {
+  if (!opportunitySlugOrId) return { success: false, error: "ID peluang kosong." };
+
+  const cleanKey = String(opportunitySlugOrId).trim();
+  const isUuid = UUID_REGEX.test(cleanKey);
+
+  // 1. Coba simpan/hapus langsung via Supabase client SDK di browser
   const supabase = getSupabase();
-  if (!supabase) return;
+  if (supabase) {
+    try {
+      const { data: authData } = await supabase.auth.getUser();
+      if (authData?.user) {
+        // Cari UUID peluang dari database berdasarkan ID jika UUID, atau slug jika teks
+        let query = supabase.from("opportunities").select("id, slug");
+        if (isUuid) {
+          query = query.eq("id", cleanKey);
+        } else {
+          query = query.eq("slug", cleanKey);
+        }
 
-  try {
-    const { data: authData } = await supabase.auth.getUser();
-    if (!authData?.user) return;
+        const { data: opp, error: oppErr } = await query.maybeSingle();
 
-    // Cari UUID dari slug
-    const { data: opp } = await supabase
-      .from("opportunities")
-      .select("id")
-      .or(`slug.eq.${opportunitySlugOrId},id.eq.${opportunitySlugOrId}`)
-      .single();
+        if (opp) {
+          if (isSaved) {
+            // Hapus bookmark
+            let deleted = false;
+            try {
+              const { error: rpcErr } = await supabase.rpc("remove_bookmark", {
+                p_opportunity_id: opp.id,
+                p_confirm: true,
+              });
+              if (!rpcErr) deleted = true;
+            } catch {}
 
-    if (!opp) return;
+            if (!deleted) {
+              await supabase
+                .from("saved_opportunities")
+                .delete()
+                .eq("user_id", authData.user.id)
+                .eq("opportunity_id", opp.id);
+            }
 
-    if (isSaved) {
-      // Hapus
-      await supabase.rpc("remove_bookmark", {
-        p_opportunity_id: opp.id,
-        p_confirm: true,
-      });
-    } else {
-      // Simpan
-      await supabase.from("saved_opportunities").upsert({
-        user_id: authData.user.id,
-        opportunity_id: opp.id,
-        application_status: "tertarik",
-        saved_at: new Date().toISOString(),
-        status_updated_at: new Date().toISOString(),
-      });
+            return { success: true, savedInDb: false };
+          } else {
+            // Simpan bookmark ke Supabase
+            const { error: saveErr } = await supabase.from("saved_opportunities").upsert(
+              {
+                user_id: authData.user.id,
+                opportunity_id: opp.id,
+                application_status: "tertarik",
+                saved_at: new Date().toISOString(),
+                status_updated_at: new Date().toISOString(),
+              },
+              { onConflict: "user_id,opportunity_id" }
+            );
+
+            if (!saveErr) {
+              return { success: true, savedInDb: true };
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Client bookmark notice, mencoba jalur API:", err);
     }
-  } catch {}
+  }
+
+  // 2. Jalur Server API Route Fallback (/api/bookmarks)
+  try {
+    const res = await fetch("/api/bookmarks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        opportunityId: cleanKey,
+        isSaved: Boolean(isSaved),
+      }),
+    });
+    return await res.json();
+  } catch (apiErr) {
+    console.warn("Gagal menyimpan bookmark ke server:", apiErr);
+    return { success: false, savedInDb: false };
+  }
 }
 
 /**

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useApp, useTr } from "@/script/app-provider";
 
 export function EmailConsentModal() {
@@ -16,46 +16,39 @@ export function EmailConsentModal() {
   const tr = useTr();
   const [toastMsg, setToastMsg] = useState("");
   const [saving, setSaving] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-  // Jangan tampilkan jika belum siap atau user sudah pernah menentukan pilihan
-  if (!ready || emailConsentDecided) {
-    if (toastMsg) {
-      return (
-        <div
-          style={{
-            position: "fixed",
-            bottom: "84px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            background: "rgba(16, 185, 129, 0.95)",
-            color: "#ffffff",
-            padding: "10px 20px",
-            borderRadius: "999px",
-            fontSize: "0.85rem",
-            fontWeight: 700,
-            zIndex: 100,
-            boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
-            textAlign: "center",
-            maxWidth: "90%",
-            backdropFilter: "blur(6px)",
-          }}
-          role="status"
-          aria-live="polite"
-        >
-          {toastMsg}
-        </div>
-      );
+  useEffect(() => {
+    if (!ready) return;
+
+    // Periksa status izin akun mahasiswa saat ini
+    const userEmail = profile?.email || "guest";
+    const consentStorageKey = `navika_notif_prompt_${userEmail}`;
+    const storedStatus = typeof window !== "undefined" ? localStorage.getItem(consentStorageKey) : null;
+
+    // Tampilkan jika belum pernah menjawab atau belum mengaktifkan notifikasi
+    if (!storedStatus && !emailConsentDecided && !profile?.emailAlerts) {
+      const timer = setTimeout(() => {
+        setIsOpen(true);
+      }, 700);
+      return () => clearTimeout(timer);
     }
-    return null;
-  }
+  }, [ready, profile?.email, emailConsentDecided, profile?.emailAlerts]);
 
   const handleConsent = async (granted) => {
     setSaving(true);
-    setEmailConsentDecided(true);
-    setEmailAlerts(granted);
+    const userEmail = profile?.email || "guest";
+    const consentStorageKey = `navika_notif_prompt_${userEmail}`;
+
+    if (setEmailConsentDecided) setEmailConsentDecided(true);
+    if (setEmailAlerts) setEmailAlerts(granted);
+    if (setDeadlineAlerts) setDeadlineAlerts(granted);
+
+    try {
+      localStorage.setItem(consentStorageKey, granted ? "granted" : "dismissed");
+    } catch {}
 
     if (granted) {
-      if (setDeadlineAlerts) setDeadlineAlerts(true);
       setToastMsg(
         tr(
           "✓ Notifikasi berhasil diaktifkan untuk info peluang & pengingat deadline!",
@@ -82,7 +75,7 @@ export function EmailConsentModal() {
         });
       }
 
-      // 2. Simpan status notifikasi ke profil pengguna di Supabase
+      // 2. Simpan preferensi notifikasi ke Supabase database
       if (updateProfile && profile) {
         try {
           updateProfile({
@@ -95,16 +88,50 @@ export function EmailConsentModal() {
     } else {
       setToastMsg(
         tr(
-          "Pilihan disimpan. Kamu bisa mengaktifkannya kapan saja di menu Pengaturan.",
-          "Preference saved. You can turn it on anytime in Settings."
+          "Pilihan disimpan. Anda dapat mengaktifkannya kapan saja di menu Pengaturan.",
+          "Preference saved. You can enable it anytime in Settings."
         )
       );
       setTimeout(() => setToastMsg(""), 3500);
     }
+
     setSaving(false);
+    setIsOpen(false);
   };
 
   const targetEmail = profile?.email && profile.email.includes("@") ? profile.email : null;
+
+  if (toastMsg) {
+    return (
+      <div
+        style={{
+          position: "fixed",
+          bottom: "84px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          background: "rgba(16, 185, 129, 0.95)",
+          color: "#ffffff",
+          padding: "10px 22px",
+          borderRadius: "999px",
+          fontSize: "0.85rem",
+          fontWeight: 700,
+          zIndex: 1000,
+          boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
+          textAlign: "center",
+          maxWidth: "90%",
+          backdropFilter: "blur(6px)",
+        }}
+        role="status"
+        aria-live="polite"
+      >
+        {toastMsg}
+      </div>
+    );
+  }
+
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div
@@ -128,7 +155,7 @@ export function EmailConsentModal() {
           background: "#ffffff",
           borderRadius: "24px",
           width: "100%",
-          maxWidth: "430px",
+          maxWidth: "440px",
           padding: "26px 22px 22px",
           boxShadow: "0 20px 40px rgba(0, 0, 0, 0.22)",
           textAlign: "center",
@@ -138,15 +165,15 @@ export function EmailConsentModal() {
       >
         <div
           style={{
-            width: "56px",
-            height: "56px",
+            width: "58px",
+            height: "58px",
             borderRadius: "50%",
             background: "linear-gradient(135deg, #e0f2fe, #bae6fd)",
-            color: "var(--biru-aksi)",
+            color: "var(--biru-aksi, #0067a6)",
             display: "grid",
             placeItems: "center",
             margin: "0 auto 16px",
-            fontSize: "1.6rem",
+            fontSize: "1.7rem",
           }}
           aria-hidden="true"
         >
@@ -159,27 +186,27 @@ export function EmailConsentModal() {
             fontSize: "1.25rem",
             fontWeight: 800,
             margin: "0 0 10px",
-            color: "var(--teks)",
+            color: "#0f172a",
             letterSpacing: "-0.2px",
           }}
         >
-          {tr("Aktifkan Notifikasi Email?", "Enable Email Notifications?")}
+          {tr("Aktifkan Notifikasi & Pengingat?", "Enable Notifications & Alerts?")}
         </h2>
 
         <p
           style={{
             fontSize: "0.92rem",
             lineHeight: 1.55,
-            color: "var(--teks-redup)",
+            color: "#475569",
             margin: "0 0 20px",
           }}
         >
           {tr(
-            "Dapatkan pemberitahuan otomatis ke emailmu saat ada info beasiswa baru dan pengingat deadline pendaftaran yang akan segera ditutup dalam 2 hari.",
-            "Get automatic email updates when new scholarships open and deadline reminders 2 days before applications close."
+            "Dapatkan pengingat batas pendaftaran (H-3) via pop-up web push di perangkat Anda, serta pembaruan beasiswa dan magang baru melalui email resmi NAVIKA.",
+            "Get application deadline reminders (within 3 days) via web push on your device, and new scholarship/internship updates through official NAVIKA emails."
           )}
           {targetEmail && (
-            <span style={{ display: "block", marginTop: "8px", fontWeight: 700, color: "var(--biru-aksi)" }}>
+            <span style={{ display: "block", marginTop: "8px", fontWeight: 700, color: "var(--biru-aksi, #0067a6)" }}>
               ({targetEmail})
             </span>
           )}
@@ -195,7 +222,7 @@ export function EmailConsentModal() {
               minHeight: "48px",
               padding: "12px 20px",
               borderRadius: "14px",
-              background: "var(--biru-aksi)",
+              background: "linear-gradient(105deg, #049ed4, #00659b)",
               color: "#ffffff",
               border: 0,
               fontSize: "0.95rem",
@@ -205,7 +232,7 @@ export function EmailConsentModal() {
               transition: "transform 0.15s ease",
             }}
           >
-            {tr("✓ Ya, Izinkan Notifikasi", "✓ Yes, Allow Notifications")}
+            {saving ? tr("Mengaktifkan...", "Enabling...") : tr("✓ Ya, Aktifkan Semua Notifikasi", "✓ Yes, Enable All Notifications")}
           </button>
 
           <button
@@ -215,12 +242,12 @@ export function EmailConsentModal() {
             style={{
               width: "100%",
               minHeight: "42px",
-              padding: "8px 16px",
+              padding: "10px 16px",
               borderRadius: "12px",
               background: "transparent",
-              color: "var(--teks-redup)",
+              color: "#64748b",
               border: 0,
-              fontSize: "0.88rem",
+              fontSize: "0.9rem",
               fontWeight: 600,
               cursor: "pointer",
             }}

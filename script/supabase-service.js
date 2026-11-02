@@ -85,47 +85,63 @@ export async function signInUser(identifier, password) {
 }
 
 /**
- * Pendaftaran Akun Mahasiswa Baru
+ * Pendaftaran Akun Mahasiswa Baru (Solusi C: Bebas Rate-Limit + Welcome Email)
  */
 export async function signUpUser(name, email, password) {
-  const supabase = getSupabase();
-  if (!supabase) {
-    return {
-      success: true,
-      user: { id: "student-mock-id", email },
-    };
-  }
-
-  const { data, error } = await supabase.auth.signUp({
-    email: email.trim(),
-    password: password,
-    options: {
-      data: { name: name.trim() },
-    },
-  });
-
-  if (error) {
-    return { success: false, error: error.message };
-  }
-
-  // Inisialisasi profil mahasiswa di database jika pengguna langsung aktif
-  if (data?.user) {
-    if (data.session) {
-      const { error: profileError } = await supabase.from("profiles").upsert({
-        user_id: data.user.id,
+  try {
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         name: name.trim(),
-        university: "",
-        major: "",
-        semester: 1,
-        gpa: null,
-        interests: [],
-        updated_at: new Date().toISOString(),
-      });
-      if (profileError) return { success: false, error: "Profil gagal dibuat. Silakan coba lagi." };
-    }
-  }
+        email: email.trim(),
+        password,
+      }),
+    });
 
-  return { success: true, user: data.user };
+    const data = await res.json();
+    if (!data.success) {
+      return { success: false, error: data.error || "Pendaftaran gagal. Silakan coba lagi." };
+    }
+
+    // Login otomatis setelah pendaftaran sukses agar sesi langsung aktif
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+      } catch (loginErr) {
+        console.warn("Auto-login notice setelah pendaftaran:", loginErr);
+      }
+    }
+
+    return { success: true, user: data.user };
+  } catch (err) {
+    console.warn("Pendaftaran via API gagal, mencoba fallback Supabase SDK:", err);
+    const supabase = getSupabase();
+    if (!supabase) {
+      return {
+        success: true,
+        user: { id: "student-mock-id", email },
+      };
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: {
+        data: { name: name.trim() },
+      },
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, user: data.user };
+  }
 }
 
 /**

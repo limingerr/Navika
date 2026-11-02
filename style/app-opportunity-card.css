@@ -1,7 +1,7 @@
 /* ============================================================
    NAVIKA — Unified Opportunity Card Style
    Konsisten di seluruh halaman: Dashboard, Peluang, Tersimpan, Kalender
-   Sesuai acuan desain Image 2
+   Sesuai acuan desain Image 2 & penyempurnaan UI/UX
    ============================================================ */
 
 .page-dashboard .opportunity-card,
@@ -21,7 +21,7 @@
   display: flex !important;
   flex-direction: column !important;
   min-width: 0 !important;
-  min-height: 200px !important;
+  min-height: 204px !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
   transition: transform 220ms ease, box-shadow 220ms ease !important;
   position: relative !important;
@@ -68,6 +68,7 @@
 
 /* ============================================================
    Baris Atas: Badges (Rekomendasi, Kategori, Deadline)
+   Terkunci rapi dalam 1 baris tanpa wrapping
    ============================================================ */
 .opportunity-card .card-badges,
 .opportunity-card .meta-atas,
@@ -76,11 +77,13 @@
 .kartu-agenda .card-badges,
 .kartu-agenda .meta-atas {
   display: flex !important;
-  flex-wrap: wrap !important;
+  flex-wrap: nowrap !important;
   align-items: center !important;
-  gap: 8px !important;
+  gap: 6px !important;
   padding: 0 0 10px 0 !important;
   margin: 0 !important;
+  width: 100% !important;
+  overflow: hidden !important;
 }
 
 .opportunity-card .badge,
@@ -88,17 +91,18 @@
 .kartu-agenda .badge {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 5px !important;
-  min-height: 28px !important;
-  padding: 4px 12px !important;
-  border-radius: 10px !important;
-  font-size: 0.76rem !important;
+  gap: 4px !important;
+  min-height: 26px !important;
+  padding: 3px 8px !important;
+  border-radius: 9px !important;
+  font-size: 0.72rem !important;
   font-weight: 700 !important;
   line-height: 1 !important;
   white-space: nowrap !important;
   color: #ffffff !important;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
   border: none !important;
+  flex-shrink: 0 !important;
 }
 
 /* Badge Rekomendasi (Dark Navy) */
@@ -111,7 +115,7 @@
   background: #1b3d68 !important;
   border: 0 !important;
   color: #ffffff !important;
-  border-radius: 10px !important;
+  border-radius: 9px !important;
 }
 
 /* Badge Kategori Berwarna Spesifik Sesuai Desain */
@@ -193,12 +197,13 @@
 .kartu-agenda .badge-tenggat,
 .kartu-agenda .badge-time {
   margin-left: auto !important;
-  padding: 4px 11px !important;
+  padding: 3px 8px !important;
   border: 1.5px solid rgba(255, 255, 255, 0.85) !important;
-  border-radius: 12px !important;
+  border-radius: 10px !important;
   background: rgba(255, 255, 255, 0.16) !important;
   color: #ffffff !important;
   box-shadow: none !important;
+  flex-shrink: 0 !important;
 }
 
 .opportunity-card .badge-tenggat.mendesak,
@@ -214,6 +219,7 @@
 
 /* ============================================================
    Bagian Tengah: Judul Peluang & Penyelenggara
+   Harmonis dan Sejajar Antar Kartu
    ============================================================ */
 .opportunity-card h3,
 .opportunity-card .judul-peluang,
@@ -226,14 +232,15 @@
   font-family: Poppins, "Segoe UI", system-ui, sans-serif !important;
   font-weight: 800 !important;
   letter-spacing: -0.02em !important;
-  line-height: 1.24 !important;
+  line-height: 1.25 !important;
   display: -webkit-box !important;
-  -webkit-line-clamp: 3 !important;
+  -webkit-line-clamp: 2 !important;
   -webkit-box-orient: vertical !important;
   overflow: hidden !important;
+  min-height: 2.5em !important;
 }
 
-/* Penyesuaian Ukuran Font Otomatis Berdasarkan Panjang Judul */
+/* Penyesuaian Ukuran Font Dinamis yang Harmonis */
 .page-dashboard .opportunity-card h3.judul-lg,
 .page-peluang .opportunity-card h3.judul-lg,
 .page-tersimpan .opportunity-card h3.judul-lg,
@@ -241,7 +248,7 @@
 .opportunity-card h3.judul-lg,
 .kartu-peluang h3.judul-lg,
 .kartu-agenda h3.judul-lg {
-  font-size: clamp(20.5px, 2.6vw, 23px) !important;
+  font-size: clamp(19px, 2.3vw, 21.5px) !important;
 }
 
 .page-dashboard .opportunity-card h3.judul-md,
@@ -251,7 +258,7 @@
 .opportunity-card h3.judul-md,
 .kartu-peluang h3.judul-md,
 .kartu-agenda h3.judul-md {
-  font-size: clamp(18px, 2.2vw, 20px) !important;
+  font-size: clamp(17.5px, 2.05vw, 19px) !important;
 }
 
 .page-dashboard .opportunity-card h3.judul-sm,
@@ -261,17 +268,17 @@
 .opportunity-card h3.judul-sm,
 .kartu-peluang h3.judul-sm,
 .kartu-agenda h3.judul-sm {
-  font-size: clamp(15.5px, 1.85vw, 17.5px) !important;
+  font-size: clamp(16px, 1.85vw, 17.5px) !important;
 }
 
 /* Fallback jika class belum tersemat */
 .opportunity-card h3:not([class*="judul-"]),
 .kartu-peluang h3:not([class*="judul-"]),
 .kartu-agenda h3:not([class*="judul-"]) {
-  font-size: clamp(18px, 2.2vw, 21px) !important;
+  font-size: clamp(17.5px, 2.1vw, 20px) !important;
 }
 
-/* Organisasi / Instansi Penyelenggara */
+/* Organisasi / Instansi Penyelenggara: Rata Baris Pertama */
 .opportunity-card .card-org,
 .opportunity-card .organisasi,
 .kartu-peluang .card-org,
@@ -279,13 +286,19 @@
 .kartu-agenda .card-org,
 .kartu-agenda .organisasi {
   display: flex !important;
-  align-items: center !important;
-  gap: 7px !important;
+  align-items: flex-start !important;
+  gap: 6px !important;
   margin: 0 0 16px 0 !important;
   color: rgba(255, 255, 255, 0.92) !important;
   font-family: Poppins, "Segoe UI", system-ui, sans-serif !important;
-  font-size: 13.5px !important;
+  font-size: 13px !important;
   font-weight: 500 !important;
+  line-height: 1.4 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  min-height: 2.8em !important;
 }
 
 .opportunity-card .card-org svg,
@@ -296,6 +309,7 @@
 .kartu-agenda .organisasi svg {
   flex-shrink: 0 !important;
   color: #ffffff !important;
+  margin-top: 2.5px !important;
 }
 
 /* ============================================================

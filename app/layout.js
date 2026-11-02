@@ -6,6 +6,14 @@ import "@/style/globals.css";
 export const metadata = {
     title: "NAVIKA — Temukan peluangmu",
     description: "Jelajahi peluang beasiswa, magang, dan bootcamp untuk mahasiswa.",
+    icons: {
+        icon: [
+            { url: "/asset/Logo%20Navika.png", type: "image/png" },
+            { url: "/favicon.png", type: "image/png" },
+        ],
+        shortcut: "/asset/Logo%20Navika.png",
+        apple: "/asset/Logo%20Navika.png",
+    },
 };
 
 const ONESIGNAL_APP_ID = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID || "772b0572-55ce-4a28-aea9-a64695604c0e";
@@ -15,6 +23,9 @@ const CLARITY_PROJECT_ID = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID || "z6b213
 export default function RootLayout({ children }) {
     return (<html lang="id">
       <head>
+        <link rel="icon" type="image/png" href="/asset/Logo%20Navika.png"/>
+        <link rel="shortcut icon" href="/asset/Logo%20Navika.png"/>
+        <link rel="apple-touch-icon" href="/asset/Logo%20Navika.png"/>
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>

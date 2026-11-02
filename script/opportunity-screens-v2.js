@@ -633,6 +633,8 @@ export function CalendarScreen() {
                                         return <OpportunityCard key={opp.id + "-" + idx} opportunity={opp} displayCategory={item.kategori || AGENDA_KATEGORI[item.warna]} />;
                                     }
                                     const isSaved = item.id && saved.includes(item.id);
+                                    const titleLen = (item.judul || "").length;
+                                    const titleClass = titleLen <= 26 ? "judul-lg" : titleLen > 42 ? "judul-sm" : "judul-md";
                                     return (
                                         <article key={idx} className="kartu-agenda kartu-peluang opportunity-card">
                                             <div className="meta-atas card-badges">
@@ -648,7 +650,7 @@ export function CalendarScreen() {
                                                     </svg> 1 {tr("Hari", "Day")}
                                                 </span>
                                             </div>
-                                            <h3 className="judul-peluang">{item.judul}</h3>
+                                            <h3 className={`judul-peluang ${titleClass}`}>{item.judul}</h3>
                                             <p className="organisasi card-org">
                                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                                                     <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 9h4a1 1 0 0 1 1 1v11M3 21h18" />

@@ -1,300 +1,449 @@
+/* ============================================================
+   NAVIKA — Unified Opportunity Card Style
+   Konsisten di seluruh halaman: Dashboard, Peluang, Tersimpan, Kalender
+   Sesuai acuan desain Image 2
+   ============================================================ */
+
 .page-dashboard .opportunity-card,
 .page-peluang .opportunity-card,
-.page-tersimpan .opportunity-card {
-  background: #05a5d9;
-  color: #fff;
-  border-radius: 28px;
-  padding: 18px;
-  margin-bottom: 0;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 0;
-  transition: transform 220ms ease, box-shadow 220ms ease;
+.page-tersimpan .opportunity-card,
+.page-kalender .opportunity-card,
+.page-dashboard .kartu-peluang,
+.page-kalender .kartu-agenda,
+.opportunity-card,
+.kartu-peluang,
+.kartu-agenda {
+  background: var(--biru-kartu, #5AA4D8) !important;
+  color: #ffffff !important;
+  border-radius: 28px !important;
+  padding: 18px 20px 20px 20px !important;
+  margin-bottom: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  min-height: 200px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  transition: transform 220ms ease, box-shadow 220ms ease !important;
+  position: relative !important;
+  border: none !important;
 }
 
+/* Container Grid Peluang */
 .page-dashboard .opportunity-grid,
 .page-peluang .opportunity-grid,
-.page-tersimpan .saved-grid {
-  gap: 14px;
-}
-
-.page-dashboard .opportunity-card .card-badges,
-.page-peluang .opportunity-card .card-badges,
-.page-tersimpan .opportunity-card .card-badges {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 7px;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-  padding: 4px 0 10px;
-}
-
-.page-dashboard .opportunity-card .card-badges::-webkit-scrollbar,
-.page-peluang .opportunity-card .card-badges::-webkit-scrollbar,
-.page-tersimpan .opportunity-card .card-badges::-webkit-scrollbar {
-  display: none;
-}
-
-.page-dashboard .opportunity-card .badge,
-.page-peluang .opportunity-card .badge,
-.page-tersimpan .opportunity-card .badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  min-height: 28px;
-  padding: 3px 10px;
-  border-radius: 10px;
-  box-shadow: 0 5px 7px rgba(0,0,0,.21);
-  font-size: .77rem;
-  font-weight: 700;
-  line-height: 1;
-  white-space: nowrap;
-  color: #fff;
-}
-
-.page-dashboard .opportunity-card .badge-blue,
-.page-peluang .opportunity-card .badge-blue,
-.page-tersimpan .opportunity-card .badge-blue,
-.page-dashboard .opportunity-card .badge-rekomendasi,
-.page-peluang .opportunity-card .badge-rekomendasi,
-.page-tersimpan .opportunity-card .badge-rekomendasi {
-  background: #0067a6;
-  border: 0;
-}
-
-.page-dashboard .opportunity-card .badge-tenggat,
-.page-peluang .opportunity-card .badge-tenggat,
-.page-tersimpan .opportunity-card .badge-tenggat,
-.page-dashboard .opportunity-card .badge-time,
-.page-peluang .opportunity-card .badge-time,
-.page-tersimpan .opportunity-card .badge-time {
-  margin-left: auto;
-  padding: 3px 9px;
-  border: 1.5px solid rgba(255,255,255,.75);
-  border-radius: 10px;
-  background: rgba(255,255,255,.15);
-  box-shadow: none;
-}
-
-.page-dashboard .opportunity-card .badge-tenggat.mendesak,
-.page-peluang .opportunity-card .badge-tenggat.mendesak,
-.page-tersimpan .opportunity-card .badge-tenggat.mendesak,
-.page-dashboard .opportunity-card .badge-time-urgent,
-.page-peluang .opportunity-card .badge-time-urgent,
-.page-tersimpan .opportunity-card .badge-time-urgent {
-  background: #ff0105;
-  border: 1.5px solid #ff7a80;
-  box-shadow: 0 5px 7px rgba(0,0,0,.21);
-}
-
-.page-dashboard .opportunity-card h3,
-.page-peluang .opportunity-card h3,
-.page-tersimpan .opportunity-card h3 {
-  margin: 14px 0 5px;
-  color: #fff;
-  font-family: Poppins, "Segoe UI", system-ui, sans-serif;
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.2px;
-  line-height: 1.25;
-}
-
-.page-dashboard .opportunity-card .card-org,
-.page-peluang .opportunity-card .card-org,
-.page-tersimpan .opportunity-card .card-org {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  color: rgba(255,255,255,.85);
-  font-family: Poppins, "Segoe UI", system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.page-dashboard .opportunity-card .card-actions,
-.page-peluang .opportunity-card .card-actions,
-.page-tersimpan .opportunity-card .card-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: auto;
-  padding-top: 16px;
-}
-
-.page-dashboard .opportunity-card .heart-button,
-.page-peluang .opportunity-card .heart-button,
-.page-tersimpan .opportunity-card .heart-button {
+.page-tersimpan .saved-grid,
+.page-kalender .agenda-daftar-kartu,
+.opportunity-grid,
+.saved-grid,
+.agenda-daftar-kartu {
   display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  margin: -6px 0 -6px -10px;
-  border: 0;
-  border-radius: 12px;
-  background: transparent;
-  color: #fff;
-  cursor: pointer;
-  transition: color 200ms ease;
+  grid-template-columns: 1fr;
+  gap: 16px !important;
 }
 
+@media (min-width: 680px) {
+  .page-dashboard .opportunity-grid,
+  .page-peluang .opportunity-grid,
+  .page-tersimpan .saved-grid,
+  .page-kalender .agenda-daftar-kartu,
+  .opportunity-grid,
+  .saved-grid,
+  .agenda-daftar-kartu {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 18px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-dashboard .opportunity-grid,
+  .page-peluang .opportunity-grid,
+  .page-tersimpan .saved-grid,
+  .page-kalender .agenda-daftar-kartu,
+  .opportunity-grid,
+  .saved-grid,
+  .agenda-daftar-kartu {
+    gap: 20px !important;
+  }
+}
+
+/* ============================================================
+   Baris Atas: Badges (Rekomendasi, Kategori, Deadline)
+   ============================================================ */
+.opportunity-card .card-badges,
+.opportunity-card .meta-atas,
+.kartu-peluang .card-badges,
+.kartu-peluang .meta-atas,
+.kartu-agenda .card-badges,
+.kartu-agenda .meta-atas {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0 0 10px 0 !important;
+  margin: 0 !important;
+}
+
+.opportunity-card .badge,
+.kartu-peluang .badge,
+.kartu-agenda .badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  min-height: 28px !important;
+  padding: 4px 12px !important;
+  border-radius: 10px !important;
+  font-size: 0.76rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
+  border: none !important;
+}
+
+/* Badge Rekomendasi (Dark Navy) */
+.opportunity-card .badge-rekomendasi,
+.opportunity-card .badge-blue,
+.kartu-peluang .badge-rekomendasi,
+.kartu-peluang .badge-blue,
+.kartu-agenda .badge-rekomendasi,
+.kartu-agenda .badge-blue {
+  background: #1b3d68 !important;
+  border: 0 !important;
+  color: #ffffff !important;
+  border-radius: 10px !important;
+}
+
+/* Badge Kategori Berwarna Spesifik Sesuai Desain */
+.opportunity-card .badge-kompetisi,
+.opportunity-card .kat-kompetisi,
+.kartu-peluang .badge-kompetisi,
+.kartu-peluang .kat-kompetisi,
+.kartu-agenda .badge-kompetisi,
+.kartu-agenda .kat-kompetisi {
+  background: #8b1e2f !important;
+  border: 0 !important;
+}
+
+.opportunity-card .badge-beasiswa,
+.opportunity-card .kat-beasiswa,
+.kartu-peluang .badge-beasiswa,
+.kartu-peluang .kat-beasiswa,
+.kartu-agenda .badge-beasiswa,
+.kartu-agenda .kat-beasiswa {
+  background: #0f766e !important;
+  border: 0 !important;
+}
+
+.opportunity-card .badge-magang,
+.opportunity-card .kat-magang,
+.kartu-peluang .badge-magang,
+.kartu-peluang .kat-magang,
+.kartu-agenda .badge-magang,
+.kartu-agenda .kat-magang {
+  background: #b45309 !important;
+  border: 0 !important;
+}
+
+.opportunity-card .badge-bootcamp,
+.opportunity-card .kat-bootcamp,
+.kartu-peluang .badge-bootcamp,
+.kartu-peluang .kat-bootcamp,
+.kartu-agenda .badge-bootcamp,
+.kartu-agenda .kat-bootcamp {
+  background: #6d28d9 !important;
+  border: 0 !important;
+}
+
+.opportunity-card .badge-studi-independen,
+.opportunity-card .kat-studi-independen,
+.kartu-peluang .badge-studi-independen,
+.kartu-peluang .kat-studi-independen,
+.kartu-agenda .badge-studi-independen,
+.kartu-agenda .kat-studi-independen {
+  background: #4338ca !important;
+  border: 0 !important;
+}
+
+.opportunity-card .badge-workshop,
+.opportunity-card .kat-workshop,
+.kartu-peluang .badge-workshop,
+.kartu-peluang .kat-workshop,
+.kartu-agenda .badge-workshop,
+.kartu-agenda .kat-workshop {
+  background: #c2410c !important;
+  border: 0 !important;
+}
+
+.opportunity-card .badge-seminar-webinar,
+.opportunity-card .kat-seminar-webinar,
+.kartu-peluang .badge-seminar-webinar,
+.kartu-peluang .kat-seminar-webinar,
+.kartu-agenda .badge-seminar-webinar,
+.kartu-agenda .kat-seminar-webinar {
+  background: #475569 !important;
+  border: 0 !important;
+}
+
+/* Badge Sisa Hari / Deadline (Kanan) */
+.opportunity-card .badge-tenggat,
+.opportunity-card .badge-time,
+.kartu-peluang .badge-tenggat,
+.kartu-peluang .badge-time,
+.kartu-agenda .badge-tenggat,
+.kartu-agenda .badge-time {
+  margin-left: auto !important;
+  padding: 4px 11px !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.85) !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.opportunity-card .badge-tenggat.mendesak,
+.opportunity-card .badge-time-urgent,
+.kartu-peluang .badge-tenggat.mendesak,
+.kartu-peluang .badge-time-urgent,
+.kartu-agenda .badge-tenggat.mendesak,
+.kartu-agenda .badge-time-urgent {
+  background: #dc2626 !important;
+  border: 1.5px solid #fca5a5 !important;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.35) !important;
+}
+
+/* ============================================================
+   Bagian Tengah: Judul Peluang & Penyelenggara
+   ============================================================ */
+.opportunity-card h3,
+.opportunity-card .judul-peluang,
+.kartu-peluang h3,
+.kartu-peluang .judul-peluang,
+.kartu-agenda h3,
+.kartu-agenda .judul-peluang {
+  margin: 6px 0 6px 0 !important;
+  color: #ffffff !important;
+  font-family: Poppins, "Segoe UI", system-ui, sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.24 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+/* Penyesuaian Ukuran Font Otomatis Berdasarkan Panjang Judul */
+.page-dashboard .opportunity-card h3.judul-lg,
+.page-peluang .opportunity-card h3.judul-lg,
+.page-tersimpan .opportunity-card h3.judul-lg,
+.page-kalender .opportunity-card h3.judul-lg,
+.opportunity-card h3.judul-lg,
+.kartu-peluang h3.judul-lg,
+.kartu-agenda h3.judul-lg {
+  font-size: clamp(20.5px, 2.6vw, 23px) !important;
+}
+
+.page-dashboard .opportunity-card h3.judul-md,
+.page-peluang .opportunity-card h3.judul-md,
+.page-tersimpan .opportunity-card h3.judul-md,
+.page-kalender .opportunity-card h3.judul-md,
+.opportunity-card h3.judul-md,
+.kartu-peluang h3.judul-md,
+.kartu-agenda h3.judul-md {
+  font-size: clamp(18px, 2.2vw, 20px) !important;
+}
+
+.page-dashboard .opportunity-card h3.judul-sm,
+.page-peluang .opportunity-card h3.judul-sm,
+.page-tersimpan .opportunity-card h3.judul-sm,
+.page-kalender .opportunity-card h3.judul-sm,
+.opportunity-card h3.judul-sm,
+.kartu-peluang h3.judul-sm,
+.kartu-agenda h3.judul-sm {
+  font-size: clamp(15.5px, 1.85vw, 17.5px) !important;
+}
+
+/* Fallback jika class belum tersemat */
+.opportunity-card h3:not([class*="judul-"]),
+.kartu-peluang h3:not([class*="judul-"]),
+.kartu-agenda h3:not([class*="judul-"]) {
+  font-size: clamp(18px, 2.2vw, 21px) !important;
+}
+
+/* Organisasi / Instansi Penyelenggara */
+.opportunity-card .card-org,
+.opportunity-card .organisasi,
+.kartu-peluang .card-org,
+.kartu-peluang .organisasi,
+.kartu-agenda .card-org,
+.kartu-agenda .organisasi {
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  margin: 0 0 16px 0 !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  font-family: Poppins, "Segoe UI", system-ui, sans-serif !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+}
+
+.opportunity-card .card-org svg,
+.opportunity-card .organisasi svg,
+.kartu-peluang .card-org svg,
+.kartu-peluang .organisasi svg,
+.kartu-agenda .card-org svg,
+.kartu-agenda .organisasi svg {
+  flex-shrink: 0 !important;
+  color: #ffffff !important;
+}
+
+/* ============================================================
+   Baris Bawah: Tombol Simpan & Cek Detail
+   ============================================================ */
+.opportunity-card .card-actions,
+.opportunity-card .aksi-kartu,
+.kartu-peluang .card-actions,
+.kartu-peluang .aksi-kartu,
+.kartu-agenda .card-actions,
+.kartu-agenda .aksi-kartu {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-top: auto !important;
+  padding-top: 10px !important;
+}
+
+/* Tombol Heart / Simpan */
+.opportunity-card .heart-button,
+.opportunity-card .simpan,
+.kartu-peluang .heart-button,
+.kartu-peluang .simpan,
+.kartu-agenda .heart-button,
+.kartu-agenda .simpan {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 44px !important;
+  height: 44px !important;
+  margin: -6px 0 -6px -8px !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  transition: transform 180ms ease, color 180ms ease !important;
+}
+
+.opportunity-card .heart-button svg,
+.opportunity-card .simpan svg,
+.kartu-peluang .heart-button svg,
+.kartu-peluang .simpan svg,
+.kartu-agenda .heart-button svg,
+.kartu-agenda .simpan svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+.opportunity-card .heart-button.saved svg,
+.opportunity-card .heart-button.tersimpan svg,
+.opportunity-card .simpan.tersimpan svg,
+.kartu-peluang .simpan.tersimpan svg,
+.kartu-agenda .simpan.tersimpan svg {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+}
+
+/* Tombol Cek Detail (Putih Solid, Rounded Pill) */
 .page-dashboard .opportunity-card .detail-pill,
 .page-peluang .opportunity-card .detail-pill,
-.page-tersimpan .opportunity-card .detail-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 16px;
-  border-radius: 12px;
-  background: #fff;
-  color: #090909;
-  font-family: Poppins, "Segoe UI", system-ui, sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  box-shadow: 0 4px 10px rgba(17,24,39,.2);
-  transition: background-color 200ms ease, color 200ms ease;
+.page-tersimpan .opportunity-card .detail-pill,
+.page-kalender .opportunity-card .detail-pill,
+.opportunity-card .detail-pill,
+.opportunity-card .tombol-detail,
+.kartu-peluang .detail-pill,
+.kartu-peluang .tombol-detail,
+.kartu-agenda .detail-pill,
+.kartu-agenda .tombol-detail {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 9px 18px !important;
+  border-radius: 999px !important;
+  background: #ffffff !important;
+  color: #090909 !important;
+  font-family: Poppins, "Segoe UI", system-ui, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease !important;
 }
 
-.page-dashboard .opportunity-card .detail-pill svg,
-.page-peluang .opportunity-card .detail-pill svg,
-.page-tersimpan .opportunity-card .detail-pill svg {
-  transition: transform 200ms ease;
+.opportunity-card .detail-pill svg,
+.opportunity-card .tombol-detail svg,
+.kartu-peluang .detail-pill svg,
+.kartu-peluang .tombol-detail svg,
+.kartu-agenda .detail-pill svg,
+.kartu-agenda .tombol-detail svg {
+  flex-shrink: 0 !important;
 }
 
+/* ============================================================
+   Hover & Fokus Interaktif
+   ============================================================ */
 @media (hover: hover) {
-  .page-dashboard .opportunity-card:hover,
-  .page-peluang .opportunity-card:hover,
-  .page-tersimpan .opportunity-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 28px rgba(9,9,9,.2);
+  .opportunity-card:hover,
+  .kartu-peluang:hover,
+  .kartu-agenda:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15) !important;
   }
 
-  .page-dashboard .opportunity-card .heart-button:hover,
-  .page-peluang .opportunity-card .heart-button:hover,
-  .page-tersimpan .opportunity-card .heart-button:hover {
-    color: #98004a;
+  .opportunity-card .heart-button:hover,
+  .kartu-peluang .heart-button:hover,
+  .kartu-agenda .heart-button:hover {
+    transform: scale(1.14) !important;
   }
 
-  .page-dashboard .opportunity-card .detail-pill:hover,
-  .page-peluang .opportunity-card .detail-pill:hover,
-  .page-tersimpan .opportunity-card .detail-pill:hover {
-    background: #0067a6;
-    color: #fff;
-  }
-
-  .page-dashboard .opportunity-card .detail-pill:hover svg,
-  .page-peluang .opportunity-card .detail-pill:hover svg,
-  .page-tersimpan .opportunity-card .detail-pill:hover svg {
-    transform: translateX(3px);
+  .opportunity-card .detail-pill:hover,
+  .kartu-peluang .detail-pill:hover,
+  .kartu-agenda .detail-pill:hover {
+    background: #f4f4f5 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18) !important;
   }
 }
 
-@media (min-width: 700px) {
-  .page-dashboard .opportunity-grid,
-  .page-peluang .opportunity-grid,
-  .page-tersimpan .saved-grid {
-    gap: 18px;
-  }
-}
-
-@media (min-width: 1000px) {
-  .page-dashboard .opportunity-grid,
-  .page-peluang .opportunity-grid,
-  .page-tersimpan .saved-grid {
-    gap: 20px;
-  }
-
-  .page-dashboard .opportunity-card .card-badges,
-  .page-peluang .opportunity-card .card-badges,
-  .page-tersimpan .opportunity-card .card-badges {
-    gap: 5px;
-  }
-
-  .page-dashboard .opportunity-card .badge,
-  .page-peluang .opportunity-card .badge,
-  .page-tersimpan .opportunity-card .badge {
-    padding-inline: 8px;
-    font-size: .72rem;
-  }
-}
-
+/* ============================================================
+   Mode Gelap (Dark Mode)
+   ============================================================ */
 :root[data-theme="dark"] .page-dashboard .opportunity-card,
 :root[data-theme="dark"] .page-peluang .opportunity-card,
-:root[data-theme="dark"] .page-tersimpan .opportunity-card {
-  background: #1e3a5f;
+:root[data-theme="dark"] .page-tersimpan .opportunity-card,
+:root[data-theme="dark"] .page-kalender .opportunity-card,
+:root[data-theme="dark"] .opportunity-card,
+:root[data-theme="dark"] .kartu-peluang,
+:root[data-theme="dark"] .kartu-agenda {
+  background: #1e3a5f !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
 }
 
+:root[data-theme="dark"] .opportunity-card .detail-pill,
+:root[data-theme="dark"] .kartu-peluang .detail-pill,
+:root[data-theme="dark"] .kartu-agenda .detail-pill {
+  background: #ffffff !important;
+  color: #090909 !important;
+}
+
+/* Accessibility: Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
-  .page-dashboard .opportunity-card,
-  .page-peluang .opportunity-card,
-  .page-tersimpan .opportunity-card {
-    transition: none;
+  .opportunity-card,
+  .kartu-peluang,
+  .kartu-agenda,
+  .opportunity-card .detail-pill,
+  .opportunity-card .heart-button {
+    transition: none !important;
+    transform: none !important;
   }
-
-  .page-dashboard .opportunity-card:hover,
-  .page-peluang .opportunity-card:hover,
-  .page-tersimpan .opportunity-card:hover {
-    transform: none;
-  }
-}
-
-/* Tersimpan masih memiliki aturan legacy dengan selector yang sama kuat. */
-body .page-tersimpan .opportunity-card {
-  min-height: 0;
-  padding: 18px;
-  border-radius: 28px;
-  background: #05a5d9;
-}
-
-body .page-tersimpan .saved-grid {
-  gap: 14px;
-}
-
-body .page-tersimpan .opportunity-card h3 {
-  margin: 14px 0 5px;
-  font-size: 22px;
-  line-height: 1.25;
-}
-
-body .page-tersimpan .opportunity-card .card-badges {
-  gap: 7px;
-  padding: 4px 0 10px;
-}
-
-body .page-tersimpan .opportunity-card .card-actions {
-  margin-top: auto;
-  padding-top: 16px;
-}
-
-body .page-tersimpan .opportunity-card .heart-button {
-  width: 44px;
-  height: 44px;
-  margin: -6px 0 -6px -10px;
-  font-size: inherit;
-}
-
-body .page-tersimpan .opportunity-card .detail-pill {
-  min-height: 0;
-  padding: 11px 16px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(17,24,39,.2);
-}
-
-@media (min-width: 700px) {
-  body .page-tersimpan .saved-grid {
-    gap: 18px;
-  }
-}
-
-@media (min-width: 1000px) {
-  body .page-tersimpan .saved-grid {
-    gap: 20px;
-  }
-}
-
-:root[data-theme="dark"] body .page-tersimpan .opportunity-card {
-  background: #1e3a5f;
 }

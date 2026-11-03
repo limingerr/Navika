@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     semester INT CHECK (semester IS NULL OR (semester BETWEEN 1 AND 8)),
     gpa NUMERIC(3,2) CHECK (gpa IS NULL OR (gpa >= 0.00 AND gpa <= 4.00)),
     interests TEXT[] DEFAULT '{}',
+    email_alerts BOOLEAN NOT NULL DEFAULT false,
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 

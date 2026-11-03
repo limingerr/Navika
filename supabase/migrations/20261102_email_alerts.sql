@@ -1,0 +1,2 @@
+ALTER TABLE public.profiles
+ADD COLUMN IF NOT EXISTS email_alerts BOOLEAN NOT NULL DEFAULT false;

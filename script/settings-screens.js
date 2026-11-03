@@ -86,8 +86,10 @@ function ThemeScreen() {
   </SettingsLayout>;
 }
 function NotificationsScreen() {
-    const { deadlineAlerts, setDeadlineAlerts, emailAlerts, setEmailAlerts, saved, locale, updateProfile, profile, opportunities = staticOpportunities } = useApp();
+    const { deadlineAlerts, setDeadlineAlerts, emailAlerts, changeEmailAlerts, saved, locale, updateProfile, profile, opportunities = staticOpportunities } = useApp();
     const tr = useTr();
+    const [emailSaving, setEmailSaving] = useState(false);
+    const [emailError, setEmailError] = useState("");
     const allOpps = opportunities && opportunities.length > 0 ? opportunities : staticOpportunities;
     const reminders = allOpps.filter((item) => saved.includes(item.id) && Number(item.demoDays) <= 3);
 
@@ -114,14 +116,19 @@ function NotificationsScreen() {
         }
     };
 
-    const handleToggleEmail = (checked) => {
-        setEmailAlerts(checked);
-        if (updateProfile && profile) {
-            updateProfile({ ...profile, emailAlerts: checked });
+    const handleToggleEmail = async (checked) => {
+        setEmailSaving(true);
+        setEmailError("");
+        try {
+            await changeEmailAlerts(checked);
+        } catch {
+            setEmailError(tr("Pilihan email gagal disimpan. Coba lagi.", "Could not save email preference. Try again."));
+        } finally {
+            setEmailSaving(false);
         }
     };
 
-    return <SettingsLayout title={tr("Notifikasi", "Notifications")} subtitle={tr("Atur pengingat peluang di aplikasi.", "Manage in-app opportunity reminders.")}><DemoNote /><div className="settings-list"><label className="settings-row settings-choice"><span className="settings-icon"><Icon name="notif-profile.svg"/></span><span className="settings-row-copy"><strong>{tr("Deadline Terdekat & Web Push", "Upcoming Deadlines & Web Push")}</strong><small>{tr("Pengingat mulai H-3 via aplikasi & browser push", "Reminders starting H-3 via in-app & browser push")}</small></span><input type="checkbox" role="switch" checked={deadlineAlerts} onChange={(event) => handleToggleAlerts(event.target.checked)}/></label><label className="settings-row settings-choice"><span className="settings-icon" style={{ fontSize: "1.3rem" }}>✉️</span><span className="settings-row-copy"><strong>{tr("Pemberitahuan Email", "Email Notifications")}</strong><small>{tr("Info beasiswa/magang baru & batas deadline ke emailmu", "New opportunities & deadline reminders sent to your email")}</small></span><input type="checkbox" role="switch" checked={emailAlerts} onChange={(event) => handleToggleEmail(event.target.checked)}/></label></div><h2 className="settings-section-label">{tr("PENGINGAT SAAT INI", "CURRENT REMINDERS")}</h2>{deadlineAlerts && reminders.length ? <ul className="reminder-list">{reminders.map((item) => <li key={item.id}><Link href={`/peluang/${item.id}`}>{item.title}</Link><span>{formatDate(demoDeadline(item.demoDays), locale)}</span></li>)}</ul> : <p className="settings-empty">{tr("Belum ada peluang tersimpan yang mendekati deadline (H-3). Simpan peluang favoritmu untuk melihat pengingatnya di sini.", "No saved opportunities approaching deadline (within 3 days). Save your favorite opportunities to view reminders here.")}</p>}<p className="settings-hint">{tr("Pengingat didukung oleh Web Push OneSignal dan Resend / Gmail SMTP Notification untuk mengirim pembaruan ke peramban dan email mahasiswa.", "Reminders are supported by OneSignal Web Push and Resend / Gmail SMTP Notification to deliver updates to students' browsers and inboxes.")}</p></SettingsLayout>;
+    return <SettingsLayout title={tr("Notifikasi", "Notifications")} subtitle={tr("Atur pengingat peluang di aplikasi.", "Manage in-app opportunity reminders.")}><DemoNote /><div className="settings-list"><label className="settings-row settings-choice"><span className="settings-icon"><Icon name="notif-profile.svg"/></span><span className="settings-row-copy"><strong>{tr("Deadline Terdekat & Web Push", "Upcoming Deadlines & Web Push")}</strong><small>{tr("Pengingat mulai H-3 via aplikasi & browser push", "Reminders starting H-3 via in-app & browser push")}</small></span><input type="checkbox" role="switch" checked={deadlineAlerts} onChange={(event) => handleToggleAlerts(event.target.checked)}/></label><label className="settings-row settings-choice"><span className="settings-icon" style={{ fontSize: "1.3rem" }}>✉️</span><span className="settings-row-copy"><strong>{tr("Pemberitahuan Email", "Email Notifications")}</strong><small>{tr("Info beasiswa/magang baru & batas deadline ke emailmu", "New opportunities & deadline reminders sent to your email")}</small></span><input type="checkbox" role="switch" checked={emailAlerts} disabled={emailSaving} onChange={(event) => handleToggleEmail(event.target.checked)}/></label></div>{emailError && <p className="form-error" role="alert">{emailError}</p>}<h2 className="settings-section-label">{tr("PENGINGAT SAAT INI", "CURRENT REMINDERS")}</h2>{deadlineAlerts && reminders.length ? <ul className="reminder-list">{reminders.map((item) => <li key={item.id}><Link href={`/peluang/${item.id}`}>{item.title}</Link><span>{formatDate(demoDeadline(item.demoDays), locale)}</span></li>)}</ul> : <p className="settings-empty">{tr("Belum ada peluang tersimpan yang mendekati deadline (H-3). Simpan peluang favoritmu untuk melihat pengingatnya di sini.", "No saved opportunities approaching deadlines (within 3 days). Save your favorite opportunities to view reminders here.")}</p>}<p className="settings-hint">{tr("Pengingat didukung oleh Web Push OneSignal dan Resend / Gmail SMTP Notification untuk mengirim pembaruan ke peramban dan email mahasiswa.", "Reminders are supported by OneSignal Web Push and Resend / Gmail SMTP Notification to deliver updates to students' browsers and inboxes.")}</p></SettingsLayout>;
 }
 function PrivacyScreen() {
     const { profile, saved, locale, theme, deadlineAlerts, clearDemo } = useApp();

@@ -4,6 +4,7 @@ import { opportunities as staticOpportunities } from "@/script/opportunities";
 import { sendDeadlineReminderEmail } from "@/script/email-service";
 import { getNotificationRecipients } from "@/lib/supabase/admin";
 import { isAuthorizedAdmin } from "@/lib/supabase/require-admin";
+import { isPushAccepted } from "@/script/notification-status";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -128,7 +129,7 @@ export async function GET(request) {
         try {
           const payload = {
             app_id: onesignalAppId,
-            included_segments: ["Total Subscriptions"],
+            included_segments: ["Subscribed Users"],
             headings: {
               id: `⏳ Deadline H-2: ${opp.title}`,
               en: `⏳ Deadline in 2 Days: ${opp.title}`,
@@ -150,8 +151,8 @@ export async function GET(request) {
           });
 
           const data = await response.json();
-          results.push({ id: opp.id, pushStatus: response.status, pushData: data });
-          if (response.ok) sentCount++;
+          results.push({ id: opp.id, pushStatus: response.status, pushMessageId: data?.id || null, pushError: isPushAccepted(response, data) ? null : data?.errors || (response.ok ? "Tidak ada langganan push yang menerima pesan." : `OneSignal HTTP ${response.status}`) });
+          if (isPushAccepted(response, data)) sentCount++;
         } catch (e) {
           results.push({ id: opp.id, pushError: e.message });
         }
@@ -163,7 +164,7 @@ export async function GET(request) {
         });
       }
 
-      // 5b. Email Notification ke user Supabase (penerima bookmark atau seluruh user terdaftar)
+      // Email hanya untuk pemegang bookmark yang mengaktifkan pemberitahuan.
       const isEmailConfigured =
         Boolean(process.env.RESEND_API_KEY) ||
         Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
@@ -179,19 +180,21 @@ export async function GET(request) {
               siteUrl,
             });
             if (emailRes.success) {
-              emailSentCount += emailRes.totalSent || 1;
+              emailSentCount += emailRes.totalSent || 0;
             }
             results.push({
               id: opp.id,
               emailStatus: emailRes.success ? 200 : 500,
               recipientsCount: recipientInfo.count,
               recipientsSource: recipientInfo.source,
-              sentRecipients: emailRes.sentRecipients || [],
-              failedRecipients: emailRes.failedRecipients || [],
+              sentCount: emailRes.totalSent || 0,
+              failedCount: emailRes.failedRecipients?.length || 0,
               provider: emailRes.provider,
-              emailResult: emailRes,
+              emailMessageIds: emailRes.ids || (emailRes.id ? [emailRes.id] : []),
+              emailError: emailRes.success ? null : emailRes.error || "Pengiriman email gagal.",
             });
           }
+          else results.push({ id: opp.id, emailNotice: "Tidak ada pemegang bookmark yang mengaktifkan email." });
         } catch (e) {
           console.warn("Gagal mengirim email pengingat:", e.message);
           results.push({ id: opp.id, emailError: e.message });

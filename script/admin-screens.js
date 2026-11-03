@@ -477,12 +477,9 @@ export function AdminPeluangTable() {
         });
         const data = await res.json();
         if (data.success) {
-          if (data.email?.sent) {
-            const failInfo = data.email.failedRecipients?.length ? ` (${data.email.failedRecipients.length} gagal)` : "";
-            showToast(`Siaran berhasil! Email terkirim langsung ke ${data.email.totalSent} mahasiswa${failInfo}.`);
-          } else {
-            showToast(`Siaran diproses. Notifikasi email: ${data.email?.error || "Cek kredensial di .env.local"}`);
-          }
+          const emailStatus = data.email?.sent ? `${data.email.totalSent} email diterima penyedia` : `email: ${data.email?.error || "tidak ada penerima"}`;
+          const pushStatus = data.push?.sent ? "push diterima OneSignal" : `push: ${data.push?.error || "tidak ada penerima"}`;
+          showToast(`${emailStatus}; ${pushStatus}.`);
           setShowBroadcastModal(false);
         } else {
           showToast(data.error || "Gagal menyiarkan notifikasi.");
@@ -494,11 +491,13 @@ export function AdminPeluangTable() {
         });
         const data = await res.json();
         if (data.success) {
-          if (data.totalEmailSent > 0 || data.totalPushSent > 0) {
-            showToast(`Pengingat deadline H-2 berhasil disiarkan (${data.totalEmailSent || 0} Email & ${data.totalPushSent || 0} Push)!`);
-          } else {
-            showToast(`Pemeriksaan H-2 selesai: Tidak ada program deadline H-2 saat ini.`);
-          }
+          const failures = (data.results || []).filter((item) => item.pushError || item.emailError).length;
+          const emailNote = data.totalEmailSent ? "" : (data.results || []).find((item) => item.emailError || item.emailNotice);
+          const pushNote = data.totalPushSent ? "" : (data.results || []).find((item) => item.pushError || item.pushNotice);
+          const reason = [emailNote?.emailError || emailNote?.emailNotice, pushNote?.pushError || pushNote?.pushNotice].filter(Boolean).join("; ");
+          showToast(data.totalOpportunities === 0
+            ? "Pemeriksaan H-2 selesai: tidak ada peluang dengan deadline H-2."
+            : `H-2 diproses: ${data.totalEmailSent || 0} email diterima penyedia, ${data.totalPushSent || 0} pesan dibuat di OneSignal${reason ? `; ${reason}` : failures ? `; ${failures} hasil perlu diperiksa` : ""}.`);
           setShowBroadcastModal(false);
         } else {
           showToast(data.error || "Gagal memicu pengingat deadline.");

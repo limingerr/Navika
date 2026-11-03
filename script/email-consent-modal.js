@@ -8,9 +8,8 @@ export function EmailConsentModal() {
     ready,
     emailConsentDecided,
     setEmailConsentDecided,
-    setEmailAlerts,
+    changeEmailAlerts,
     setDeadlineAlerts,
-    updateProfile,
     profile,
   } = useApp();
   const tr = useTr();
@@ -40,8 +39,15 @@ export function EmailConsentModal() {
     const userEmail = profile?.email || "guest";
     const consentStorageKey = `navika_notif_prompt_${userEmail}`;
 
+    try {
+      await changeEmailAlerts(granted);
+    } catch {
+      setToastMsg(tr("Pilihan email gagal disimpan. Coba lagi.", "Could not save email preference. Try again."));
+      setTimeout(() => setToastMsg(""), 3500);
+      setSaving(false);
+      return;
+    }
     if (setEmailConsentDecided) setEmailConsentDecided(true);
-    if (setEmailAlerts) setEmailAlerts(granted);
     if (setDeadlineAlerts) setDeadlineAlerts(granted);
 
     try {
@@ -75,16 +81,6 @@ export function EmailConsentModal() {
         });
       }
 
-      // 2. Simpan preferensi notifikasi ke Supabase database
-      if (updateProfile && profile) {
-        try {
-          updateProfile({
-            ...profile,
-            emailAlerts: true,
-            deadlineAlerts: true,
-          });
-        } catch {}
-      }
     } else {
       setToastMsg(
         tr(

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { sendEmail } from "./email-service.js";
 import { getNotificationRecipients } from "../lib/supabase/admin.js";
+import { isPushAccepted } from "./notification-status.js";
 
 test("sendEmail menolak penerima kosong secara aman", async () => {
   const result = await sendEmail({
@@ -33,11 +34,46 @@ test("sendEmail menangani penerima string tunggal atau array", async () => {
   }
 });
 
-test("getNotificationRecipients menggunakan fallback env saat Supabase offline/placeholder", async () => {
+test("getNotificationRecipients tidak memakai alamat fallback saat Supabase tidak tersedia", async () => {
   process.env.NOTIFICATION_EMAIL_TO = "test-mahasiswa@example.com";
   const recipients = await getNotificationRecipients();
 
-  assert.equal(recipients.source, "fallback_env");
-  assert.equal(recipients.count, 1);
-  assert.deepEqual(recipients.emails, ["test-mahasiswa@example.com"]);
+  assert.equal(recipients.source, "none");
+  assert.equal(recipients.count, 0);
+  assert.deepEqual(recipients.emails, []);
+  delete process.env.NOTIFICATION_EMAIL_TO;
+});
+
+test("penerima email hanya akun opt-in dan bookmark peluang", async () => {
+  const client = {
+    from(table) {
+      return { select() { return { eq() {
+        return Promise.resolve({ data: table === "profiles"
+          ? [{ user_id: "aktif" }, { user_id: "lain" }]
+          : [{ user_id: "aktif" }], error: null });
+      } }; } };
+    },
+    auth: { admin: { async listUsers() { return { data: { users: [
+      { id: "aktif", email: "Aktif@example.com" },
+      { id: "lain", email: "lain@example.com" },
+      { id: "mati", email: "mati@example.com" },
+    ] }, error: null }; } } },
+  };
+  assert.deepEqual((await getNotificationRecipients({ client })).emails,
+    ["aktif@example.com", "lain@example.com"]);
+  assert.deepEqual((await getNotificationRecipients({ client, opportunityId: "peluang-1" })).emails,
+    ["aktif@example.com"]);
+});
+
+test("kesalahan membaca preferensi menghentikan pemilihan penerima", async () => {
+  const client = { from() { return { select() { return { eq() {
+    return Promise.resolve({ data: null, error: new Error("database gagal") });
+  } }; } }; } };
+  await assert.rejects(getNotificationRecipients({ client }), /database gagal/);
+});
+
+test("push hanya dihitung ketika OneSignal membuat pesan", () => {
+  assert.equal(isPushAccepted({ ok: true }, { id: "pesan-1" }), true);
+  assert.equal(isPushAccepted({ ok: true }, { errors: ["no subscribers"] }), false);
+  assert.equal(isPushAccepted({ ok: false }, { id: "pesan-1" }), false);
 });

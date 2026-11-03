@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sendNewOpportunityEmail } from "@/script/email-service";
 import { getNotificationRecipients } from "@/lib/supabase/admin";
 import { isAuthorizedAdmin } from "@/lib/supabase/require-admin";
+import { isPushAccepted } from "@/script/notification-status";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -22,7 +23,7 @@ export async function broadcastNewOpportunity({ title, organization, category, f
     try {
       const payload = {
         app_id: onesignalAppId,
-        included_segments: ["Total Subscriptions"],
+        included_segments: ["Subscribed Users"],
         headings: {
           id: `📢 Info Terbaru: ${title.trim()}`,
           en: `📢 New Opportunity: ${title.trim()}`,
@@ -44,7 +45,7 @@ export async function broadcastNewOpportunity({ title, organization, category, f
       });
 
       pushData = await response.json();
-      pushSuccess = response.ok;
+      pushSuccess = isPushAccepted(response, pushData);
     } catch (err) {
       console.warn("Gagal mengirim OneSignal push:", err.message);
     }
@@ -59,10 +60,9 @@ export async function broadcastNewOpportunity({ title, organization, category, f
     Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
 
   if (isEmailConfigured) {
-    recipientInfo = await getNotificationRecipients();
-
-    if (recipientInfo.emails.length > 0) {
-      try {
+    try {
+      recipientInfo = await getNotificationRecipients();
+      if (recipientInfo.emails.length > 0) {
         emailResult = await sendNewOpportunityEmail({
           to: recipientInfo.emails,
           opportunity: {
@@ -74,24 +74,25 @@ export async function broadcastNewOpportunity({ title, organization, category, f
           },
           siteUrl,
         });
-      } catch (err) {
-        console.warn("Gagal mengirim notifikasi email massal:", err.message);
       }
+    } catch (err) {
+      console.warn("Gagal memilih penerima atau mengirim email notifikasi:", err.message);
+      emailResult = { success: false, error: "Penerima atau layanan email tidak tersedia." };
     }
   }
 
   return {
     push: {
       sent: pushSuccess,
-      data: pushData,
+      id: pushData?.id || null,
+      error: pushSuccess ? null : pushData?.errors || (onesignalAppId && onesignalRestKey ? "Tidak ada langganan push yang menerima pesan." : "OneSignal belum dikonfigurasi."),
     },
     email: {
       sent: Boolean(emailResult?.success),
       recipientsSource: recipientInfo.source,
       totalRecipients: recipientInfo.count,
-      totalSent: emailResult?.totalSent || (emailResult?.success ? 1 : 0),
-      sentRecipients: emailResult?.sentRecipients || [],
-      failedRecipients: emailResult?.failedRecipients || [],
+      totalSent: emailResult?.totalSent || 0,
+      failedCount: emailResult?.failedRecipients?.length || 0,
       provider: emailResult?.provider,
       error:
         emailResult?.error ||
@@ -100,7 +101,7 @@ export async function broadcastNewOpportunity({ title, organization, category, f
           : recipientInfo.count === 0
           ? "Tidak ada penerima email terdaftar di database Supabase"
           : undefined),
-      result: emailResult,
+      ids: emailResult?.ids || (emailResult?.id ? [emailResult.id] : []),
     },
   };
 }

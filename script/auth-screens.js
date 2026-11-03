@@ -92,24 +92,26 @@ export function RegisterScreen() {
 }
 export function VerificationScreen() {
     const router = useRouter();
-    const { profile, setEmailAlerts, setDeadlineAlerts, setEmailConsentDecided, updateProfile } = useApp();
+    const { profile, changeEmailAlerts, setDeadlineAlerts, setEmailConsentDecided } = useApp();
     const tr = useTr();
     const [loading, setLoading] = useState(false);
     const [notifGranted, setNotifGranted] = useState(false);
+    const [notifError, setNotifError] = useState("");
 
     const userName = profile.name && profile.name !== "Pengguna Demo" && profile.name !== "Mahasiswa" ? profile.name : "";
 
     const handleEnableNotifications = async () => {
         setLoading(true);
-        if (setEmailAlerts) setEmailAlerts(true);
+        try {
+            await changeEmailAlerts(true);
+        } catch {
+            setNotifError(tr("Pilihan email gagal disimpan. Coba lagi.", "Could not save email preference. Try again."));
+            setLoading(false);
+            return;
+        }
         if (setDeadlineAlerts) setDeadlineAlerts(true);
         if (setEmailConsentDecided) setEmailConsentDecided(true);
 
-        if (updateProfile && profile) {
-            try {
-                updateProfile({ ...profile, emailAlerts: true, deadlineAlerts: true });
-            } catch {}
-        }
 
         if (typeof window !== "undefined" && window.OneSignalDeferred) {
             window.OneSignalDeferred.push(async function(OneSignal) {
@@ -176,6 +178,7 @@ export function VerificationScreen() {
                     >
                         {loading ? tr("Mengaktifkan...", "Enabling...") : notifGranted ? tr("✓ Notifikasi Diaktifkan!", "✓ Notifications Enabled!") : tr("✓ Izinkan Notifikasi & Masuk", "✓ Allow Notifications & Enter")}
                     </button>
+                    {notifError && <p className="form-error" role="alert">{notifError}</p>}
 
                     <div>
                         <Link

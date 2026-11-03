@@ -10,6 +10,7 @@ export function resolveAccount(user, role, profile) {
       semester: profile?.semester ? String(profile.semester) : "",
       gpa: profile?.gpa ? String(profile.gpa) : "",
       interest: Array.isArray(profile?.interests) ? profile.interests.join(", ") : "",
+      emailAlerts: profile?.email_alerts === true,
     },
   };
 }

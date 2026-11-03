@@ -180,7 +180,21 @@ export async function fetchUserProfile() {
     semester: data.semester ? String(data.semester) : "",
     gpa: data.gpa ? String(data.gpa) : "",
     interest: Array.isArray(data.interests) ? data.interests.join(", ") : "",
+    emailAlerts: data.email_alerts === true,
   };
+}
+
+export async function saveEmailAlertPreference(enabled) {
+  const supabase = getSupabase();
+  if (!supabase) return;
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+  if (authError || !authData?.user) throw new Error("Sesi pengguna tidak tersedia.");
+  const { data, error } = await supabase.from("profiles")
+    .update({ email_alerts: enabled })
+    .eq("user_id", authData.user.id)
+    .select("user_id");
+  if (error) throw error;
+  if (!data?.length) throw new Error("Profil pengguna tidak ditemukan.");
 }
 
 /**

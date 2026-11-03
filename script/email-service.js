@@ -178,6 +178,8 @@ export async function sendEmail({ to, subject, html }) {
     let totalSent = 0;
     const ids = [];
     const errors = [];
+    const sentRecipients = [];
+    const failedRecipients = [];
 
     for (const chunk of chunks) {
       const batchPayload = chunk.map((recipient) => ({
@@ -200,53 +202,23 @@ export async function sendEmail({ to, subject, html }) {
         const data = await response.json();
         if (!response.ok) {
           errors.push(data.message || `HTTP ${response.status}`);
+          failedRecipients.push(...chunk);
         } else {
-          const sentInChunk = Array.isArray(data?.data) ? data.data.length : chunk.length;
+          const sentInChunk = Array.isArray(data?.data) ? data.data.length : 0;
           totalSent += sentInChunk;
+          if (sentInChunk === chunk.length) sentRecipients.push(...chunk);
+          else failedRecipients.push(...chunk);
           if (Array.isArray(data?.data)) {
             ids.push(...data.data.map((item) => item.id));
           }
         }
       } catch (err) {
         errors.push(err.message);
+        failedRecipients.push(...chunk);
       }
     }
 
     if (totalSent === 0 && errors.length > 0) {
-      const fallbackEmail = process.env.NOTIFICATION_EMAIL_TO;
-      if (fallbackEmail && typeof fallbackEmail === "string" && fallbackEmail.includes("@")) {
-        try {
-          const fallbackRes = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              from,
-              to: [fallbackEmail.trim().toLowerCase()],
-              subject: `[Fallback Testing] ${subject}`,
-              html,
-            }),
-          });
-          const fbData = await fallbackRes.json();
-          if (fallbackRes.ok) {
-            return {
-              success: true,
-              id: fbData.id,
-              recipients: [fallbackEmail],
-              sentRecipients: [fallbackEmail],
-              failedRecipients: validRecipients.filter((e) => e !== fallbackEmail.trim().toLowerCase()),
-              totalSent: 1,
-              provider: "resend_fallback",
-              warning:
-                "Batch Resend gagal (domain belum terverifikasi / sandbox tier). Notifikasi hanya terkirim ke alamat fallback: " +
-                fallbackEmail,
-            };
-          }
-        } catch {}
-      }
-
       return {
         success: false,
         error: errors.join("; "),
@@ -261,8 +233,8 @@ export async function sendEmail({ to, subject, html }) {
       success: totalSent > 0,
       totalSent,
       recipients: validRecipients,
-      sentRecipients: validRecipients,
-      failedRecipients: [],
+      sentRecipients,
+      failedRecipients,
       ids,
       provider: "resend_batch",
       errors: errors.length > 0 ? errors : undefined,

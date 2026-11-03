@@ -10,6 +10,7 @@ import {
     signOutUser,
     fetchUserProfile,
     saveUserProfile,
+    saveEmailAlertPreference,
     fetchOpportunitiesFromDb,
     fetchSavedOpportunityIds,
     toggleBookmarkInDb,
@@ -115,6 +116,7 @@ export function AppProvider({ children }) {
                     if (account) {
                         setIsAdminLoggedIn(Boolean(account.isAdmin));
                         setProfile(account.isAdmin ? adminProfile : account.profile || defaultProfile);
+                        setEmailAlerts(account.isAdmin ? false : account.profile?.emailAlerts === true);
                         if (account.isAdmin) {
                             try { localStorage.setItem(adminStorageKey, "true"); } catch {}
                         } else {
@@ -129,11 +131,13 @@ export function AppProvider({ children }) {
                     } else if (adminRaw !== "true") {
                         setIsAdminLoggedIn(false);
                         setProfile(defaultProfile);
+                        setEmailAlerts(false);
                     }
                 }).catch(() => {
                     if (adminRaw !== "true") {
                         setIsAdminLoggedIn(false);
                         setProfile(defaultProfile);
+                        setEmailAlerts(false);
                     }
                 }).finally(() => setReady(true));
             }
@@ -383,6 +387,7 @@ export function AppProvider({ children }) {
                 try { localStorage.removeItem(adminStorageKey); } catch {}
                 const account = await fetchCurrentAccount();
                 setProfile(account?.profile || { ...defaultProfile, email: res.user?.email || identifier.trim() });
+                setEmailAlerts(account?.profile?.emailAlerts === true);
                 if (typeof window !== "undefined" && window.OneSignalDeferred) {
                     window.OneSignalDeferred.push(async function(OneSignal) {
                         try {
@@ -520,6 +525,11 @@ export function AppProvider({ children }) {
             saveUserProfile(newProfile).catch(() => {});
         }
     };
+    const changeEmailAlerts = async (enabled) => {
+        if (isSupabaseConfigured()) await saveEmailAlertPreference(enabled);
+        setEmailAlerts(enabled);
+        setProfile((current) => ({ ...current, emailAlerts: enabled }));
+    };
     const setRegistrationProfile = (newProfile) => setProfile(newProfile);
     const logoutUser = async () => {
         setIsAdminLoggedIn(false);
@@ -528,6 +538,7 @@ export function AppProvider({ children }) {
             try { await signOutUser(); } catch {}
         }
         setProfile(demoProfile);
+        setEmailAlerts(false);
         setSaved([]);
         try {
             localStorage.setItem(storageKey, JSON.stringify({
@@ -543,6 +554,7 @@ export function AppProvider({ children }) {
 
     const clearDemo = () => {
         setProfile(demoProfile);
+        setEmailAlerts(false);
         setSaved([]);
         setLocale("id");
         setTheme("light");
@@ -571,7 +583,7 @@ export function AppProvider({ children }) {
       deadlineAlerts,
       setDeadlineAlerts,
       emailAlerts,
-      setEmailAlerts,
+      changeEmailAlerts,
       emailConsentDecided,
       setEmailConsentDecided,
       calendarFilter,

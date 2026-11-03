@@ -1,36 +1,57 @@
 import { NextResponse } from "next/server";
 import { sendNewOpportunityEmail } from "@/script/email-service";
-import { getNotificationRecipients, getPushUserIds } from "@/lib/supabase/admin";
+import { getNotificationRecipients } from "@/lib/supabase/admin";
 import { isAuthorizedAdmin } from "@/lib/supabase/require-admin";
-import { sendPushToUsers } from "@/script/push-service";
+import { isPushAccepted } from "@/script/notification-status";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 export async function broadcastNewOpportunity({ title, organization, category, field, slug, id }) {
+  const onesignalAppId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
+  const onesignalRestKey = process.env.ONESIGNAL_REST_API_KEY;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://navika-pi.vercel.app";
   const opportunitySlug = slug || id || "";
   const opportunityPath = opportunitySlug ? `/peluang/${encodeURIComponent(opportunitySlug)}` : "/peluang";
   const categoryName = category || "Peluang";
   const orgName = organization || "Mitra NAVIKA";
 
-  let pushResult;
-  try {
-    const userIds = await getPushUserIds();
-    pushResult = await sendPushToUsers({
-      userIds,
-      headings: {
+  let pushSuccess = false;
+  let pushData = null;
+  let pushError = null;
+
+  // 1. Kirim Web Push Notification via OneSignal
+  if (onesignalAppId && onesignalRestKey) {
+    try {
+      const payload = {
+        app_id: onesignalAppId,
+        included_segments: ["Subscribed Users"],
+        headings: {
           id: `📢 Info Terbaru: ${title.trim()}`,
           en: `📢 New Opportunity: ${title.trim()}`,
-      },
-      contents: {
+        },
+        contents: {
           id: `Telah dibuka ${categoryName} dari ${orgName}. Cek info lengkap dan persyaratannya sekarang di Navika!`,
           en: `New ${categoryName} from ${orgName} is now open. Check eligibility and requirements on Navika!`,
-      },
-      url: `${siteUrl}${opportunityPath}`,
-    });
-  } catch (error) {
-    pushResult = { sent: false, count: 0, error: error.message };
+        },
+        url: `${siteUrl}${opportunityPath}`,
+      };
+
+      const response = await fetch("https://api.onesignal.com/notifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Key ${onesignalRestKey}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      pushData = await response.json();
+      pushSuccess = isPushAccepted(response, pushData);
+    } catch (err) {
+      console.warn("Gagal mengirim OneSignal push:", err.message);
+      pushError = "Gagal menghubungi OneSignal.";
+    }
   }
 
   // 2. Kirim Email Notifikasi ke seluruh pengguna mahasiswa terdaftar di Supabase
@@ -64,7 +85,13 @@ export async function broadcastNewOpportunity({ title, organization, category, f
   }
 
   return {
-    push: { ...pushResult, id: pushResult.ids?.[0] || null },
+    push: {
+      sent: pushSuccess,
+      id: pushData?.id || null,
+      error: pushSuccess ? null : String(pushData?.errors || "").includes("All included players are not subscribed")
+        ? "Belum ada perangkat berlangganan Web Push. Mahasiswa perlu mengaktifkannya di Pengaturan Notifikasi."
+        : pushData?.errors || pushError || (onesignalAppId && onesignalRestKey ? "Tidak ada langganan push yang menerima pesan." : "OneSignal belum dikonfigurasi."),
+    },
     email: {
       sent: Boolean(emailResult?.success),
       recipientsSource: recipientInfo.source,

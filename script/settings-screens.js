@@ -112,13 +112,13 @@ function NotificationsScreen() {
     const [pushSaving, setPushSaving] = useState(false);
     useEffect(() => {
         let active = true;
-        const refresh = () => getWebPushStatus(profile?.id).then((status) => { if (active) { setPushStatus(status); setPushError(""); } }).catch((error) => { if (active) { setPushStatus(null); setPushError(error.message); } });
+        const refresh = () => getWebPushStatus().then((status) => { if (active) { setPushStatus(status); setPushError(""); } }).catch((error) => { if (active) { setPushStatus(null); setPushError(error.message); } });
         refresh();
         window.addEventListener("focus", refresh);
         return () => { active = false; window.removeEventListener("focus", refresh); };
-    }, [profile?.id]);
+    }, []);
     const allOpps = opportunities && opportunities.length > 0 ? opportunities : staticOpportunities;
-    const reminders = allOpps.filter((item) => saved.includes(item.id) && Number(item.demoDays) <= 2);
+    const reminders = allOpps.filter((item) => saved.includes(item.id) && Number(item.demoDays) <= 3);
 
     const handleToggleAlerts = (checked) => {
         setDeadlineAlerts(checked);
@@ -131,14 +131,15 @@ function NotificationsScreen() {
         setPushError("");
         try {
             await enableWebPush(profile?.id || profile?.email);
-            setPushStatus(await getWebPushStatus(profile?.id));
+            setPushStatus(await getWebPushStatus());
         } catch (error) {
             setPushError(error.message);
-            getWebPushStatus(profile?.id).then(setPushStatus).catch(() => {});
+            getWebPushStatus().then(setPushStatus).catch(() => {});
         } finally {
             setPushSaving(false);
         }
     };
+
     const handleToggleEmail = async (checked) => {
         setEmailSaving(true);
         setEmailError("");
@@ -151,7 +152,7 @@ function NotificationsScreen() {
         }
     };
 
-    return <SettingsLayout title={tr("Notifikasi", "Notifications")} subtitle={tr("Atur pengingat peluang di aplikasi.", "Manage in-app opportunity reminders.")}><DemoNote /><div className="settings-list"><label className="settings-row settings-choice"><span className="settings-icon"><Icon name="notif-profile.svg"/></span><span className="settings-row-copy"><strong>{tr("Pengingat Deadline", "Deadline Reminders")}</strong><small>{tr("Pengingat peluang tersimpan mulai H-2", "Saved opportunity reminders starting H-2")}</small></span><input type="checkbox" role="switch" checked={deadlineAlerts} onChange={(event) => handleToggleAlerts(event.target.checked)}/></label><label className="settings-row settings-choice"><span className="settings-icon" style={{ fontSize: "1.3rem" }}>✉️</span><span className="settings-row-copy"><strong>{tr("Pemberitahuan Email", "Email Notifications")}</strong><small>{tr("Info beasiswa/magang baru & batas deadline ke emailmu", "New opportunities & deadline reminders sent to your email")}</small></span><input type="checkbox" role="switch" checked={emailAlerts} disabled={emailSaving} onChange={(event) => handleToggleEmail(event.target.checked)}/></label></div>{emailError && <p className="form-error" role="alert">{emailError}</p>}<h2 className="settings-section-label">WEB PUSH</h2><p className="settings-hint" role="status">{pushStatus?.subscribed ? tr("Aktif di browser ini dan terdaftar di OneSignal.", "Active in this browser and registered with OneSignal.") : pushStatus?.localSubscribed ? tr("Browser mengizinkan push, tetapi langganannya belum ditemukan di OneSignal pengirim.", "Browser allows push, but the sending OneSignal app cannot find this subscription.") : pushStatus?.permission === "denied" ? tr("Izin diblokir. Izinkan notifikasi untuk situs ini di pengaturan browser.", "Permission blocked. Allow notifications for this site in browser settings.") : pushStatus?.supported === false ? tr("Browser ini tidak mendukung Web Push.", "This browser does not support Web Push.") : tr("Belum aktif di browser ini.", "Not active in this browser yet.")}</p>{!pushStatus?.subscribed && pushStatus?.supported !== false && <button type="button" className="push-enable-button" disabled={pushSaving} onClick={handleEnablePush}>{pushSaving ? tr("Mengaktifkan...", "Enabling...") : tr("Aktifkan Web Push", "Enable Web Push")}</button>}{pushError && <p className="form-error" role="alert">{pushError}</p>}<h2 className="settings-section-label">{tr("PENGINGAT SAAT INI", "CURRENT REMINDERS")}</h2>{deadlineAlerts && reminders.length ? <ul className="reminder-list">{reminders.map((item) => <li key={item.id}><Link href={`/peluang/${item.id}`}>{item.title}</Link><span>{formatDate(demoDeadline(item.demoDays), locale)}</span></li>)}</ul> : <p className="settings-empty">{tr("Belum ada peluang tersimpan yang mendekati deadline (H-2). Simpan peluang favoritmu untuk melihat pengingatnya di sini.", "No saved opportunities approaching deadlines (within 2 days). Save your favorite opportunities to view reminders here.")}</p>}</SettingsLayout>;
+    return <SettingsLayout title={tr("Notifikasi", "Notifications")} subtitle={tr("Atur pengingat peluang di aplikasi.", "Manage in-app opportunity reminders.")}><DemoNote /><div className="settings-list"><label className="settings-row settings-choice"><span className="settings-icon"><Icon name="notif-profile.svg"/></span><span className="settings-row-copy"><strong>{tr("Pengingat Deadline", "Deadline Reminders")}</strong><small>{tr("Pengingat peluang tersimpan mulai H-3", "Saved opportunity reminders starting H-3")}</small></span><input type="checkbox" role="switch" checked={deadlineAlerts} onChange={(event) => handleToggleAlerts(event.target.checked)}/></label><label className="settings-row settings-choice"><span className="settings-icon" style={{ fontSize: "1.3rem" }}>✉️</span><span className="settings-row-copy"><strong>{tr("Pemberitahuan Email", "Email Notifications")}</strong><small>{tr("Info beasiswa/magang baru & batas deadline ke emailmu", "New opportunities & deadline reminders sent to your email")}</small></span><input type="checkbox" role="switch" checked={emailAlerts} disabled={emailSaving} onChange={(event) => handleToggleEmail(event.target.checked)}/></label></div>{emailError && <p className="form-error" role="alert">{emailError}</p>}<h2 className="settings-section-label">WEB PUSH</h2><p className="settings-hint" role="status">{pushStatus?.subscribed ? tr("Aktif di browser ini dan terdaftar di OneSignal.", "Active in this browser and registered with OneSignal.") : pushStatus?.localSubscribed ? tr("Browser mengizinkan push, tetapi langganannya belum ditemukan di OneSignal pengirim.", "Browser allows push, but the sending OneSignal app cannot find this subscription.") : pushStatus?.permission === "denied" ? tr("Izin diblokir. Izinkan notifikasi untuk situs ini di pengaturan browser.", "Permission blocked. Allow notifications for this site in browser settings.") : pushStatus?.supported === false ? tr("Browser ini tidak mendukung Web Push.", "This browser does not support Web Push.") : tr("Belum aktif di browser ini.", "Not active in this browser yet.")}</p>{!pushStatus?.subscribed && pushStatus?.supported !== false && <button type="button" className="push-enable-button" disabled={pushSaving} onClick={handleEnablePush}>{pushSaving ? tr("Mengaktifkan...", "Enabling...") : tr("Aktifkan Web Push", "Enable Web Push")}</button>}{pushError && <p className="form-error" role="alert">{pushError}</p>}<h2 className="settings-section-label">{tr("PENGINGAT SAAT INI", "CURRENT REMINDERS")}</h2>{deadlineAlerts && reminders.length ? <ul className="reminder-list">{reminders.map((item) => <li key={item.id}><Link href={`/peluang/${item.id}`}>{item.title}</Link><span>{formatDate(demoDeadline(item.demoDays), locale)}</span></li>)}</ul> : <p className="settings-empty">{tr("Belum ada peluang tersimpan yang mendekati deadline (H-3). Simpan peluang favoritmu untuk melihat pengingatnya di sini.", "No saved opportunities approaching deadlines (within 3 days). Save your favorite opportunities to view reminders here.")}</p>}</SettingsLayout>;
 }
 function PrivacyScreen() {
     const { profile, saved, locale, theme, deadlineAlerts, clearDemo } = useApp();

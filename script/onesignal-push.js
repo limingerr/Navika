@@ -31,9 +31,8 @@ async function verifyServerSubscription(subscriptionId) {
   return data.registered === true;
 }
 
-export async function getWebPushStatus(userId) {
+export async function getWebPushStatus() {
   return withOneSignal(async (OneSignal) => {
-    if (userId) await OneSignal.login(userId);
     const subscriptionId = OneSignal.User.PushSubscription.id;
     const localSubscribed = Boolean(OneSignal.Notifications.permission && OneSignal.User.PushSubscription.optedIn && subscriptionId);
     return {

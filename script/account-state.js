@@ -3,7 +3,6 @@ export function resolveAccount(user, role, profile) {
   return {
     isAdmin,
     profile: isAdmin ? null : {
-      id: user.id,
       name: profile?.name || user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0] || "Mahasiswa",
       email: user.email || "",
       university: profile?.university || "",

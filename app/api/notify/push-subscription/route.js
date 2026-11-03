@@ -25,16 +25,8 @@ export async function POST(request) {
     if (!response.ok) return NextResponse.json({ error: `Pemeriksaan OneSignal gagal (HTTP ${response.status}).` }, { status: 502 });
     const data = await response.json();
     const externalId = data?.identity?.external_id;
-    if (externalId !== user.id) return NextResponse.json({ registered: false, reason: "identity" });
-    const userResponse = await fetch(`https://api.onesignal.com/apps/${encodeURIComponent(appId)}/users/by/external_id/${encodeURIComponent(user.id)}`, {
-      headers: { Authorization: `Key ${apiKey}` },
-      cache: "no-store",
-    });
-    if (!userResponse.ok) return NextResponse.json({ error: `Status langganan OneSignal gagal dibaca (HTTP ${userResponse.status}).` }, { status: 502 });
-    const oneSignalUser = await userResponse.json();
-    const subscription = (oneSignalUser.subscriptions || []).find((item) => item.id === subscriptionId);
-    const registered = Boolean(subscription?.enabled && /push$/i.test(subscription.type || ""));
-    return NextResponse.json({ registered, reason: subscription?.enabled ? null : "disabled" });
+    const registered = externalId === user.id || externalId === user.email;
+    return NextResponse.json({ registered });
   } catch {
     return NextResponse.json({ error: "OneSignal tidak dapat dihubungi." }, { status: 502 });
   }

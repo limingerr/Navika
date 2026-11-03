@@ -128,10 +128,6 @@ export function AppProvider({ children }) {
                             try { localStorage.setItem(adminStorageKey, "true"); } catch {}
                         } else {
                             try { localStorage.removeItem(adminStorageKey); } catch {}
-                            window.OneSignalDeferred = window.OneSignalDeferred || [];
-                            window.OneSignalDeferred.push(async function(OneSignal) {
-                                try { await OneSignal.login(account.profile.id); } catch {}
-                            });
                             // Sinkronkan daftar bookmark milik akun mahasiswa ini dari Supabase
                             fetchSavedOpportunityIds().then((savedIds) => {
                                 if (savedIds && Array.isArray(savedIds)) {
@@ -563,11 +559,6 @@ export function AppProvider({ children }) {
         setAuthenticated(false);
         setIsAdminLoggedIn(false);
         try { localStorage.removeItem(adminStorageKey); } catch {}
-        if (typeof window !== "undefined" && window.OneSignalDeferred) {
-            window.OneSignalDeferred.push(async function(OneSignal) {
-                try { await OneSignal.logout(); } catch {}
-            });
-        }
         if (isSupabaseConfigured()) {
             try { await signOutUser(); } catch {}
         }

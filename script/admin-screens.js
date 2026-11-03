@@ -453,7 +453,6 @@ export function AdminPeluangTable() {
   const [customOrg, setCustomOrg] = useState("");
   const [customCat, setCustomCat] = useState("Beasiswa");
   const [broadcasting, setBroadcasting] = useState(false);
-  const [broadcastReport, setBroadcastReport] = useState(null);
 
   const showToast = (msg, duration = 4000) => {
     setToastMsg(msg);
@@ -463,7 +462,6 @@ export function AdminPeluangTable() {
   const handleTriggerBroadcast = async (e) => {
     if (e) e.preventDefault();
     setBroadcasting(true);
-    setBroadcastReport(null);
     showToast("Sedang menyiarkan notifikasi ke mahasiswa...");
     try {
       if (broadcastType === "new") {
@@ -481,7 +479,7 @@ export function AdminPeluangTable() {
           const emailStatus = data.email?.sent ? `${data.email.totalSent} email diterima penyedia${data.email.failedCount ? `, ${data.email.failedCount} gagal` : ""}` : `email: ${data.email?.error || "tidak ada penerima"}`;
           const pushStatus = data.push?.sent ? "pesan push dibuat di OneSignal; periksa penerima dan pengiriman di OneSignal" : `push: ${data.push?.error || "belum ada perangkat yang berlangganan; mahasiswa perlu mengaktifkan Web Push di Pengaturan Notifikasi"}`;
           showToast(`${emailStatus}; ${pushStatus}.`);
-          setBroadcastReport({ type: "new", data });
+          setShowBroadcastModal(false);
         } else {
           showToast(data.error || "Gagal menyiarkan notifikasi.");
         }
@@ -498,9 +496,9 @@ export function AdminPeluangTable() {
           const emailCounts = emailNote?.bookmarkCount == null ? "" : ` (${emailNote.bookmarkCount} bookmark, ${emailNote.optedInCount} akun email aktif, ${emailNote.eligibleCount} memenuhi keduanya)`;
           const reason = [emailNote ? `${emailNote.id}: ${emailNote.emailError || emailNote.emailNotice}${emailCounts}` : "", pushNote?.pushError || pushNote?.pushNotice].filter(Boolean).join("; ");
           showToast(data.totalOpportunities === 0
-            ? "Pemeriksaan selesai: tidak ada peluang dengan deadline H-2, H-1, atau hari H."
-            : `Pengingat diproses: ${data.totalEmailSent || 0} email diterima penyedia, ${data.totalPushSent || 0} pesan dibuat di OneSignal${reason ? `; ${reason}` : failures ? `; ${failures} hasil perlu diperiksa` : ""}.`);
-          setBroadcastReport({ type: "deadline", data });
+            ? "Pemeriksaan H-2 selesai: tidak ada peluang dengan deadline H-2."
+            : `H-2 diproses: ${data.totalEmailSent || 0} email diterima penyedia, ${data.totalPushSent || 0} pesan dibuat di OneSignal${reason ? `; ${reason}` : failures ? `; ${failures} hasil perlu diperiksa` : ""}.`);
+          setShowBroadcastModal(false);
         } else {
           showToast(data.error || "Gagal memicu pengingat deadline.");
         }
@@ -801,26 +799,8 @@ export function AdminPeluangTable() {
               Pusat Siaran Notifikasi Mahasiswa
             </h2>
             <p className="admin-modal-desc" style={{ marginBottom: "18px" }}>
-              Info peluang baru ditujukan kepada seluruh mahasiswa. Pengingat deadline ditujukan kepada mahasiswa yang menyimpan peluang; email memerlukan izin pemberitahuan email.
+              Kirimkan notifikasi langsung berupa <strong>Pop-up Web Push</strong> ke HP/browser serta <strong>Email</strong> kepada seluruh mahasiswa terdaftar.
             </p>
-
-            {broadcastReport && (
-              <div className="admin-broadcast-report" role="status" style={{ maxHeight: "260px", overflowY: "auto", marginBottom: "16px" }}>
-                <strong>Hasil siaran</strong>
-                {broadcastReport.type === "new" ? (
-                  <p>{broadcastReport.data.email?.totalSent || 0} email diterima penyedia; {broadcastReport.data.push?.count || 0} pesan push dibuat untuk {broadcastReport.data.push?.recipients || 0} langganan. {broadcastReport.data.email?.error || broadcastReport.data.push?.error || ""}</p>
-                ) : broadcastReport.data.results?.length ? (
-                  <ul>
-                    {broadcastReport.data.results.map((item, index) => (
-                      <li key={`${item.id}-${item.stage}-${index}`}>
-                        <strong>{item.stage}: {item.title || item.id}</strong>
-                        <span> Email: {item.sentCount || 0} diterima penyedia{item.emailError || item.emailNotice ? ` (${item.emailError || item.emailNotice})` : ""}. Push: {item.pushRecipients || 0} langganan ditargetkan{item.pushError ? ` (${item.pushError})` : ""}.</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : <p>Tidak ada peluang dengan deadline H-2, H-1, atau hari H.</p>}
-              </div>
-            )}
 
             <form onSubmit={handleTriggerBroadcast}>
               <div className="admin-form-group" style={{ marginBottom: "14px" }}>
@@ -830,7 +810,7 @@ export function AdminPeluangTable() {
                 <div style={{ display: "flex", gap: "10px" }}>
                   <button
                     type="button"
-                    onClick={() => { setBroadcastType("new"); setBroadcastReport(null); }}
+                    onClick={() => setBroadcastType("new")}
                     className={`admin-btn admin-btn-sm ${broadcastType === "new" ? "admin-btn-primary" : "admin-btn-secondary"}`}
                     style={{ flex: 1, justifyContent: "center" }}
                   >
@@ -838,11 +818,11 @@ export function AdminPeluangTable() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => { setBroadcastType("deadline"); setBroadcastReport(null); }}
+                    onClick={() => setBroadcastType("deadline")}
                     className={`admin-btn admin-btn-sm ${broadcastType === "deadline" ? "admin-btn-primary" : "admin-btn-secondary"}`}
                     style={{ flex: 1, justifyContent: "center" }}
                   >
-                    ⏰ Pengingat Deadline (H-2, H-1, Hari H)
+                    ⏰ Pengingat Deadline (H-2)
                   </button>
                 </div>
               </div>
@@ -892,7 +872,7 @@ export function AdminPeluangTable() {
               ) : (
                 <div style={{ background: "#f8fafc", padding: "14px", borderRadius: "10px", border: "1px solid #e2e8f0", marginBottom: "16px" }}>
                   <p style={{ margin: "0 0 8px", fontSize: "13px", color: "var(--teks)" }}>
-                    Sistem akan memindai seluruh katalog peluang aktif dan mengirimkan notifikasi <strong>Pop-up & Email Pengingat Deadline</strong> kepada mahasiswa untuk program yang batas pendaftarannya ditutup pada <strong>H-2, H-1, atau hari H</strong>.
+                    Sistem akan memindai seluruh katalog peluang aktif dan mengirimkan notifikasi <strong>Pop-up & Email Pengingat Deadline</strong> kepada mahasiswa untuk program yang batas pendaftarannya ditutup dalam <strong>2 hari ke depan (H-2)</strong>.
                   </p>
                   <small style={{ color: "#ea580c", fontWeight: 600 }}>
                     💡 Notifikasi ini juga berjalan otomatis setiap hari via server cron.
@@ -907,7 +887,7 @@ export function AdminPeluangTable() {
                   onClick={() => setShowBroadcastModal(false)}
                   disabled={broadcasting}
                 >
-                  {broadcastReport ? "Tutup" : "Batal"}
+                  Batal
                 </button>
                 <button
                   type="submit"

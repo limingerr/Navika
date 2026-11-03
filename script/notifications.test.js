@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { sendEmail } from "./email-service.js";
-import { getNotificationRecipients, getPushUserIds } from "../lib/supabase/admin.js";
+import { getNotificationRecipients } from "../lib/supabase/admin.js";
 import { isPushAccepted } from "./notification-status.js";
 import { deadlineTarget, jakartaDateAfterDays } from "./notification-targets.js";
 
@@ -13,30 +13,6 @@ test("target H-2 memisahkan UUID bookmark dan slug tautan", () => {
 
 test("tanggal H-2 mengikuti hari di Jakarta", () => {
   assert.equal(jakartaDateAfterDays(new Date("2026-11-02T17:30:00Z"), 2), "2026-11-05");
-  assert.equal(jakartaDateAfterDays(new Date("2026-11-02T17:30:00Z"), 1), "2026-11-04");
-  assert.equal(jakartaDateAfterDays(new Date("2026-11-02T17:30:00Z"), 0), "2026-11-03");
-});
-
-test("push pengingat hanya menargetkan mahasiswa pemegang bookmark", async () => {
-  const client = { from(table) { return { select() { return { eq() { return { range() { return Promise.resolve({
-    data: table === "user_roles" ? [{ user_id: "mahasiswa-1" }, { user_id: "mahasiswa-2" }] : [{ user_id: "mahasiswa-1" }, { user_id: "pengelola" }],
-    error: null,
-  }); } }; } }; } }; } };
-  assert.deepEqual(await getPushUserIds({ client, opportunityId: "peluang-1" }), ["mahasiswa-1"]);
-  assert.deepEqual(await getPushUserIds({ client }), ["mahasiswa-1", "mahasiswa-2"]);
-});
-
-test("daftar mahasiswa push dibaca melewati batas 1000 baris", async () => {
-  const ranges = [];
-  const client = { from() { return { select() { return { eq() { return { range(start, end) {
-    ranges.push([start, end]);
-    return Promise.resolve({ data: start === 0
-      ? Array.from({ length: 1000 }, (_, index) => ({ user_id: `mahasiswa-${index}` }))
-      : [{ user_id: "mahasiswa-1000" }], error: null });
-  } }; } }; } }; } };
-  const ids = await getPushUserIds({ client });
-  assert.equal(ids.length, 1001);
-  assert.deepEqual(ranges, [[0, 999], [1000, 1999]]);
 });
 
 test("sendEmail menolak penerima kosong secara aman", async () => {
@@ -82,12 +58,11 @@ test("getNotificationRecipients tidak memakai alamat fallback saat Supabase tida
 test("penerima email hanya akun opt-in dan bookmark peluang", async () => {
   const client = {
     from(table) {
-      return { select() { return { eq() { return { range() {
-        return Promise.resolve({ data: table === "user_roles"
+      return { select() { return { eq() {
+        return Promise.resolve({ data: table === "profiles"
           ? [{ user_id: "aktif" }, { user_id: "lain" }]
-          : table === "profiles" ? [{ user_id: "aktif" }, { user_id: "lain" }]
-            : [{ user_id: "aktif" }], error: null });
-      } }; } }; } };
+          : [{ user_id: "aktif" }], error: null });
+      } }; } };
     },
     auth: { admin: { async listUsers() { return { data: { users: [
       { id: "aktif", email: "Aktif@example.com" },
@@ -105,9 +80,9 @@ test("penerima email hanya akun opt-in dan bookmark peluang", async () => {
 });
 
 test("kesalahan membaca preferensi menghentikan pemilihan penerima", async () => {
-  const client = { from() { return { select() { return { eq() { return { range() {
+  const client = { from() { return { select() { return { eq() {
     return Promise.resolve({ data: null, error: new Error("database gagal") });
-  } }; } }; } }; } };
+  } }; } }; } };
   await assert.rejects(getNotificationRecipients({ client }), /database gagal/);
 });
 

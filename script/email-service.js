@@ -250,12 +250,10 @@ export async function sendEmail({ to, subject, html }) {
 /**
  * Template Email Pengingat Deadline H-2
  */
-export async function sendDeadlineReminderEmail({ to, opportunity, targetDate, daysBefore = 2, siteUrl }) {
+export async function sendDeadlineReminderEmail({ to, opportunity, targetDate, siteUrl }) {
   const baseSite = siteUrl || process.env.NEXT_PUBLIC_SITE_URL || "https://navika-pi.vercel.app";
   const oppUrl = `${baseSite}/peluang/${opportunity.id || opportunity.slug}`;
-  const stage = daysBefore === 0 ? "hari H" : `H-${daysBefore}`;
-  const deadlineText = daysBefore === 0 ? "hari ini" : `dalam ${daysBefore} hari`;
-  const subject = `⏳ [NAVIKA] Pengingat ${stage}: Pendaftaran "${opportunity.title}" ditutup ${deadlineText}`;
+  const subject = `⏳ [NAVIKA] Pengingat: Pendaftaran "${opportunity.title}" Ditutup 2 Hari Lagi!`;
 
   const html = `
 <!DOCTYPE html>
@@ -281,13 +279,13 @@ export async function sendDeadlineReminderEmail({ to, opportunity, targetDate, d
           <tr>
             <td style="padding:32px;">
               <span style="display:inline-block;background:#fef3c7;color:#92400e;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:16px;">
-                ⏳ Batas Waktu ${stage}
+                ⏳ Batas Waktu H-2
               </span>
               <h1 style="font-size:22px;line-height:1.3;margin:0 0 12px 0;color:#0f172a;">
                 Pengingat: Deadline Pendaftaran Segera Ditutup!
               </h1>
               <p style="font-size:15px;line-height:1.6;color:#475569;margin:0 0 20px 0;">
-                Halo! Program peluang yang kamu simpan akan menutup pendaftaran <strong>${deadlineText}</strong> (${targetDate || "segera"}). Pastikan berkas dan persyaratannya sudah siap.
+                Halo! Program peluang yang tersimpan di radar belajarmu akan segera menutup pendaftaran dalam <strong>2 hari ke depan</strong> (${targetDate || "segera"}). Pastikan berkas dan persyaratannya sudah siap.
               </p>
 
               <!-- Card Program -->
@@ -304,7 +302,7 @@ export async function sendDeadlineReminderEmail({ to, opportunity, targetDate, d
                       Diselenggarakan oleh: <strong>${opportunity.organization || "Mitra NAVIKA"}</strong>
                     </p>
                     <p style="font-size:13px;color:#334155;margin:0;line-height:1.5;">
-                      Batas Akhir: <strong style="color:#dc2626;">${deadlineText}</strong>
+                      Batas Akhir: <strong style="color:#dc2626;">2 Hari Lagi</strong>
                     </p>
                   </td>
                 </tr>

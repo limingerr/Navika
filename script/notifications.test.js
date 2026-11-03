@@ -3,6 +3,17 @@ import test from "node:test";
 import { sendEmail } from "./email-service.js";
 import { getNotificationRecipients } from "../lib/supabase/admin.js";
 import { isPushAccepted } from "./notification-status.js";
+import { deadlineTarget, jakartaDateAfterDays } from "./notification-targets.js";
+
+test("target H-2 memisahkan UUID bookmark dan slug tautan", () => {
+  const target = deadlineTarget({ id: "123e4567-e89b-12d3-a456-426614174000", slug: "djarum", title: "Djarum", organization: "Mitra", primary_category: { name: "Beasiswa" } });
+  assert.equal(target.databaseId, "123e4567-e89b-12d3-a456-426614174000");
+  assert.equal(target.id, "djarum");
+});
+
+test("tanggal H-2 mengikuti hari di Jakarta", () => {
+  assert.equal(jakartaDateAfterDays(new Date("2026-11-02T17:30:00Z"), 2), "2026-11-05");
+});
 
 test("sendEmail menolak penerima kosong secara aman", async () => {
   const result = await sendEmail({

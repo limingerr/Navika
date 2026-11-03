@@ -12,6 +12,7 @@ export async function broadcastNewOpportunity({ title, organization, category, f
   const onesignalRestKey = process.env.ONESIGNAL_REST_API_KEY;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://navika-pi.vercel.app";
   const opportunitySlug = slug || id || "";
+  const opportunityPath = opportunitySlug ? `/peluang/${encodeURIComponent(opportunitySlug)}` : "/peluang";
   const categoryName = category || "Peluang";
   const orgName = organization || "Mitra NAVIKA";
 
@@ -32,7 +33,7 @@ export async function broadcastNewOpportunity({ title, organization, category, f
           id: `Telah dibuka ${categoryName} dari ${orgName}. Cek info lengkap dan persyaratannya sekarang di Navika!`,
           en: `New ${categoryName} from ${orgName} is now open. Check eligibility and requirements on Navika!`,
         },
-        url: `${siteUrl}/peluang/${opportunitySlug}`,
+        url: `${siteUrl}${opportunityPath}`,
       };
 
       const response = await fetch("https://api.onesignal.com/notifications", {
@@ -77,7 +78,7 @@ export async function broadcastNewOpportunity({ title, organization, category, f
       }
     } catch (err) {
       console.warn("Gagal memilih penerima atau mengirim email notifikasi:", err.message);
-      emailResult = { success: false, error: "Penerima atau layanan email tidak tersedia." };
+      emailResult = { success: false, error: "Gagal membaca penerima atau mengirim email." };
     }
   }
 
@@ -99,7 +100,7 @@ export async function broadcastNewOpportunity({ title, organization, category, f
         (!isEmailConfigured
           ? "EMAIL_USER & EMAIL_PASS belum disetel"
           : recipientInfo.count === 0
-          ? "Tidak ada penerima email terdaftar di database Supabase"
+          ? recipientInfo.source === "none" ? "Database penerima email belum dikonfigurasi." : "Tidak ada mahasiswa yang mengaktifkan pemberitahuan email."
           : undefined),
       ids: emailResult?.ids || (emailResult?.id ? [emailResult.id] : []),
     },

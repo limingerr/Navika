@@ -24,12 +24,15 @@ export async function POST(request) {
 
     // 2. Simpan ke database Supabase
     const dbResult = await saveScrapedToSupabase(scrapedItems);
+    if (!dbResult.success || dbResult.processed === 0) {
+      return NextResponse.json({ success: false, error: dbResult.error || "Tidak ada beasiswa yang berhasil disimpan.", dbResult }, { status: 500 });
+    }
 
     // 3. Otomatis siarkan notifikasi pop-up & email untuk peluang terbaru yang masuk
     let broadcastResult = null;
-    if (scrapedItems.length > 0) {
+    const topItem = scrapedItems.find((item) => !dbResult.errors?.some((failure) => failure.slug === item.slug));
+    if (topItem) {
       try {
-        const topItem = scrapedItems[0];
         broadcastResult = await broadcastNewOpportunity({
           title: topItem.title,
           organization: topItem.organization,
@@ -44,7 +47,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      message: `Berhasil menarik ${scrapedItems.length} beasiswa terbaru dari Indbeasiswa.com dan menyiarkan notifikasi.`,
+      message: `${dbResult.processed} beasiswa diproses; hasil notifikasi tercantum terpisah.`,
       scrapedCount: scrapedItems.length,
       dbResult,
       broadcastResult,

@@ -454,9 +454,9 @@ export function AdminPeluangTable() {
   const [customCat, setCustomCat] = useState("Beasiswa");
   const [broadcasting, setBroadcasting] = useState(false);
 
-  const showToast = (msg) => {
+  const showToast = (msg, duration = 4000) => {
     setToastMsg(msg);
-    setTimeout(() => setToastMsg(""), 4000);
+    setTimeout(() => setToastMsg(""), duration);
   };
 
   const handleTriggerBroadcast = async (e) => {
@@ -472,12 +472,11 @@ export function AdminPeluangTable() {
             title: customTitle || "Beasiswa Baru Resmi Dibuka",
             organization: customOrg || "Mitra NAVIKA",
             category: customCat,
-            slug: "djarum",
           }),
         });
         const data = await res.json();
         if (data.success) {
-          const emailStatus = data.email?.sent ? `${data.email.totalSent} email diterima penyedia` : `email: ${data.email?.error || "tidak ada penerima"}`;
+          const emailStatus = data.email?.sent ? `${data.email.totalSent} email diterima penyedia${data.email.failedCount ? `, ${data.email.failedCount} gagal` : ""}` : `email: ${data.email?.error || "tidak ada penerima"}`;
           const pushStatus = data.push?.sent ? "push diterima OneSignal" : `push: ${data.push?.error || "tidak ada penerima"}`;
           showToast(`${emailStatus}; ${pushStatus}.`);
           setShowBroadcastModal(false);
@@ -521,10 +520,16 @@ export function AdminPeluangTable() {
       });
       const data = await res.json();
       if (data.success) {
-        showToast(`Berhasil menarik ${data.scrapedCount} beasiswa terbaru! Memperbarui tampilan...`);
+        const emailStatus = data.broadcastResult?.email?.sent
+          ? `${data.broadcastResult.email.totalSent} email diterima penyedia${data.broadcastResult.email.failedCount ? `, ${data.broadcastResult.email.failedCount} gagal` : ""}`
+          : `email: ${data.broadcastResult?.email?.error || "siaran tidak dijalankan"}`;
+        const pushStatus = data.broadcastResult?.push?.sent
+          ? "push diterima OneSignal"
+          : `push: ${data.broadcastResult?.push?.error || "siaran tidak dijalankan"}`;
+        showToast(`${data.dbResult.processed} beasiswa diproses. ${emailStatus}; ${pushStatus}.`, 6000);
         setTimeout(() => {
           window.location.reload();
-        }, 1200);
+        }, 6300);
       } else {
         showToast(data.error || "Gagal menarik data beasiswa.");
       }

@@ -343,7 +343,8 @@ export async function sendDeadlineReminderEmail({ to, opportunity, targetDate, s
  */
 export async function sendNewOpportunityEmail({ to, opportunity, siteUrl }) {
   const baseSite = siteUrl || process.env.NEXT_PUBLIC_SITE_URL || "https://navika-pi.vercel.app";
-  const oppUrl = `${baseSite}/peluang/${opportunity.id || opportunity.slug}`;
+  const opportunityKey = opportunity.id || opportunity.slug;
+  const oppUrl = opportunityKey ? `${baseSite}/peluang/${encodeURIComponent(opportunityKey)}` : `${baseSite}/peluang`;
   const subject = `📢 [NAVIKA] Info ${opportunity.category || "Peluang"} Baru: ${opportunity.title}`;
 
   const html = `

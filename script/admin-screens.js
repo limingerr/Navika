@@ -477,7 +477,7 @@ export function AdminPeluangTable() {
         const data = await res.json();
         if (data.success) {
           const emailStatus = data.email?.sent ? `${data.email.totalSent} email diterima penyedia${data.email.failedCount ? `, ${data.email.failedCount} gagal` : ""}` : `email: ${data.email?.error || "tidak ada penerima"}`;
-          const pushStatus = data.push?.sent ? "push diterima OneSignal" : `push: ${data.push?.error || "tidak ada penerima"}`;
+          const pushStatus = data.push?.sent ? "pesan push dibuat di OneSignal; periksa penerima dan pengiriman di OneSignal" : `push: ${data.push?.error || "belum ada perangkat yang berlangganan; mahasiswa perlu mengaktifkan Web Push di Pengaturan Notifikasi"}`;
           showToast(`${emailStatus}; ${pushStatus}.`);
           setShowBroadcastModal(false);
         } else {

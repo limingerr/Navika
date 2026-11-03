@@ -18,6 +18,7 @@ export async function broadcastNewOpportunity({ title, organization, category, f
 
   let pushSuccess = false;
   let pushData = null;
+  let pushError = null;
 
   // 1. Kirim Web Push Notification via OneSignal
   if (onesignalAppId && onesignalRestKey) {
@@ -49,6 +50,7 @@ export async function broadcastNewOpportunity({ title, organization, category, f
       pushSuccess = isPushAccepted(response, pushData);
     } catch (err) {
       console.warn("Gagal mengirim OneSignal push:", err.message);
+      pushError = "Gagal menghubungi OneSignal.";
     }
   }
 
@@ -86,7 +88,9 @@ export async function broadcastNewOpportunity({ title, organization, category, f
     push: {
       sent: pushSuccess,
       id: pushData?.id || null,
-      error: pushSuccess ? null : pushData?.errors || (onesignalAppId && onesignalRestKey ? "Tidak ada langganan push yang menerima pesan." : "OneSignal belum dikonfigurasi."),
+      error: pushSuccess ? null : String(pushData?.errors || "").includes("All included players are not subscribed")
+        ? "Belum ada perangkat berlangganan Web Push. Mahasiswa perlu mengaktifkannya di Pengaturan Notifikasi."
+        : pushData?.errors || pushError || (onesignalAppId && onesignalRestKey ? "Tidak ada langganan push yang menerima pesan." : "OneSignal belum dikonfigurasi."),
     },
     email: {
       sent: Boolean(emailResult?.success),

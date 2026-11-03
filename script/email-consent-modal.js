@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useApp, useTr } from "@/script/app-provider";
+import { enableWebPush } from "@/script/onesignal-push";
 
 export function EmailConsentModal() {
   const {
@@ -55,31 +56,13 @@ export function EmailConsentModal() {
     } catch {}
 
     if (granted) {
-      setToastMsg(
-        tr(
-          "✓ Notifikasi berhasil diaktifkan untuk info peluang & pengingat deadline!",
-          "✓ Notifications successfully activated for opportunities & deadline alerts!"
-        )
-      );
-      setTimeout(() => setToastMsg(""), 4500);
-
-      // 1. Minta izin Web Push OneSignal di browser
-      if (typeof window !== "undefined" && window.OneSignalDeferred) {
-        window.OneSignalDeferred.push(async function (OneSignal) {
-          try {
-            if (OneSignal.Notifications && OneSignal.Notifications.requestPermission) {
-              await OneSignal.Notifications.requestPermission();
-            } else if (OneSignal.Slidedown && OneSignal.Slidedown.promptPush) {
-              await OneSignal.Slidedown.promptPush();
-            }
-            if (profile?.id || profile?.email) {
-              await OneSignal.login(profile.id || profile.email);
-            }
-          } catch (pushErr) {
-            console.warn("OneSignal permission request notice:", pushErr);
-          }
-        });
+      try {
+        await enableWebPush(profile?.id || profile?.email);
+        setToastMsg(tr("Email dan Web Push aktif di browser ini.", "Email and Web Push are active in this browser."));
+      } catch {
+        setToastMsg(tr("Pilihan email tersimpan. Web Push belum aktif; periksa di Pengaturan Notifikasi.", "Email preference saved. Web Push is not active; check Notification Settings."));
       }
+      setTimeout(() => setToastMsg(""), 4500);
 
     } else {
       setToastMsg(

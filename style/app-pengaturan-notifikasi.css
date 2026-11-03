@@ -42,6 +42,22 @@ html {
   cursor: pointer;
 }
 
+.page-pengaturan-notifikasi .push-enable-button {
+  min-height: 44px;
+  padding: 8px 18px;
+  margin-bottom: 18px;
+  color: #fff;
+  background: #00699d;
+  border: 0;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.page-pengaturan-notifikasi .push-enable-button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
 .page-pengaturan-notifikasi a {
   color: inherit;
   text-decoration: none;

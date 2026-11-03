@@ -8,6 +8,7 @@ import { Brand, DemoNote } from "@/script/ui";
 import { isSupabaseConfigured, signUpUser } from "@/script/supabase-service";
 import { isAllowedRegistrationEmail } from "@/script/account-state";
 import { safeRedirectPath } from "@/script/protected-routes";
+import { enableWebPush } from "@/script/onesignal-push";
 function AuthHero({ kind }) {
     const tr = useTr();
     return <div className="auth-hero"><img src={`/asset/asset-ilustrasi-${kind === "login" ? "masuk" : "daftar"}.png`} alt={kind === "login" ? tr("Ilustrasi mahasiswa menggunakan laptop", "Illustration of a student using a laptop") : tr("Ilustrasi mahasiswa membawa buku", "Illustration of a student carrying books")}/></div>;
@@ -117,24 +118,14 @@ export function VerificationScreen() {
         if (setEmailConsentDecided) setEmailConsentDecided(true);
 
 
-        if (typeof window !== "undefined" && window.OneSignalDeferred) {
-            window.OneSignalDeferred.push(async function(OneSignal) {
-                try {
-                    if (OneSignal.Notifications && OneSignal.Notifications.requestPermission) {
-                        await OneSignal.Notifications.requestPermission();
-                    } else if (OneSignal.Slidedown && OneSignal.Slidedown.promptPush) {
-                        await OneSignal.Slidedown.promptPush();
-                    }
-                    if (profile?.id || profile?.email) {
-                        await OneSignal.login(profile.id || profile.email);
-                    }
-                } catch (pushErr) {
-                    console.warn("OneSignal permission notice:", pushErr);
-                }
-            });
+        try {
+            await enableWebPush(profile?.id || profile?.email);
+            setNotifGranted(true);
+        } catch (error) {
+            setNotifError(error.message);
+            setLoading(false);
+            return;
         }
-
-        setNotifGranted(true);
         setTimeout(() => {
             router.push("/dashboard");
         }, 900);

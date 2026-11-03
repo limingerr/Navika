@@ -16,7 +16,7 @@ export const metadata = {
     },
 };
 
-const ONESIGNAL_APP_ID = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID || "772b0572-55ce-4a28-aea9-a64695604c0e";
+const ONESIGNAL_APP_ID = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-200XEVQNVQ";
 const CLARITY_PROJECT_ID = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID || "z6b213a2fj";
 
@@ -63,7 +63,7 @@ export default function RootLayout({ children }) {
             </Script>
           </>
         )}
-        <Script
+        {ONESIGNAL_APP_ID && <><Script
           src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
           strategy="afterInteractive"
           defer
@@ -80,15 +80,11 @@ export default function RootLayout({ children }) {
                     prompts: [
                       {
                         type: "push",
-                        autoPrompt: true,
+                        autoPrompt: false,
                         text: {
                           actionMessage: "Dapatkan update beasiswa & pengingat deadline pendaftaran langsung di layarmu.",
                           acceptButton: "Izinkan",
                           cancelButton: "Nanti Saja"
-                        },
-                        delay: {
-                          pageViews: 1,
-                          timeDelay: 1
                         }
                       }
                     ]
@@ -97,7 +93,7 @@ export default function RootLayout({ children }) {
               });
             });
           `}
-        </Script>
+        </Script></>}
       </body>
     </html>);
 }

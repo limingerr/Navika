@@ -217,6 +217,10 @@ html {
   height: 25px;
 }
 
+.page-pengaturan .admin-panel-icon {
+  color: #111827;
+}
+
 .page-pengaturan .settings-row-copy {
   display: block;
   flex: 1;
@@ -306,6 +310,10 @@ html {
 
 :root[data-theme=dark] .page-pengaturan .settings-icon img {
   filter: brightness(0) invert(1);
+}
+
+:root[data-theme=dark] .page-pengaturan .admin-panel-icon {
+  color: #fff;
 }
 
 @media (min-width:700px) {

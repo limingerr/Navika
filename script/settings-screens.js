@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { LogOut } from "iconoir-react";
+import { DashboardDots, LogOut } from "iconoir-react";
 import { useApp, useTr } from "@/script/app-provider";
 import { DemoNote, Icon } from "@/script/ui";
 import { demoDeadline, demoReminders, formatDate, opportunities as staticOpportunities } from "@/script/opportunities";
@@ -10,7 +10,7 @@ function SettingsLayout({ title, subtitle, children, back = "/pengaturan" }) {
     return <main className="settings-page"><div className="settings-inner"><Link className="settings-back" href={back}><span className="settings-back-btn" aria-hidden="true"><svg width="18" height="14" viewBox="0 0 20 15" fill="currentColor" aria-hidden="true"><path d="M7.91901 1.94806C8.02954 1.84507 8.11819 1.72087 8.17968 1.58287C8.24117 1.44487 8.27423 1.2959 8.2769 1.14485C8.27956 0.993792 8.25178 0.843748 8.19519 0.703666C8.13861 0.563583 8.05439 0.436333 7.94757 0.329505C7.84074 0.222676 7.71349 0.13846 7.57341 0.081878C7.43332 0.0252965 7.28328 -0.00249009 7.13223 0.000175084C6.98117 0.00284026 6.8322 0.0359026 6.6942 0.0973905C6.5562 0.158878 6.432 0.247532 6.32901 0.358062L0.32901 6.35806C0.118334 6.569 0 6.85494 0 7.15306C0 7.45119 0.118334 7.73712 0.32901 7.94806L6.32901 13.9481C6.432 14.0586 6.5562 14.1472 6.6942 14.2087C6.8322 14.2702 6.98117 14.3033 7.13223 14.3059C7.28328 14.3086 7.43332 14.2808 7.57341 14.2242C7.71349 14.1677 7.84074 14.0834 7.94757 13.9766C8.05439 13.8698 8.13861 13.7425 8.19519 13.6025C8.25178 13.4624 8.27956 13.3123 8.2769 13.1613C8.27423 13.0102 8.24117 12.8613 8.17968 12.7233C8.11819 12.5853 8.02954 12.4611 7.91901 12.3581L3.83901 8.27806H18.374C18.6724 8.27806 18.9585 8.15954 19.1695 7.94856C19.3805 7.73758 19.499 7.45143 19.499 7.15306C19.499 6.85469 19.3805 6.56855 19.1695 6.35757C18.9585 6.14659 18.6724 6.02806 18.374 6.02806H3.83901L7.91901 1.94806Z"/></svg></span>{tr("Kembali", "Back")}</Link><header className="settings-heading"><h1>{title}</h1><p>{subtitle}</p></header>{children}</div></main>;
 }
 function SettingsRow({ href, icon, title, detail, danger = false }) {
-    return <Link href={href} className={`settings-row ${danger ? "danger" : ""}`}><span className="settings-icon"><Icon name={icon}/></span><span className="settings-row-copy"><strong>{title}</strong>{detail && <small>{detail}</small>}</span><span className="settings-chevron" aria-hidden="true">›</span></Link>;
+    return <Link href={href} className={`settings-row ${danger ? "danger" : ""}`}><span className="settings-icon">{typeof icon === "string" ? <Icon name={icon}/> : icon}</span><span className="settings-row-copy"><strong>{title}</strong>{detail && <small>{detail}</small>}</span><span className="settings-chevron" aria-hidden="true">›</span></Link>;
 }
 export function SettingsScreen() {
     const logoutDialog = useRef(null);
@@ -56,7 +56,7 @@ export function SettingsScreen() {
             <SettingsRow href="/pengaturan/bantuan" icon="bantuandukungan-profile.svg" title={tr("Bantuan & Dukungan", "Help & Support")} detail={tr("Pertanyaan umum dan panduan", "Frequently asked questions")} />
             <SettingsRow href="/pengaturan/tentang" icon="tentangaplikasi-profile.svg" title={tr("Tentang Aplikasi", "About the App")} detail={tr("Informasi NAVIKA", "About NAVIKA")} />
             {isAdminLoggedIn && (
-                <SettingsRow href="/admin" icon="setting-gerigi.svg" title={tr("Panel Admin", "Admin Panel")} detail={tr("Kelola katalog peluang & pemeliharaan data", "Manage opportunity catalog & data")} />
+                <SettingsRow href="/admin" icon={<DashboardDots className="admin-panel-icon" width={25} height={25} strokeWidth={2.2} aria-hidden="true" />} title={tr("Panel Admin", "Admin Panel")} detail={tr("Kelola katalog peluang & pemeliharaan data", "Manage opportunity catalog & data")} />
             )}
             <button type="button" className="settings-row danger" onClick={() => { setLogoutError(""); logoutDialog.current?.showModal(); }}>
                 <span className="settings-icon"><Icon name="keluar-profile.svg" /></span>

@@ -493,7 +493,8 @@ export function AdminPeluangTable() {
           const failures = (data.results || []).filter((item) => item.pushError || item.emailError).length;
           const emailNote = data.totalEmailSent ? "" : (data.results || []).find((item) => item.emailError || item.emailNotice);
           const pushNote = data.totalPushSent ? "" : (data.results || []).find((item) => item.pushError || item.pushNotice);
-          const reason = [emailNote?.emailError || emailNote?.emailNotice, pushNote?.pushError || pushNote?.pushNotice].filter(Boolean).join("; ");
+          const emailCounts = emailNote?.bookmarkCount == null ? "" : ` (${emailNote.bookmarkCount} bookmark, ${emailNote.optedInCount} akun email aktif, ${emailNote.eligibleCount} memenuhi keduanya)`;
+          const reason = [emailNote ? `${emailNote.id}: ${emailNote.emailError || emailNote.emailNotice}${emailCounts}` : "", pushNote?.pushError || pushNote?.pushNotice].filter(Boolean).join("; ");
           showToast(data.totalOpportunities === 0
             ? "Pemeriksaan H-2 selesai: tidak ada peluang dengan deadline H-2."
             : `H-2 diproses: ${data.totalEmailSent || 0} email diterima penyedia, ${data.totalPushSent || 0} pesan dibuat di OneSignal${reason ? `; ${reason}` : failures ? `; ${failures} hasil perlu diperiksa` : ""}.`);

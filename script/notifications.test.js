@@ -72,8 +72,11 @@ test("penerima email hanya akun opt-in dan bookmark peluang", async () => {
   };
   assert.deepEqual((await getNotificationRecipients({ client })).emails,
     ["aktif@example.com", "lain@example.com"]);
-  assert.deepEqual((await getNotificationRecipients({ client, opportunityId: "peluang-1" })).emails,
-    ["aktif@example.com"]);
+  const selected = await getNotificationRecipients({ client, opportunityId: "peluang-1" });
+  assert.deepEqual(selected.emails, ["aktif@example.com"]);
+  assert.equal(selected.optedInCount, 2);
+  assert.equal(selected.bookmarkCount, 1);
+  assert.equal(selected.eligibleCount, 1);
 });
 
 test("kesalahan membaca preferensi menghentikan pemilihan penerima", async () => {

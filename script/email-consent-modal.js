@@ -37,6 +37,9 @@ export function EmailConsentModal() {
 
   const handleConsent = async (granted) => {
     setSaving(true);
+    const pushResult = granted
+      ? enableWebPush(profile?.id || profile?.email).then(() => true, () => false)
+      : null;
     const userEmail = profile?.email || "guest";
     const consentStorageKey = `navika_notif_prompt_${userEmail}`;
 
@@ -57,7 +60,7 @@ export function EmailConsentModal() {
 
     if (granted) {
       try {
-        await enableWebPush(profile?.id || profile?.email);
+        if (!await pushResult) throw new Error("Web Push belum aktif.");
         setToastMsg(tr("Email dan Web Push aktif di browser ini.", "Email and Web Push are active in this browser."));
       } catch {
         setToastMsg(tr("Pilihan email tersimpan. Web Push belum aktif; periksa di Pengaturan Notifikasi.", "Email preference saved. Web Push is not active; check Notification Settings."));

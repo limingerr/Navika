@@ -366,11 +366,12 @@ export async function toggleBookmarkInDb(opportunitySlugOrId, isSaved) {
             } catch {}
 
             if (!deleted) {
-              await supabase
+              const { error: deleteErr } = await supabase
                 .from("saved_opportunities")
                 .delete()
                 .eq("user_id", authData.user.id)
                 .eq("opportunity_id", opp.id);
+              if (deleteErr) throw deleteErr;
             }
 
             return { success: true, savedInDb: false };

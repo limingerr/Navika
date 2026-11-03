@@ -93,11 +93,12 @@ export async function POST(request) {
 
     if (isSaved) {
       // Hapus bookmark
-      await admin
+      const { error: deleteError } = await admin
         .from("saved_opportunities")
         .delete()
         .eq("user_id", user.id)
         .eq("opportunity_id", opp.id);
+      if (deleteError) throw deleteError;
 
       return NextResponse.json({
         success: true,
@@ -107,7 +108,7 @@ export async function POST(request) {
       });
     } else {
       // Simpan bookmark
-      await admin.from("saved_opportunities").upsert(
+      const { error: saveError } = await admin.from("saved_opportunities").upsert(
         {
           user_id: user.id,
           opportunity_id: opp.id,
@@ -117,6 +118,7 @@ export async function POST(request) {
         },
         { onConflict: "user_id,opportunity_id" }
       );
+      if (saveError) throw saveError;
 
       return NextResponse.json({
         success: true,

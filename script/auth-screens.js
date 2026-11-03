@@ -107,6 +107,7 @@ export function VerificationScreen() {
 
     const handleEnableNotifications = async () => {
         setLoading(true);
+        const pushResult = enableWebPush(profile?.id || profile?.email).then(() => ({ success: true }), (error) => ({ success: false, error }));
         try {
             await changeEmailAlerts(true);
         } catch {
@@ -119,7 +120,8 @@ export function VerificationScreen() {
 
 
         try {
-            await enableWebPush(profile?.id || profile?.email);
+            const result = await pushResult;
+            if (!result.success) throw result.error;
             setNotifGranted(true);
         } catch (error) {
             setNotifError(error.message);

@@ -533,7 +533,14 @@ export function AppProvider({ children }) {
             } catch {}
         }
         if (isSupabaseConfigured()) {
-            toggleBookmarkInDb(id, isCurrentlySaved).catch(() => {});
+            toggleBookmarkInDb(id, isCurrentlySaved).then((result) => {
+                if (result?.success) return;
+                setSaved((current) => willBeSaved ? current.filter((item) => item !== id) : [...new Set([...current, id])]);
+                setBookmarkNotice({ id: Date.now(), message: "Bookmark gagal disimpan. Coba lagi.", type: "error" });
+            }).catch(() => {
+                setSaved((current) => willBeSaved ? current.filter((item) => item !== id) : [...new Set([...current, id])]);
+                setBookmarkNotice({ id: Date.now(), message: "Bookmark gagal disimpan. Coba lagi.", type: "error" });
+            });
         }
     };
     const updateProfile = (newProfile) => {

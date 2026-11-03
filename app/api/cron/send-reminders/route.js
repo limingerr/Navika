@@ -108,7 +108,7 @@ export async function GET(request) {
           });
 
           const data = await response.json();
-          results.push({ id: opp.id, pushStatus: response.status, pushMessageId: data?.id || null, pushError: isPushAccepted(response, data) ? null : data?.errors || (response.ok ? "Tidak ada langganan push yang menerima pesan." : `OneSignal HTTP ${response.status}`) });
+          results.push({ id: opp.id, pushStatus: response.status, pushMessageId: data?.id || null, pushError: isPushAccepted(response, data) ? null : String(data?.errors || "").includes("All included players are not subscribed") ? "OneSignal tidak menemukan perangkat berlangganan pada aplikasi pengirim." : data?.errors || (response.ok ? "Tidak ada langganan push yang menerima pesan." : `OneSignal HTTP ${response.status}`) });
           if (isPushAccepted(response, data)) sentCount++;
         } catch (e) {
           results.push({ id: opp.id, pushError: e.message });
@@ -143,6 +143,9 @@ export async function GET(request) {
               id: opp.id,
               emailStatus: emailRes.success ? 200 : 500,
               recipientsCount: recipientInfo.count,
+              optedInCount: recipientInfo.optedInCount,
+              bookmarkCount: recipientInfo.bookmarkCount,
+              eligibleCount: recipientInfo.eligibleCount,
               recipientsSource: recipientInfo.source,
               sentCount: emailRes.totalSent || 0,
               failedCount: emailRes.failedRecipients?.length || 0,
@@ -151,7 +154,19 @@ export async function GET(request) {
               emailError: emailRes.success ? null : emailRes.error || "Pengiriman email gagal.",
             });
           }
-          else results.push({ id: opp.id, emailNotice: "Tidak ada pemegang bookmark yang mengaktifkan email." });
+          else results.push({
+            id: opp.id,
+            optedInCount: recipientInfo.optedInCount,
+            bookmarkCount: recipientInfo.bookmarkCount,
+            eligibleCount: recipientInfo.eligibleCount,
+            emailNotice: recipientInfo.bookmarkCount === 0
+              ? "Belum ada mahasiswa yang menyimpan peluang H-2 ini."
+              : recipientInfo.optedInCount === 0
+                ? "Belum ada mahasiswa yang mengaktifkan email di database."
+                : recipientInfo.eligibleCount === 0
+                  ? "Pemegang bookmark peluang H-2 ini belum mengaktifkan email."
+                  : "Akun yang memenuhi syarat tidak memiliki alamat email autentikasi.",
+          });
         } catch (e) {
           console.warn("Gagal mengirim email pengingat:", e.message);
           results.push({ id: opp.id, emailError: e.message });

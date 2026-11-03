@@ -13,6 +13,7 @@ import {
     fetchUserProfile,
     saveUserProfile,
     saveEmailAlertPreference,
+    saveDeadlineAlertPreference,
     fetchOpportunitiesFromDb,
     fetchSavedOpportunityIds,
     toggleBookmarkInDb,
@@ -31,6 +32,8 @@ export const defaultProfile = {
 export const demoProfile = defaultProfile;
 
 import { BookmarkNotification } from "@/script/bookmark-notification";
+import { InAppToast } from "@/script/in-app-toast";
+import { createClient } from "@/lib/supabase/client";
 import {
   SECRET_ADMIN_TOKEN,
   adminProfile,
@@ -63,7 +66,47 @@ export function AppProvider({ children }) {
     const [opportunities, setOpportunities] = useState(initialOpportunities);
     const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
     const [bookmarkNotice, setBookmarkNotice] = useState(null);
+    const [notifications, setNotifications] = useState([]);
+    const [notificationToast, setNotificationToast] = useState(null);
     const [ready, setReady] = useState(false);
+    useEffect(() => {
+        if (!ready || !authenticated || isAdminLoggedIn || !profile?.id) {
+            setNotifications([]);
+            return;
+        }
+        const client = createClient();
+        if (!client) return;
+        let active = true;
+        const load = async () => {
+            const { data, error } = await client.from("in_app_notifications")
+                .select("id, kind, title, body, href, created_at, read_at")
+                .eq("user_id", profile.id).order("created_at", { ascending: false }).limit(100);
+            if (active && !error) setNotifications(data || []);
+        };
+        const channel = client.channel(`notifikasi-${profile.id}`)
+            .on("postgres_changes", { event: "INSERT", schema: "public", table: "in_app_notifications", filter: `user_id=eq.${profile.id}` }, ({ new: item }) => {
+                if (!active) return;
+                setNotifications((items) => [item, ...items.filter((old) => old.id !== item.id)].slice(0, 100));
+                setNotificationToast(item);
+            })
+            .subscribe((status) => { if (status === "SUBSCRIBED") load(); });
+        const onFocus = () => load();
+        window.addEventListener("focus", onFocus);
+        return () => { active = false; window.removeEventListener("focus", onFocus); client.removeChannel(channel); };
+    }, [ready, authenticated, isAdminLoggedIn, profile?.id]);
+
+    useEffect(() => {
+        if (!notificationToast) return;
+        const timer = window.setTimeout(() => setNotificationToast(null), 6000);
+        return () => window.clearTimeout(timer);
+    }, [notificationToast]);
+
+    const markNotificationsRead = async () => {
+        const response = await fetch("/api/notify/read", { method: "POST" });
+        if (!response.ok) return;
+        const readAt = new Date().toISOString();
+        setNotifications((items) => items.map((item) => item.read_at ? item : { ...item, read_at: readAt }));
+    };
     useEffect(() => {
         try {
             const raw = localStorage.getItem(storageKey);
@@ -124,10 +167,15 @@ export function AppProvider({ children }) {
                         setIsAdminLoggedIn(Boolean(account.isAdmin));
                         setProfile(account.isAdmin ? adminProfile : account.profile || defaultProfile);
                         setEmailAlerts(account.isAdmin ? false : account.profile?.emailAlerts === true);
+                        if (!account.isAdmin) setDeadlineAlerts(account.profile?.deadlineAlerts !== false);
                         if (account.isAdmin) {
                             try { localStorage.setItem(adminStorageKey, "true"); } catch {}
                         } else {
                             try { localStorage.removeItem(adminStorageKey); } catch {}
+                            window.OneSignalDeferred = window.OneSignalDeferred || [];
+                            window.OneSignalDeferred.push(async (OneSignal) => {
+                                try { await OneSignal.login(account.profile.id); } catch {}
+                            });
                             // Sinkronkan daftar bookmark milik akun mahasiswa ini dari Supabase
                             fetchSavedOpportunityIds().then((savedIds) => {
                                 if (savedIds && Array.isArray(savedIds)) {
@@ -404,8 +452,9 @@ export function AppProvider({ children }) {
                 setSaved([]);
                 try { localStorage.removeItem(adminStorageKey); } catch {}
                 const account = await fetchCurrentAccount();
-                setProfile(account?.profile || { ...defaultProfile, email: res.user?.email || identifier.trim() });
+                setProfile(account?.profile || { ...defaultProfile, id: res.user?.id, email: res.user?.email || identifier.trim() });
                 setEmailAlerts(account?.profile?.emailAlerts === true);
+                setDeadlineAlerts(account?.profile?.deadlineAlerts !== false);
                 if (typeof window !== "undefined" && window.OneSignalDeferred) {
                     window.OneSignalDeferred.push(async function(OneSignal) {
                         try {
@@ -554,11 +603,21 @@ export function AppProvider({ children }) {
         setEmailAlerts(enabled);
         setProfile((current) => ({ ...current, emailAlerts: enabled }));
     };
+    const changeDeadlineAlerts = async (enabled) => {
+        if (isSupabaseConfigured()) await saveDeadlineAlertPreference(enabled);
+        setDeadlineAlerts(enabled);
+        setProfile((current) => ({ ...current, deadlineAlerts: enabled }));
+    };
     const setRegistrationProfile = (newProfile) => setProfile(newProfile);
     const logoutUser = async () => {
         setAuthenticated(false);
         setIsAdminLoggedIn(false);
+        setNotifications([]);
+        setNotificationToast(null);
         try { localStorage.removeItem(adminStorageKey); } catch {}
+        if (typeof window !== "undefined" && window.OneSignalDeferred) {
+            window.OneSignalDeferred.push(async (OneSignal) => { try { await OneSignal.logout(); } catch {} });
+        }
         if (isSupabaseConfigured()) {
             try { await signOutUser(); } catch {}
         }
@@ -601,6 +660,8 @@ export function AppProvider({ children }) {
       saved,
       toggleSaved,
       bookmarkNotice,
+      notifications,
+      markNotificationsRead,
       setBookmarkNotice,
       locale,
       setLocale,
@@ -608,6 +669,7 @@ export function AppProvider({ children }) {
       setTheme,
       deadlineAlerts,
       setDeadlineAlerts,
+      changeDeadlineAlerts,
       emailAlerts,
       changeEmailAlerts,
       emailConsentDecided,
@@ -629,6 +691,7 @@ export function AppProvider({ children }) {
     }}>
       {isProtectedPage(pathname) && (!ready || !authenticated) ? null : children}
       <BookmarkNotification notice={bookmarkNotice} onDismiss={() => setBookmarkNotice(null)} />
+      <InAppToast notification={notificationToast} onDismiss={() => setNotificationToast(null)} />
     </AppContext.Provider>);
 }
 export function useApp() {

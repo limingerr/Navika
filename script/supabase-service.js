@@ -173,6 +173,7 @@ export async function fetchUserProfile() {
   if (error || !data) return null;
 
   return {
+    id: authData.user.id,
     name: data.name || "",
     email: authData.user.email || "",
     university: data.university || "",
@@ -181,7 +182,19 @@ export async function fetchUserProfile() {
     gpa: data.gpa ? String(data.gpa) : "",
     interest: Array.isArray(data.interests) ? data.interests.join(", ") : "",
     emailAlerts: data.email_alerts === true,
+    deadlineAlerts: data.deadline_alerts !== false,
   };
+}
+
+export async function saveDeadlineAlertPreference(enabled) {
+  const supabase = getSupabase();
+  if (!supabase) throw new Error("Database tidak tersedia.");
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+  if (authError || !authData?.user) throw new Error("Sesi pengguna tidak tersedia.");
+  const { data, error } = await supabase.from("profiles")
+    .update({ deadline_alerts: enabled }).eq("user_id", authData.user.id).select("user_id");
+  if (error) throw error;
+  if (!data?.length) throw new Error("Profil pengguna tidak ditemukan.");
 }
 
 export async function saveEmailAlertPreference(enabled) {

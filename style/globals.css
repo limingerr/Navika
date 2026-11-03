@@ -211,12 +211,21 @@ button:active, a:active {
 }
 
 .main-nav .nav-icon {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 22px;
   height: 22px;
 }
+
+.notification-badge { position: absolute; top: -9px; right: -14px; min-width: 18px; height: 18px; padding: 0 3px; border-radius: 9px; background: #b42318; color: #fff; font-size: 10px; line-height: 18px; text-align: center; }
+.in-app-toast { position: fixed; z-index: 1100; top: 16px; right: 16px; width: min(360px, calc(100vw - 32px)); padding: 16px; border: 1px solid var(--garis); border-radius: 14px; background: var(--warna-kartu, #fff); color: var(--teks); box-shadow: 0 12px 30px rgba(0,0,0,.16); }
+.in-app-toast p { margin: 8px 0 14px; line-height: 1.5; }
+.in-app-toast div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.in-app-toast a { color: var(--biru-aksi); font-weight: 700; }
+.in-app-toast button { border: 0; background: transparent; color: var(--teks-redup); cursor: pointer; }
+:root[data-theme="dark"] .in-app-toast { background: #16202b; color: #f4f7fb; border-color: #344455; }
 
 .main-nav .nav-icon svg {
   display: block;

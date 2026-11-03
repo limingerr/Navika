@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { sendDeadlineReminderEmail } from "@/script/email-service";
 import { getNotificationRecipients, getSupabaseAdmin } from "@/lib/supabase/admin";
 import { isAuthorizedAdmin } from "@/lib/supabase/require-admin";
-import { isPushAccepted } from "@/script/notification-status";
 import { deadlineTarget, jakartaDateAfterDays } from "@/script/notification-targets";
+import { getBookmarkedStudentIds, getDeadlineRecipientIds, storeNotifications } from "@/script/in-app-service";
+import { sendPushToUsers } from "@/script/push-service";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -30,7 +31,7 @@ export async function GET(request) {
       Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
 
     // 2. Hitung target tanggal H-2 (2 hari dari sekarang)
-    const dateStr = jakartaDateAfterDays(new Date(), 2);
+    const targetDates = new Map([2, 1, 0].map((days) => [jakartaDateAfterDays(new Date(), days), days]));
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://navika-pi.vercel.app";
     const opportunitiesToNotify = [];
@@ -51,65 +52,60 @@ export async function GET(request) {
               primary_category:categories!primary_category_id (name)
             )
           `)
-          .eq("local_date", dateStr);
+          .in("local_date", [...targetDates.keys()]);
     if (error || !Array.isArray(deadlines)) throw error || new Error("Deadline tidak dapat dibaca dari database.");
     for (const item of deadlines) {
       const opp = item.opportunity;
-      if (opp?.publication_status === "terbit") opportunitiesToNotify.push(deadlineTarget(opp));
+      if (opp?.publication_status === "terbit") opportunitiesToNotify.push({ ...deadlineTarget(opp), daysBefore: targetDates.get(item.local_date), targetDate: item.local_date });
     }
 
     if (opportunitiesToNotify.length === 0) {
       return NextResponse.json({
         success: true,
-        message: `Tidak ada peluang dengan deadline H-2 (${dateStr}) saat ini.`,
-        date: dateStr,
+        message: "Tidak ada peluang dengan deadline H-2, H-1, atau hari H.",
+        dates: [...targetDates.keys()],
         totalSent: 0,
         totalOpportunities: 0,
         totalPushSent: 0,
+        totalWebStored: 0,
         totalEmailSent: 0,
         results: [],
       });
     }
 
-    if (!isOneSignalConfigured && !isEmailConfigured) {
-      return NextResponse.json({ success: false, error: "Layanan email dan OneSignal belum dikonfigurasi." }, { status: 503 });
-    }
-
     // 5. Kirim Push Notification & Email untuk tiap peluang yang deadline-nya H-2
     let sentCount = 0;
     let emailSentCount = 0;
+    let webStoredCount = 0;
     const results = [];
 
     for (const opp of opportunitiesToNotify) {
+      const stage = opp.daysBefore === 0 ? "hari H" : `H-${opp.daysBefore}`;
+      let recipientIds;
+      let webStored = 0;
+      let webError = null;
+      try {
+        recipientIds = await getDeadlineRecipientIds(opp.databaseId, supabase);
+        webStored = await storeNotifications({
+          userIds: recipientIds, kind: "deadline", title: `Deadline ${stage}: ${opp.title}`,
+          body: `Pendaftaran ${opp.title} ditutup ${opp.daysBefore === 0 ? "hari ini" : `dalam ${opp.daysBefore} hari`}.`,
+          href: `/peluang/${encodeURIComponent(opp.id)}`, admin: supabase,
+        });
+      } catch (error) {
+        webError = `Notifikasi web gagal disimpan: ${error.message}`;
+        recipientIds ||= await getBookmarkedStudentIds(opp.databaseId, supabase);
+      }
+      webStoredCount += webStored;
+      results.push({ id: opp.id, stage, webStored, webError });
       // 5a. Push Notification OneSignal (jika dikonfigurasi)
       if (isOneSignalConfigured) {
         try {
-          const payload = {
-            app_id: onesignalAppId,
-            included_segments: ["Subscribed Users"],
-            headings: {
-              id: `⏳ Deadline H-2: ${opp.title}`,
-              en: `⏳ Deadline in 2 Days: ${opp.title}`,
-            },
-            contents: {
-              id: `Pendaftaran ${opp.category} "${opp.title}" (${opp.organization}) ditutup dalam 2 hari. Segera lengkapi berkas pendaftaranmu!`,
-              en: `Registration for ${opp.category} "${opp.title}" closes in 2 days. Complete your application now!`,
-            },
-            url: `${siteUrl}/peluang/${opp.id}`,
-          };
-
-          const response = await fetch("https://api.onesignal.com/notifications", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Key ${onesignalRestKey}`,
-            },
-            body: JSON.stringify(payload),
-          });
-
-          const data = await response.json();
-          results.push({ id: opp.id, pushStatus: response.status, pushMessageId: data?.id || null, pushError: isPushAccepted(response, data) ? null : String(data?.errors || "").includes("All included players are not subscribed") ? "OneSignal tidak menemukan perangkat berlangganan pada aplikasi pengirim." : data?.errors || (response.ok ? "Tidak ada langganan push yang menerima pesan." : `OneSignal HTTP ${response.status}`) });
-          if (isPushAccepted(response, data)) sentCount++;
+          const push = await sendPushToUsers({ userIds: recipientIds,
+            headings: { id: `Deadline ${stage}: ${opp.title}`, en: `Deadline ${stage}: ${opp.title}` },
+            contents: { id: `Pendaftaran ${opp.title} ditutup ${opp.daysBefore === 0 ? "hari ini" : `dalam ${opp.daysBefore} hari`}.`, en: `Registration for ${opp.title} closes soon.` },
+            url: `${siteUrl}/peluang/${encodeURIComponent(opp.id)}` });
+          results.push({ id: opp.id, stage, pushRecipients: push.recipients, pushError: push.error });
+          sentCount += push.count;
         } catch (e) {
           results.push({ id: opp.id, pushError: e.message });
         }
@@ -133,7 +129,8 @@ export async function GET(request) {
             const emailRes = await sendDeadlineReminderEmail({
               to: recipientInfo.emails,
               opportunity: opp,
-              targetDate: dateStr,
+              targetDate: opp.targetDate,
+              daysBefore: opp.daysBefore,
               siteUrl,
             });
             if (emailRes.success) {
@@ -179,10 +176,11 @@ export async function GET(request) {
 
     return NextResponse.json({
       success: true,
-      message: `Cron job H-2 berhasil diproses untuk tanggal ${dateStr}.`,
-      date: dateStr,
+      message: "Pengingat H-2, H-1, dan hari H selesai diproses.",
+      dates: [...targetDates.keys()],
       totalOpportunities: opportunitiesToNotify.length,
       totalPushSent: sentCount,
+      totalWebStored: webStoredCount,
       totalEmailSent: emailSentCount,
       results,
     });

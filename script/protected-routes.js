@@ -1,4 +1,4 @@
-const privatePaths = ["/pengaturan", "/profil", "/tersimpan", "/dashboard", "/kalender"];
+const privatePaths = ["/pengaturan", "/profil", "/tersimpan", "/dashboard", "/kalender", "/notifikasi"];
 
 export function isProtectedPage(pathname) {
   return privatePaths.some((path) => pathname === path || pathname.startsWith(`${path}/`));

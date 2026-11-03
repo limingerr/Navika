@@ -13,6 +13,8 @@ test("target H-2 memisahkan UUID bookmark dan slug tautan", () => {
 
 test("tanggal H-2 mengikuti hari di Jakarta", () => {
   assert.equal(jakartaDateAfterDays(new Date("2026-11-02T17:30:00Z"), 2), "2026-11-05");
+  assert.equal(jakartaDateAfterDays(new Date("2026-11-02T17:30:00Z"), 1), "2026-11-04");
+  assert.equal(jakartaDateAfterDays(new Date("2026-11-02T17:30:00Z"), 0), "2026-11-03");
 });
 
 test("sendEmail menolak penerima kosong secara aman", async () => {

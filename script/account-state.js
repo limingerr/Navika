@@ -3,6 +3,7 @@ export function resolveAccount(user, role, profile) {
   return {
     isAdmin,
     profile: isAdmin ? null : {
+      id: user.id,
       name: profile?.name || user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0] || "Mahasiswa",
       email: user.email || "",
       university: profile?.university || "",
@@ -11,6 +12,7 @@ export function resolveAccount(user, role, profile) {
       gpa: profile?.gpa ? String(profile.gpa) : "",
       interest: Array.isArray(profile?.interests) ? profile.interests.join(", ") : "",
       emailAlerts: profile?.email_alerts === true,
+      deadlineAlerts: profile?.deadline_alerts !== false,
     },
   };
 }

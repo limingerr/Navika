@@ -478,7 +478,7 @@ export function AdminPeluangTable() {
         if (data.success) {
           const emailStatus = data.email?.sent ? `${data.email.totalSent} email diterima penyedia${data.email.failedCount ? `, ${data.email.failedCount} gagal` : ""}` : `email: ${data.email?.error || "tidak ada penerima"}`;
           const pushStatus = data.push?.sent ? "pesan push dibuat di OneSignal; periksa penerima dan pengiriman di OneSignal" : `push: ${data.push?.error || "belum ada perangkat yang berlangganan; mahasiswa perlu mengaktifkan Web Push di Pengaturan Notifikasi"}`;
-          showToast(`${emailStatus}; ${pushStatus}.`);
+          showToast(`${data.web?.stored || 0} notifikasi web tersimpan${data.web?.error ? ` (${data.web.error})` : ""}; ${emailStatus}; ${pushStatus}.`);
           setShowBroadcastModal(false);
         } else {
           showToast(data.error || "Gagal menyiarkan notifikasi.");
@@ -490,14 +490,15 @@ export function AdminPeluangTable() {
         });
         const data = await res.json();
         if (data.success) {
-          const failures = (data.results || []).filter((item) => item.pushError || item.emailError).length;
+          const failures = (data.results || []).filter((item) => item.pushError || item.emailError || item.webError).length;
           const emailNote = data.totalEmailSent ? "" : (data.results || []).find((item) => item.emailError || item.emailNotice);
           const pushNote = data.totalPushSent ? "" : (data.results || []).find((item) => item.pushError || item.pushNotice);
           const emailCounts = emailNote?.bookmarkCount == null ? "" : ` (${emailNote.bookmarkCount} bookmark, ${emailNote.optedInCount} akun email aktif, ${emailNote.eligibleCount} memenuhi keduanya)`;
-          const reason = [emailNote ? `${emailNote.id}: ${emailNote.emailError || emailNote.emailNotice}${emailCounts}` : "", pushNote?.pushError || pushNote?.pushNotice].filter(Boolean).join("; ");
+          const webNote = (data.results || []).find((item) => item.webError);
+          const reason = [webNote?.webError, emailNote ? `${emailNote.id}: ${emailNote.emailError || emailNote.emailNotice}${emailCounts}` : "", pushNote?.pushError || pushNote?.pushNotice].filter(Boolean).join("; ");
           showToast(data.totalOpportunities === 0
-            ? "Pemeriksaan H-2 selesai: tidak ada peluang dengan deadline H-2."
-            : `H-2 diproses: ${data.totalEmailSent || 0} email diterima penyedia, ${data.totalPushSent || 0} pesan dibuat di OneSignal${reason ? `; ${reason}` : failures ? `; ${failures} hasil perlu diperiksa` : ""}.`);
+            ? "Tidak ada peluang dengan deadline H-2, H-1, atau hari H."
+            : `Pengingat diproses: ${data.totalWebStored || 0} notifikasi web tersimpan, ${data.totalEmailSent || 0} email diterima penyedia, ${data.totalPushSent || 0} pesan dibuat di OneSignal${reason ? `; ${reason}` : failures ? `; ${failures} hasil perlu diperiksa` : ""}.`);
           setShowBroadcastModal(false);
         } else {
           showToast(data.error || "Gagal memicu pengingat deadline.");
@@ -822,7 +823,7 @@ export function AdminPeluangTable() {
                     className={`admin-btn admin-btn-sm ${broadcastType === "deadline" ? "admin-btn-primary" : "admin-btn-secondary"}`}
                     style={{ flex: 1, justifyContent: "center" }}
                   >
-                    ⏰ Pengingat Deadline (H-2)
+                    ⏰ Pengingat Deadline (H-2, H-1, Hari H)
                   </button>
                 </div>
               </div>
@@ -872,7 +873,7 @@ export function AdminPeluangTable() {
               ) : (
                 <div style={{ background: "#f8fafc", padding: "14px", borderRadius: "10px", border: "1px solid #e2e8f0", marginBottom: "16px" }}>
                   <p style={{ margin: "0 0 8px", fontSize: "13px", color: "var(--teks)" }}>
-                    Sistem akan memindai seluruh katalog peluang aktif dan mengirimkan notifikasi <strong>Pop-up & Email Pengingat Deadline</strong> kepada mahasiswa untuk program yang batas pendaftarannya ditutup dalam <strong>2 hari ke depan (H-2)</strong>.
+                    Sistem akan mengirimkan pengingat H-2, H-1, dan hari H kepada mahasiswa yang menyimpan peluang dan mengaktifkan pengingat.
                   </p>
                   <small style={{ color: "#ea580c", fontWeight: 600 }}>
                     💡 Notifikasi ini juga berjalan otomatis setiap hari via server cron.

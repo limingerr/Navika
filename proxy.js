@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
+import { isProtectedPage } from "@/script/protected-routes";
 
 /**
  * Next.js 16 Proxy (Konvensi baru menggantikan middleware.js).
@@ -7,6 +8,12 @@ import { NextResponse } from "next/server";
  * dan menegakkan proteksi keamanan ketat untuk rute /admin/*.
  */
 export async function proxy(request) {
+  const protectedPage = isProtectedPage(request.nextUrl.pathname);
+  const loginRedirect = () => {
+    const loginUrl = new URL("/masuk", request.url);
+    loginUrl.searchParams.set("redirect", `${request.nextUrl.pathname}${request.nextUrl.search}`);
+    return NextResponse.redirect(loginUrl);
+  };
   // 1. Proteksi ketat rute /admin/* di level server sebelum merender halaman
   if (request.nextUrl.pathname.startsWith("/admin")) {
     const adminSession = request.cookies.get("navika_admin_session")?.value;
@@ -29,7 +36,7 @@ export async function proxy(request) {
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
-    return response;
+    return protectedPage ? loginRedirect() : response;
   }
 
   try {
@@ -53,9 +60,10 @@ export async function proxy(request) {
     });
 
     // Refresh sesi jika sudah mendekati masa kedaluwarsa
-    await supabase.auth.getUser();
+    const { data, error } = await supabase.auth.getUser();
+    if (protectedPage && (error || !data?.user)) return loginRedirect();
   } catch (error) {
-    // Jika koneksi gagal, jangan blokir request
+    if (protectedPage) return loginRedirect();
   }
 
   return response;

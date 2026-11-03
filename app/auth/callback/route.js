@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { safeRedirectPath } from "@/script/protected-routes";
 
 export async function GET(request) {
-  const code = new URL(request.url).searchParams.get("code");
+  const params = new URL(request.url).searchParams;
+  const code = params.get("code");
+  const redirectPath = safeRedirectPath(request.cookies.get("navika_auth_redirect")?.value);
   if (!code) {
     return NextResponse.redirect(new URL("/masuk?oauth=failed", request.url));
   }
@@ -36,5 +39,7 @@ export async function GET(request) {
     return NextResponse.redirect(new URL("/masuk?oauth=failed", request.url));
   }
 
-  return NextResponse.redirect(new URL("/dashboard", request.url));
+  const response = NextResponse.redirect(new URL(redirectPath || "/dashboard", request.url));
+  response.cookies.set("navika_auth_redirect", "", { path: "/auth", maxAge: 0 });
+  return response;
 }

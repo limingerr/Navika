@@ -1,5 +1,7 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { isProtectedPage } from "@/script/protected-routes";
 import { resolveTheme, translate } from "@/script/i18n";
 import { calendarFilters, opportunities as initialOpportunities } from "@/script/opportunities";
 import { adminEmailForIdentifier } from "@/script/admin-identity";
@@ -19,7 +21,7 @@ import {
 } from "@/script/supabase-service";
 export const defaultProfile = {
     name: "Mahasiswa",
-    email: "mahasiswa@navika.id",
+    email: "",
     university: "",
     major: "",
     semester: "",
@@ -47,8 +49,11 @@ const oppsStorageKey = "navika-opportunities-custom-v1";
 const adminStorageKey = "navika-admin-session-v1";
 
 export function AppProvider({ children }) {
+    const pathname = usePathname();
+    const router = useRouter();
     const [profile, setProfile] = useState(demoProfile);
-    const [saved, setSaved] = useState(["djarum", "vinix7", "kip-kuliah"]);
+    const [saved, setSaved] = useState([]);
+    const [authenticated, setAuthenticated] = useState(false);
     const [locale, setLocale] = useState("id");
     const [theme, setTheme] = useState("light");
     const [deadlineAlerts, setDeadlineAlerts] = useState(true);
@@ -66,7 +71,7 @@ export function AppProvider({ children }) {
                 const parsed = JSON.parse(raw);
                 if (!isSupabaseConfigured() && parsed.profile && typeof parsed.profile === "object")
                     setProfile({ ...demoProfile, ...parsed.profile });
-                if (Array.isArray(parsed.saved))
+                if (!isSupabaseConfigured() && Array.isArray(parsed.saved))
                     setSaved(parsed.saved.filter((id) => typeof id === "string"));
                 if (parsed.locale === "id" || parsed.locale === "en")
                     setLocale(parsed.locale);
@@ -114,6 +119,8 @@ export function AppProvider({ children }) {
 
                 fetchCurrentAccount().then((account) => {
                     if (account) {
+                        setAuthenticated(true);
+                        setSaved([]);
                         setIsAdminLoggedIn(Boolean(account.isAdmin));
                         setProfile(account.isAdmin ? adminProfile : account.profile || defaultProfile);
                         setEmailAlerts(account.isAdmin ? false : account.profile?.emailAlerts === true);
@@ -129,12 +136,14 @@ export function AppProvider({ children }) {
                             }).catch(() => {});
                         }
                     } else if (adminRaw !== "true") {
+                        setAuthenticated(false);
                         setIsAdminLoggedIn(false);
                         setProfile(defaultProfile);
                         setEmailAlerts(false);
                     }
                 }).catch(() => {
                     if (adminRaw !== "true") {
+                        setAuthenticated(false);
                         setIsAdminLoggedIn(false);
                         setProfile(defaultProfile);
                         setEmailAlerts(false);
@@ -148,6 +157,12 @@ export function AppProvider({ children }) {
         }
         if (!isSupabaseConfigured()) setReady(true);
     }, []);
+    useEffect(() => {
+        if (ready && isProtectedPage(pathname) && !authenticated) {
+            const destination = `${pathname}${window.location.search}`;
+            router.replace(`/masuk?redirect=${encodeURIComponent(destination)}`);
+        }
+    }, [ready, authenticated, pathname, router]);
     useEffect(() => {
         if (!ready)
             return;
@@ -368,6 +383,7 @@ export function AppProvider({ children }) {
                 return { error: res.error || "Email/ID atau kata sandi tidak valid." };
             }
             if (res.role === "admin") {
+                setAuthenticated(true);
                 setIsAdminLoggedIn(true);
                 try { localStorage.setItem(adminStorageKey, "true"); } catch {}
                 setProfile(adminProfile);
@@ -383,7 +399,9 @@ export function AppProvider({ children }) {
                 } catch {}
                 return { role: "admin" };
             } else {
+                setAuthenticated(true);
                 setIsAdminLoggedIn(false);
+                setSaved([]);
                 try { localStorage.removeItem(adminStorageKey); } catch {}
                 const account = await fetchCurrentAccount();
                 setProfile(account?.profile || { ...defaultProfile, email: res.user?.email || identifier.trim() });
@@ -399,9 +417,7 @@ export function AppProvider({ children }) {
                 }
                 try {
                     const savedFromDb = await fetchSavedOpportunityIds();
-                    if (savedFromDb && savedFromDb.length > 0) {
-                        setSaved((prev) => Array.from(new Set([...(prev || []), ...savedFromDb])));
-                    }
+                    setSaved(savedFromDb || []);
                 } catch {}
                 return { role: "mahasiswa" };
             }
@@ -411,6 +427,7 @@ export function AppProvider({ children }) {
         if (isAdminIdentifier(identifier)) {
             return { error: "Kata sandi admin tidak valid." };
         } else {
+            setAuthenticated(true);
             setIsAdminLoggedIn(false);
             try {
                 localStorage.removeItem(adminStorageKey);
@@ -532,6 +549,7 @@ export function AppProvider({ children }) {
     };
     const setRegistrationProfile = (newProfile) => setProfile(newProfile);
     const logoutUser = async () => {
+        setAuthenticated(false);
         setIsAdminLoggedIn(false);
         try { localStorage.removeItem(adminStorageKey); } catch {}
         if (isSupabaseConfigured()) {
@@ -553,6 +571,7 @@ export function AppProvider({ children }) {
     };
 
     const clearDemo = () => {
+        setAuthenticated(false);
         setProfile(demoProfile);
         setEmailAlerts(false);
         setSaved([]);
@@ -601,7 +620,7 @@ export function AppProvider({ children }) {
       logoutAdmin,
       clearAdminSession,
     }}>
-      {children}
+      {isProtectedPage(pathname) && (!ready || !authenticated) ? null : children}
       <BookmarkNotification notice={bookmarkNotice} onDismiss={() => setBookmarkNotice(null)} />
     </AppContext.Provider>);
 }

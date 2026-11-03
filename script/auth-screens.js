@@ -7,6 +7,7 @@ import { useApp, useTr } from "@/script/app-provider";
 import { Brand, DemoNote } from "@/script/ui";
 import { isSupabaseConfigured, signUpUser } from "@/script/supabase-service";
 import { isAllowedRegistrationEmail } from "@/script/account-state";
+import { safeRedirectPath } from "@/script/protected-routes";
 function AuthHero({ kind }) {
     const tr = useTr();
     return <div className="auth-hero"><img src={`/asset/asset-ilustrasi-${kind === "login" ? "masuk" : "daftar"}.png`} alt={kind === "login" ? tr("Ilustrasi mahasiswa menggunakan laptop", "Illustration of a student using a laptop") : tr("Ilustrasi mahasiswa membawa buku", "Illustration of a student carrying books")}/></div>;
@@ -14,13 +15,15 @@ function AuthHero({ kind }) {
 function GoogleAuthLink({ action }) {
     const tr = useTr();
     const [failed, setFailed] = useState(false);
+    const [redirectPath, setRedirectPath] = useState(null);
     useEffect(() => {
         setFailed(new URLSearchParams(window.location.search).get("oauth") === "failed");
+        setRedirectPath(safeRedirectPath(new URLSearchParams(window.location.search).get("redirect")));
     }, []);
     const available = process.env.NEXT_PUBLIC_SUPABASE_URL &&
         (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
     if (!available) return null;
-    return <div className="google-auth"><p className="google-auth-divider">{tr("atau", "or")}</p><a className="google-auth-link" href="/auth/google"><img src="/asset/google-icon.svg" alt="" width="20" height="20"/>{action === "login" ? tr("Masuk dengan Google", "Sign in with Google") : tr("Daftar dengan Google", "Sign up with Google")}</a>{action === "login" && failed && <p className="form-error" role="alert">{tr("Login Google gagal atau dibatalkan. Coba lagi.", "Google sign-in failed or was cancelled. Try again.")}</p>}</div>;
+    return <div className="google-auth"><p className="google-auth-divider">{tr("atau", "or")}</p><a className="google-auth-link" href={redirectPath ? `/auth/google?redirect=${encodeURIComponent(redirectPath)}` : "/auth/google"}><img src="/asset/google-icon.svg" alt="" width="20" height="20"/>{action === "login" ? tr("Masuk dengan Google", "Sign in with Google") : tr("Daftar dengan Google", "Sign up with Google")}</a>{action === "login" && failed && <p className="form-error" role="alert">{tr("Login Google gagal atau dibatalkan. Coba lagi.", "Google sign-in failed or was cancelled. Try again.")}</p>}</div>;
 }
 export function LandingScreen() {
     const tr = useTr();
@@ -49,7 +52,8 @@ export function LoginScreen() {
         if (result?.role === "admin") {
             router.push("/admin");
         } else {
-            router.push("/dashboard");
+            const destination = safeRedirectPath(new URLSearchParams(window.location.search).get("redirect"));
+            router.push(destination || "/dashboard");
         }
     };
     return <main className="auth-page page-width"><Brand /><div className="auth-layout"><div><AuthHero kind="login"/><div className="auth-intro"><h1>{tr("Temukan peluang yang sesuai untukmu", "Find opportunities that suit you")}</h1><p>{tr("Masuk untuk melanjutkan ke akun NAVIKA.", "Sign in to continue to your NAVIKA account.")}</p><DemoNote /></div></div><div className="auth-controls"><form className="auth-form" onSubmit={handleSubmit}><label htmlFor="identifier">{tr("Email", "Email")}</label><input id="identifier" type="text" placeholder="nama@email.com" value={identifier} onChange={(e) => { setIdentifier(e.target.value); setError(""); }} autoComplete="username" required/><label htmlFor="password">{tr("Kata Sandi", "Password")}</label><div className="password-field"><input id="password" type={showPassword ? "text" : "password"} placeholder={tr("Masukkan kata sandi", "Enter password")} value={password} onChange={(e) => { setPassword(e.target.value); setError(""); }} autoComplete="current-password" required/><button type="button" className="password-toggle" onClick={() => setShowPassword((shown) => !shown)} aria-label={showPassword ? tr("Sembunyikan kata sandi", "Hide password") : tr("Lihat kata sandi", "Show password")} aria-pressed={showPassword}>{showPassword ? <EyeClosed aria-hidden="true" /> : <Eye aria-hidden="true" />}</button></div>{error && <p className="form-error" role="alert">{error}</p>}<button className="primary-button" type="submit">{tr("Masuk", "Sign In")}</button></form><GoogleAuthLink action="login"/><p className="auth-switch">{tr("Belum punya akun?", "No account yet?")} <Link href="/daftar">{tr("Daftar", "Sign Up")}</Link></p></div></div></main>;

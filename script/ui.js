@@ -31,8 +31,6 @@ export function DemoNote() {
 export function MainNav() {
     const pathname = usePathname();
     const tr = useTr();
-    const { notifications } = useApp();
-    const unread = notifications.filter((item) => !item.read_at).length;
     const items = [
         {
             href: "/dashboard",
@@ -56,16 +54,6 @@ export function MainNav() {
             ),
         },
         {
-            href: "/notifikasi",
-            label: tr("Notifikasi", "Notifications"),
-            icon: "notification",
-            svg: (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4"/>
-                </svg>
-            ),
-        },
-        {
             href: "/profil",
             label: tr("Profil", "Profile"),
             icon: "profile",
@@ -79,7 +67,7 @@ export function MainNav() {
     ];
     return <nav className="main-nav" aria-label={tr("Navigasi utama", "Main navigation")}>{items.map((item) => {
             const active = pathname === item.href || (item.href === "/dashboard" && (pathname.startsWith("/peluang") || pathname === "/kalender")) || (item.href === "/profil" && (pathname.startsWith("/profil/") || pathname.startsWith("/pengaturan")));
-            return <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} aria-label={item.icon === "notification" && unread > 0 ? `${item.label}, ${unread} belum dibaca` : undefined} className={active ? "active" : ""}><span className={`nav-icon nav-icon-${item.icon}`} aria-hidden="true">{item.svg}{item.icon === "notification" && unread > 0 && <span className="notification-badge">{unread > 99 ? "99+" : unread}</span>}</span><span>{item.label}</span></Link>;
+            return <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={active ? "active" : ""}><span className={`nav-icon nav-icon-${item.icon}`} aria-hidden="true">{item.svg}</span><span>{item.label}</span></Link>;
         })}</nav>;
 }
 export function AppShell({ children, className = "" }) {

@@ -93,8 +93,10 @@ export async function GET(request) {
         });
       } catch (error) {
         webError = `Notifikasi web gagal disimpan: ${error.message}`;
+        console.warn(`${opp.id} ${stage}: ${webError}`);
         recipientIds ||= await getBookmarkedStudentIds(opp.databaseId, supabase);
       }
+      if (!recipientIds.length) console.warn(`Pengingat ${stage} ${opp.id}: tidak ada pemegang bookmark dengan pengingat aktif.`);
       webStoredCount += webStored;
       results.push({ id: opp.id, stage, webStored, webError });
       // 5a. Push Notification OneSignal (jika dikonfigurasi)

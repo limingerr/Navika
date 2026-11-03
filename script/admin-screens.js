@@ -476,9 +476,9 @@ export function AdminPeluangTable() {
         });
         const data = await res.json();
         if (data.success) {
-          const emailStatus = data.email?.sent ? `${data.email.totalSent} email diterima penyedia${data.email.failedCount ? `, ${data.email.failedCount} gagal` : ""}` : `email: ${data.email?.error || "tidak ada penerima"}`;
-          const pushStatus = data.push?.sent ? "pesan push dibuat di OneSignal; periksa penerima dan pengiriman di OneSignal" : `push: ${data.push?.error || "belum ada perangkat yang berlangganan; mahasiswa perlu mengaktifkan Web Push di Pengaturan Notifikasi"}`;
-          showToast(`${data.web?.stored || 0} notifikasi web tersimpan${data.web?.error ? ` (${data.web.error})` : ""}; ${emailStatus}; ${pushStatus}.`);
+          showToast(data.web?.stored > 0
+            ? "Siaran berhasil dikirim ke notifikasi web mahasiswa."
+            : "Siaran diproses, tetapi notifikasi web belum terkirim. Periksa konfigurasi penerima dan database.");
           setShowBroadcastModal(false);
         } else {
           showToast(data.error || "Gagal menyiarkan notifikasi.");
@@ -490,15 +490,11 @@ export function AdminPeluangTable() {
         });
         const data = await res.json();
         if (data.success) {
-          const failures = (data.results || []).filter((item) => item.pushError || item.emailError || item.webError).length;
-          const emailNote = data.totalEmailSent ? "" : (data.results || []).find((item) => item.emailError || item.emailNotice);
-          const pushNote = data.totalPushSent ? "" : (data.results || []).find((item) => item.pushError || item.pushNotice);
-          const emailCounts = emailNote?.bookmarkCount == null ? "" : ` (${emailNote.bookmarkCount} bookmark, ${emailNote.optedInCount} akun email aktif, ${emailNote.eligibleCount} memenuhi keduanya)`;
-          const webNote = (data.results || []).find((item) => item.webError);
-          const reason = [webNote?.webError, emailNote ? `${emailNote.id}: ${emailNote.emailError || emailNote.emailNotice}${emailCounts}` : "", pushNote?.pushError || pushNote?.pushNotice].filter(Boolean).join("; ");
           showToast(data.totalOpportunities === 0
             ? "Tidak ada peluang dengan deadline H-2, H-1, atau hari H."
-            : `Pengingat diproses: ${data.totalWebStored || 0} notifikasi web tersimpan, ${data.totalEmailSent || 0} email diterima penyedia, ${data.totalPushSent || 0} pesan dibuat di OneSignal${reason ? `; ${reason}` : failures ? `; ${failures} hasil perlu diperiksa` : ""}.`);
+            : data.totalWebStored > 0
+              ? "Pengingat berhasil dikirim ke notifikasi web mahasiswa yang memenuhi syarat."
+              : "Pengingat diproses, tetapi notifikasi web belum terkirim. Periksa bookmark dan pengaturan pengingat mahasiswa.");
           setShowBroadcastModal(false);
         } else {
           showToast(data.error || "Gagal memicu pengingat deadline.");

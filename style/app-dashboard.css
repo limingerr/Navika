@@ -185,6 +185,8 @@
   gap: 2px;
 }
 
+.page-dashboard .dashboard-notification-link { position: relative; }
+
 .page-dashboard .ikon-tombol,
 .page-dashboard .icon-link {
   display: grid;

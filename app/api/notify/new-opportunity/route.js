@@ -17,6 +17,7 @@ export async function broadcastNewOpportunity({ title, organization, category, f
   const categoryName = category || "Peluang";
   const orgName = organization || "Mitra NAVIKA";
   const studentIds = await getStudentIds();
+  if (!studentIds.length) console.warn("Siaran peluang baru: tidak ada profil mahasiswa penerima notifikasi web.");
   let webCount = 0;
   let webError = null;
   try {
@@ -26,6 +27,7 @@ export async function broadcastNewOpportunity({ title, organization, category, f
     });
   } catch (error) {
     webError = `Notifikasi web gagal disimpan: ${error.message}`;
+    console.warn(webError);
   }
 
   let pushSuccess = false;

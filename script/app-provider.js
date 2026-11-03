@@ -77,22 +77,34 @@ export function AppProvider({ children }) {
         const client = createClient();
         if (!client) return;
         let active = true;
+        let loaded = false;
+        let foregroundAt = Date.now();
+        const knownIds = new Set();
         const load = async () => {
             const { data, error } = await client.from("in_app_notifications")
                 .select("id, kind, title, body, href, created_at, read_at")
                 .eq("user_id", profile.id).order("created_at", { ascending: false }).limit(100);
-            if (active && !error) setNotifications(data || []);
+            if (!active || error) return;
+            const fresh = loaded && document.visibilityState === "visible"
+                ? (data || []).find((item) => !knownIds.has(item.id) && new Date(item.created_at).getTime() >= foregroundAt)
+                : null;
+            for (const item of data || []) knownIds.add(item.id);
+            loaded = true;
+            setNotifications(data || []);
+            if (fresh) setNotificationToast(fresh);
         };
         const channel = client.channel(`notifikasi-${profile.id}`)
             .on("postgres_changes", { event: "INSERT", schema: "public", table: "in_app_notifications", filter: `user_id=eq.${profile.id}` }, ({ new: item }) => {
                 if (!active) return;
+                knownIds.add(item.id);
                 setNotifications((items) => [item, ...items.filter((old) => old.id !== item.id)].slice(0, 100));
-                setNotificationToast(item);
+                if (document.visibilityState === "visible") setNotificationToast(item);
             })
             .subscribe((status) => { if (status === "SUBSCRIBED") load(); });
-        const onFocus = () => load();
+        const onFocus = () => { foregroundAt = Date.now(); load(); };
+        const interval = window.setInterval(() => { if (document.visibilityState === "visible") load(); }, 15000);
         window.addEventListener("focus", onFocus);
-        return () => { active = false; window.removeEventListener("focus", onFocus); client.removeChannel(channel); };
+        return () => { active = false; window.clearInterval(interval); window.removeEventListener("focus", onFocus); client.removeChannel(channel); };
     }, [ready, authenticated, isAdminLoggedIn, profile?.id]);
 
     useEffect(() => {

@@ -211,7 +211,8 @@ function CategoryTabs({ selected, onSelect }) {
     return <div className="category-tabs" role="group" aria-label={tr("Kategori peluang", "Opportunity categories")}>{categories.map((item) => <button key={item} type="button" className={selected === item ? "selected" : ""} aria-pressed={selected === item} onClick={() => onSelect(item)}>{categoryLabel(item, locale)}</button>)}</div>;
 }
 export function DashboardScreen() {
-    const { profile, saved, locale, calendarFilter, setCalendarFilter, deadlineAlerts, opportunities = staticOpportunities } = useApp();
+    const { profile, saved, locale, calendarFilter, setCalendarFilter, deadlineAlerts, notifications, opportunities = staticOpportunities } = useApp();
+    const unreadNotifications = notifications.filter((item) => !item.read_at).length;
     const tr = useTr();
     const today = useMemo(() => new Date(), []);
     const [viewMonth, setViewMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
@@ -273,6 +274,10 @@ export function DashboardScreen() {
         <h1 className="nama">{displayName}</h1>
       </div>
       <div className="aksi-kepala">
+        <Link className="ikon-tombol icon-link dashboard-notification-link" href="/notifikasi" aria-label={unreadNotifications ? `${tr("Notifikasi", "Notifications")}, ${unreadNotifications} belum dibaca` : tr("Notifikasi", "Notifications")}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4"/></svg>
+          {unreadNotifications > 0 && <span className="notification-badge" aria-hidden="true">{unreadNotifications > 99 ? "99+" : unreadNotifications}</span>}
+        </Link>
         <Link className="ikon-tombol icon-link" href="/peluang" aria-label={tr("Cari peluang", "Search opportunities")}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
             <circle cx="11" cy="11" r="7" />

@@ -173,6 +173,7 @@ export async function fetchUserProfile() {
   if (error || !data) return null;
 
   return {
+    id: authData.user.id,
     name: data.name || "",
     email: authData.user.email || "",
     university: data.university || "",

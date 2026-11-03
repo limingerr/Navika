@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { LogOut } from "iconoir-react";
 import { useApp, useTr } from "@/script/app-provider";
 import { DemoNote, Icon } from "@/script/ui";
 import { demoDeadline, demoReminders, formatDate, opportunities as staticOpportunities } from "@/script/opportunities";
@@ -13,7 +13,9 @@ function SettingsRow({ href, icon, title, detail, danger = false }) {
     return <Link href={href} className={`settings-row ${danger ? "danger" : ""}`}><span className="settings-icon"><Icon name={icon}/></span><span className="settings-row-copy"><strong>{title}</strong>{detail && <small>{detail}</small>}</span><span className="settings-chevron" aria-hidden="true">›</span></Link>;
 }
 export function SettingsScreen() {
-    const router = useRouter();
+    const logoutDialog = useRef(null);
+    const [loggingOut, setLoggingOut] = useState(false);
+    const [logoutError, setLogoutError] = useState("");
     const { profile, locale, theme, clearDemo, logoutUser, isAdminLoggedIn } = useApp();
     const tr = useTr();
     const displayName = isAdminLoggedIn
@@ -23,14 +25,18 @@ export function SettingsScreen() {
         ? "AD"
         : (profile.name || "M").split(" ").filter(Boolean).slice(0, 3).map((word) => word[0].toUpperCase()).join("");
     const handleLogout = async () => {
-        if (!window.confirm(tr("Apakah Anda yakin ingin keluar dari akun?", "Are you sure you want to sign out?")))
-            return;
-        if (logoutUser) {
-            await logoutUser();
-        } else {
-            clearDemo();
+        setLoggingOut(true);
+        setLogoutError("");
+        try {
+            if (logoutUser) await logoutUser();
+            else clearDemo();
+            logoutDialog.current?.close();
+            window.location.replace("/");
+        } catch {
+            setLogoutError(tr("Gagal keluar dari akun. Coba lagi.", "Could not sign out. Try again."));
+        } finally {
+            setLoggingOut(false);
         }
-        router.push("/");
     };
     return <SettingsLayout title={tr("Pengaturan", "Settings")} subtitle={tr("Kelola akun dan preferensimu.", "Manage your profile and preferences.")} back="/profil">
         <DemoNote />
@@ -52,7 +58,7 @@ export function SettingsScreen() {
             {isAdminLoggedIn && (
                 <SettingsRow href="/admin" icon="setting-gerigi.svg" title={tr("Panel Admin", "Admin Panel")} detail={tr("Kelola katalog peluang & pemeliharaan data", "Manage opportunity catalog & data")} />
             )}
-            <button type="button" className="settings-row danger" onClick={handleLogout}>
+            <button type="button" className="settings-row danger" onClick={() => { setLogoutError(""); logoutDialog.current?.showModal(); }}>
                 <span className="settings-icon"><Icon name="keluar-profile.svg" /></span>
                 <span className="settings-row-copy">
                     <strong>{tr("Keluar", "Sign Out")}</strong>
@@ -61,6 +67,16 @@ export function SettingsScreen() {
                 <span className="settings-chevron" aria-hidden="true">›</span>
             </button>
         </div>
+        <dialog ref={logoutDialog} className="settings-logout-dialog" aria-labelledby="logout-title" aria-describedby="logout-description" onCancel={(event) => { if (loggingOut) event.preventDefault(); }}>
+            <span className="settings-logout-icon" aria-hidden="true"><LogOut width={28} height={28} strokeWidth={2} /></span>
+            <h2 id="logout-title">{tr("Keluar dari akun?", "Sign out of your account?")}</h2>
+            <p id="logout-description">{tr("Kamu perlu masuk lagi untuk membuka halaman akunmu.", "You'll need to sign in again to open your account pages.")}</p>
+            {logoutError && <p className="settings-logout-error" role="alert">{logoutError}</p>}
+            <div className="settings-logout-actions">
+                <button type="button" className="settings-logout-cancel" autoFocus disabled={loggingOut} onClick={() => logoutDialog.current?.close()}>{tr("Batal", "Cancel")}</button>
+                <button type="button" className="settings-logout-confirm" disabled={loggingOut} onClick={handleLogout}>{loggingOut ? tr("Keluar...", "Signing out...") : tr("Keluar", "Sign out")}</button>
+            </div>
+        </dialog>
         <p className="settings-footer">NAVIKA · {tr("Dibuat untuk mahasiswa Indonesia", "Made for students in Indonesia")}</p>
     </SettingsLayout>;
 }

@@ -1,4 +1,4 @@
-import { AdminLayout } from "@/script/admin-screens";
+import { AdminLayout } from "@/src/components/admin/admin-layout";
 import "../../style/app-admin.css";
 
 export const metadata = {

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { sendEmail } from "@/script/email-service";
-import { isAllowedRegistrationEmail } from "@/script/account-state";
+import { getSupabaseAdmin } from "@/src/lib/supabase/admin";
+import { sendEmail } from "@/src/services/email-service";
+import { isAllowedRegistrationEmail } from "@/src/lib/account-state";
 
 export async function POST(request) {
   try {

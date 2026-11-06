@@ -1,6 +1,6 @@
 import Script from "next/script";
-import { AppProvider } from "@/script/app-provider";
-import { ClarityTracker } from "@/script/clarity-tracker";
+import { AppProvider } from "@/src/components/app-provider";
+import { ClarityTracker } from "@/src/components/clarity-tracker";
 import "@/style/globals.css";
 
 export const metadata = {

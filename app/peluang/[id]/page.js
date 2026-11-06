@@ -1,4 +1,4 @@
-import { DetailScreen } from "@/script/opportunity-screens-v2";
+import { DetailScreen } from "@/src/components/opportunity-screens-v2";
 import "../../../style/app-peluang-detail.css";
 import "../../../style/app-opportunity-card.css";
 export default async function Page({ params }) {

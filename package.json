@@ -7,8 +7,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --test script/*.test.js",
-    "scrape:beasiswa": "node script/scrapers/indbeasiswa-cli.js"
+    "test": "node --test tests/*.test.js",
+    "scrape:beasiswa": "node scripts/indbeasiswa-cli.js"
   },
   "dependencies": {
     "@microsoft/clarity": "^1.0.2",

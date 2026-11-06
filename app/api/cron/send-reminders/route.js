@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { sendDeadlineReminderEmail } from "@/script/email-service";
-import { getNotificationRecipients, getSupabaseAdmin } from "@/lib/supabase/admin";
-import { isAuthorizedAdmin } from "@/lib/supabase/require-admin";
-import { deadlineTarget, jakartaDateAfterDays } from "@/script/notification-targets";
-import { getBookmarkedStudentIds, getDeadlineRecipientIds, storeNotifications } from "@/script/in-app-service";
-import { sendPushToUsers } from "@/script/push-service";
+import { sendDeadlineReminderEmail } from "@/src/services/email-service";
+import { getNotificationRecipients, getSupabaseAdmin } from "@/src/lib/supabase/admin";
+import { isAuthorizedAdmin } from "@/src/lib/supabase/require-admin";
+import { deadlineTarget, jakartaDateAfterDays } from "@/src/lib/notification-targets";
+import { getBookmarkedStudentIds, getDeadlineRecipientIds, storeNotifications } from "@/src/services/in-app-service";
+import { sendPushToUsers } from "@/src/services/push-service";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";

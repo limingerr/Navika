@@ -1,4 +1,4 @@
-import { SettingsSectionScreen } from "@/script/settings-screens";
+import { SettingsSectionScreen } from "@/src/components/settings-screens";
 import "../../../style/app-pengaturan-bantuan.css";
 
 export default function Page() {

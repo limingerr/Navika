@@ -1,4 +1,4 @@
-import { AdminArsipTable } from "@/script/admin-screens";
+import { AdminArsipTable } from "@/src/components/admin/admin-archive-table";
 
 export const metadata = {
   title: "Arsip Peluang — Panel Admin NAVIKA",

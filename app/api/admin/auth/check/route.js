@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { isAuthorizedAdmin } from "@/lib/supabase/require-admin";
-import { createClient } from "@/lib/supabase/server";
+import { isAuthorizedAdmin } from "@/src/lib/supabase/require-admin";
+import { createClient } from "@/src/lib/supabase/server";
 
 export async function GET(request) {
   const authorized = await isAuthorizedAdmin(request);

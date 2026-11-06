@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
-import { isProtectedPage } from "@/script/protected-routes";
+import { isProtectedPage } from "@/src/lib/protected-routes";
 
 /**
  * Next.js 16 Proxy (Konvensi baru menggantikan middleware.js).
@@ -74,6 +74,6 @@ export const config = {
     /*
      * Cocokkan semua rute kecuali file statis Next.js, gambar, dan aset lokal
      */
-    "/((?!_next/static|_next/image|favicon.ico|asset/|dokum/|contoh desain/|export/).*)",
+    "/((?!_next/static|_next/image|favicon.ico|asset/|contoh desain/|export/).*)",
   ],
 };

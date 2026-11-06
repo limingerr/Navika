@@ -1,40 +1,24 @@
 # AGENTS.md
 
-NAVIKA: a student opportunity finder (beasiswa / magang / bootcamp). The repo root contains the Next.js app and the static HTML5 clickable prototype (23 pages, Indonesian UI, `lang="id"`) kept as a migration reference. Keep copy and comments in Indonesian. The specification is `PRD-NAVIKA.md` (also Indonesian).
+NAVIKA adalah aplikasi pencari peluang mahasiswa (beasiswa, magang, bootcamp). Gunakan bahasa Indonesia untuk copy dan komentar. Spesifikasi produk ada di `PRD-NAVIKA.md`.
 
-## Repo facts
+## Struktur aplikasi
 
-- Prototype (root, `*.html`): JavaScript behavior lives in `script/dashboard.js` for month navigation and the date agenda on `dashboard.html`; the other 22 pages stay static. Open any `.html` directly in a browser to preview.
-- Prototype styling: only `dashboard.html` is styled, via `style/dashboard.css` (Indonesian comments, Poppins, WCAG-adjusted colors). The other 22 pages render with browser defaults.
-- `dashboard.html` and `style/dashboard.css` are the hand-done semantic reference pattern for the rest (semantic landmarks, inline SVG instead of icon images, relative `asset/...` paths, hover feedback transitions only, no decorative animation). Check `git status` / `git diff` before touching them.
-- Layout refactor in progress: `kalender.html` and `lihatSemua.html` still use `<table>` for layout; the other 21 pages are plain semantic HTML5. Don't introduce inline styles, presentational attributes, or new layout tables — continue the semantic direction.
-- Asset paths vary by page (`asset/...` vs `./asset/...`); keep the style of the file you edit. Only `lihatSemua.html` still uses root-absolute `/asset/...`, which breaks on `file://`.
-- Indentation is not uniform (2 spaces in some files, 4 in others); match the file you edit.
-- The 7 `detail-<slug>.html` pages are hand-copied versions of the same card structure, written near-minified (one tag per line, no indentation). Duplication is expected; there are no shared components, partials, or templates.
+- `app/` berisi halaman, layout, dan Route Handlers Next.js 16.
+- `src/components/` berisi komponen React dan penyedia state aplikasi; `src/data/` berisi katalog bawaan; `src/lib/` berisi fungsi pendukung serta klien Supabase; `src/services/` berisi integrasi dan layanan.
+- `scripts/` berisi perintah CLI, `tests/` berisi tes Node.js, dan `style/` berisi CSS aplikasi.
+- `supabase/` berisi skema, seed, dan migrasi database. Jangan pindahkan kunci service role ke kode browser.
+- Prototipe HTML lama sudah dihapus. PRD dan bahan referensi desain tetap merupakan dokumen sejarah, bukan sumber data pengguna atau katalog produksi.
+- `export/`, `laporan.pdf`, dan `contoh desain/` adalah bahan referensi. Tanggal, nama, dan jumlah pada mockup bukan data nyata.
 
-## Next.js app (repo root)
+## Konvensi
 
-- Next.js 16 App Router + React 19 + JavaScript and plain CSS, managed with npm. Routes and layout live in `app/`, shared JavaScript modules in `script/`, and one scoped `style/app-*.css` file is imported by each page. There is no shared app CSS file; the prototype keeps `style/dashboard.css`.
-- Commands run from the repo root: `npm.cmd run dev` (localhost:3000), `npm.cmd test`, `npm.cmd run build`.
-- Read `node_modules/next/dist/docs/` before changing Next.js code; this version's APIs and conventions differ from older ones.
-- Do not add Tailwind or TypeScript.
-
-## Reference material (inputs to the PRD, not app code)
-
-- `export/` — 63 PNG mockups (light/dark) mapped to screens in PRD §2.5; `laporan.pdf` — the Module 5 report the PRD is based on; `contoh desain/` — 2 design-example JPGs. Their dates, names, and counts are examples, not real data (PRD §2.8, §4.6 step 3).
-
-## Known mockup gaps — don't "fix" these silently
-
-- 12 referenced targets don't exist: `pencarian.html`, `lihatBeasiswa.html`, `lihatMagang.html`, `lihatBootcamp.html`, `semua-peluang.html` (GET target of the `lihatSemua.html` search form), `logout.html`, `notifikasi.html`, `bahasa.html`, `bantuan.html`, `privasi.html`, `tentang.html`, and `edit-profile.html` (the real page is `editprofile.html`). ~36 other links are `href="#"`.
-- Forms only navigate via GET (`login.html` -> `dashboard.html`, `register.html` -> `verifikasi.html`, `editprofile.html` -> `pengaturan.html`, `tema.html` -> `#`). There is no auth, storage, or validation code.
-- Demo identities are inconsistent placeholders ("Fajar Pelari Kalcer" on profile/pengaturan, "Ayip batagor" on dashboard, "Fajar Batagor" on editprofile) and deadlines ("Oktober, 2026") are fictional; PRD §4.2 forbids treating them as real catalog/user data.
-
-## Direction of the rewrite (from PRD-NAVIKA.md)
-
-- Stack: Next.js 16 + JavaScript + plain CSS at the repo root. P0 scope: auth, profile, Finder, detail, Match, bookmark, tracker/calendar, catalog.
-- Match must stay deterministic and explainable per dimension; the PRD explicitly rules out AI for the MVP.
-- PRD §4.6 step 1 has the page-to-route mapping; step 2 warns not to equate HTML file names with future business IDs.
-- `style/dashboard.css` tokens deliberately differ from the PRD §2.6 palette (darkened for WCAG AA contrast; stated in its comments). Don't "restore" the PRD hex values without review.
+- Jalankan perintah dari root: `npm.cmd run dev`, `npm.cmd test`, dan `npm.cmd run build`.
+- Baca panduan yang relevan di `node_modules/next/dist/docs/` sebelum mengubah kode Next.js.
+- Gunakan JavaScript dan CSS biasa; jangan tambahkan Tailwind atau TypeScript.
+- Match harus deterministik dan dapat dijelaskan per dimensi; MVP tidak menggunakan AI untuk pencocokan.
+- ID bisnis tidak boleh diambil dari nama file atau label tampilan.
+- Pertahankan penyesuaian warna untuk kontras WCAG saat mengubah CSS aplikasi.
 
 <!-- antislop:start -->
 ## antislop

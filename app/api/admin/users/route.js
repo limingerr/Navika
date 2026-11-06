@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { isAuthorizedAdmin } from "@/lib/supabase/require-admin";
+import { getSupabaseAdmin } from "@/src/lib/supabase/admin";
+import { isAuthorizedAdmin } from "@/src/lib/supabase/require-admin";
 
 const PROTECTED_ADMIN_EMAILS = [
   "admin@navika.id",

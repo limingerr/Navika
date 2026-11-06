@@ -6,7 +6,7 @@ Status: draf kebutuhan backend MVP. Dokumen ini mendampingi `PRD-NAVIKA.md`. Sem
 
 ### 1.1 Problem Statement
 
-Aplikasi Next.js NAVIKA saat ini masih memakai login demo, profil dan bookmark di `localStorage`, katalog dalam `script/opportunities.js`, serta deadline contoh yang dihitung dari `demoDays`. Pengguna belum memiliki akun dan data pribadi yang persisten lintas perangkat; tim juga belum memiliki satu sumber data peluang yang dapat diaudit.
+Pada tahap prototipe, aplikasi Next.js NAVIKA memakai login demo, profil dan bookmark di `localStorage`, katalog yang kini berada di `src/data/opportunities.js`, serta deadline contoh yang dihitung dari `demoDays`. Pada tahap itu, pengguna belum memiliki akun dan data pribadi yang persisten lintas perangkat; tim juga belum memiliki satu sumber data peluang yang dapat diaudit.
 
 ### 1.2 Proposed Solution
 
@@ -75,7 +75,7 @@ Bangun backend memakai Supabase PostgreSQL sebagai sumber data utama dan Supabas
 - Katalog Supabase memuat tujuh kategori awal dan kategori tambahan yang dibuat admin. Finder membaca kategori dari database, termasuk kategori tambahan pada satu peluang. Hanya entri berstatus terbit/ditutup yang tampil pada hasil umum; entri ditutup dikecualikan dari hasil default tetapi tetap dapat dibuka melalui bookmark dan filter status.
 - Hasil diurutkan menurut deadline terdekat atau kecocokan; tanggal kosong terakhir. Urutan stabil memakai ID sebagai pemecah seri. Pagination menggunakan 12 entri per halaman sebagai usulan PRD utama.
 - Detail yang tidak ada atau belum dapat diakses pengguna menghasilkan 404. Detail terbit memuat sumber HTTP(S) resmi, waktu verifikasi, persyaratan, manfaat bila tersedia, serta deadline beserta presisi dan zona waktunya.
-- Entri baru belum boleh terbit tanpa ID stabil, kategori valid, judul, penyelenggara, URL sumber, waktu verifikasi, dan deadline atau penanda “Belum diumumkan”. Seluruh data kandidat dari `script/opportunities.js` diperiksa ulang sebelum impor produksi.
+- Entri baru belum boleh terbit tanpa ID stabil, kategori valid, judul, penyelenggara, URL sumber, waktu verifikasi, dan deadline atau penanda “Belum diumumkan”. Seluruh data kandidat dari `src/data/opportunities.js` diperiksa ulang sebelum impor produksi.
 
 **Match**
 
@@ -247,7 +247,7 @@ RPC Finder, Match, dan kalender memakai `SECURITY INVOKER` agar RLS pemanggil be
 
 ### 4.4 Aturan Data dan Migrasi Demo
 
-- Inventarisasi 46 entri contoh di `script/opportunities.js` sebagai kandidat. Seed tujuh kategori awal, lalu petakan nilai `category` dan `alsoCategories` ke ID kategori utama dan tambahan tanpa memakai teks nama sebagai ID bisnis. Untuk setiap entri, periksa sumber resmi, judul, penyelenggara, kategori, target audiens, syarat, URL, dan tanggal. Catat pemeriksa dan waktu verifikasi sebelum terbit; entri yang gagal audit tetap draf atau dikeluarkan dari impor.
+- Inventarisasi 46 entri contoh di `src/data/opportunities.js` sebagai kandidat. Seed tujuh kategori awal, lalu petakan nilai `category` dan `alsoCategories` ke ID kategori utama dan tambahan tanpa memakai teks nama sebagai ID bisnis. Untuk setiap entri, periksa sumber resmi, judul, penyelenggara, kategori, target audiens, syarat, URL, dan tanggal. Catat pemeriksa dan waktu verifikasi sebelum terbit; entri yang gagal audit tetap draf atau dikeluarkan dari impor.
 - Ganti `demoDays` dengan tanggal sumber dan presisinya. `recommended` dan `targetMajors` demo tidak langsung menjadi keputusan Match; ubah hanya syarat yang terbukti menjadi aturan terstruktur, sisanya teks untuk pemeriksaan manual.
 - Migrasi UI mengarahkan login ke Supabase Auth serta profil, bookmark, tracker, dan kalender ke Data API/RPC. Nilai dari `localStorage` demo tidak otomatis dikaitkan ke akun nyata. Data demo tetap terpisah sampai ada alur migrasi yang secara eksplisit dirancang dan disetujui.
 - Katalog menggunakan ID stabil baru. Nama file HTML dan slug demo tidak dianggap ID bisnis. Jika tautan demo yang telah dibagikan perlu dipertahankan, buat pemetaan eksplisit dari slug lama ke ID baru setelah audit entri.

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { safeRedirectPath } from "@/script/protected-routes";
+import { createClient } from "@/src/lib/supabase/server";
+import { safeRedirectPath } from "@/src/lib/protected-routes";
 
 export async function GET(request) {
   const redirectPath = safeRedirectPath(new URL(request.url).searchParams.get("redirect"));

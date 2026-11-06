@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { scrapeIndbeasiswa, saveScrapedToSupabase } from "@/script/scrapers/indbeasiswa";
+import { scrapeIndbeasiswa, saveScrapedToSupabase } from "@/src/services/scrapers/indbeasiswa";
 import { broadcastNewOpportunity } from "@/app/api/notify/new-opportunity/route";
-import { isAuthorizedAdmin } from "@/lib/supabase/require-admin";
+import { isAuthorizedAdmin } from "@/src/lib/supabase/require-admin";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";

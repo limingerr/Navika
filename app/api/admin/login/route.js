@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { createClient as createServerClient } from "@/lib/supabase/server";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { generateAdminSessionToken } from "@/lib/supabase/admin-session";
+import { createClient as createServerClient } from "@/src/lib/supabase/server";
+import { getSupabaseAdmin } from "@/src/lib/supabase/admin";
+import { generateAdminSessionToken } from "@/src/lib/supabase/admin-session";
 
 export async function POST(request) {
   try {

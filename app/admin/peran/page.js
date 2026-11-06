@@ -1,4 +1,4 @@
-import { AdminRoleManagement } from "@/script/admin-screens";
+import { AdminRoleManagement } from "@/src/components/admin/admin-role-management";
 
 export const metadata = {
   title: "Kelola Peran & Akses — Panel Admin NAVIKA",

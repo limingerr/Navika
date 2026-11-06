@@ -117,44 +117,23 @@ Dikembangkan menggunakan **Next.js 16 App Router**, **React 19**, **JavaScript E
 
 ## 📁 Struktur Direktori Proyek
 
+Prototipe HTML lama sudah dihapus. PRD tetap menyimpan konteks rancangan awal.
+
 ```text
 Navika/
-├── app/                           # Next.js 16 App Router (Server & Client Pages)
-│   ├── page.js                    # Halaman landing / selamat datang
-│   ├── layout.js                  # Root layout & providers Next.js
-│   ├── masuk/page.js              # Halaman masuk / login demo
-│   ├── daftar/page.js             # Halaman registrasi demo
-│   ├── dashboard/page.js          # Beranda utama, kalender mini, rekomendasi
-│   ├── peluang/
-│   │   ├── page.js                # Katalog penelusuran & filter peluang
-│   │   └── [id]/page.js           # Dynamic route detail peluang (/peluang/:id)
-│   ├── kalender/page.js           # Kalender agenda & deadline bulanan
-│   ├── tersimpan/page.js          # Daftar peluang yang disimpan (bookmark)
-│   ├── profil/                    # Informasi & tinjauan akun profil
-│   │   └── edit/page.js           # Formulir kelengkapan data (onboarding 5-field)
-│   └── pengaturan/                # Pengaturan tema, bahasa, notifikasi, dll
-│
-├── script/                        # Modul JavaScript aplikasi
-│   ├── app-provider.js            # Context provider aplikasi & persistensi sesi
-│   ├── opportunities.js           # Katalog 46 peluang terpusat & fungsi filter
-│   ├── opportunities.test.js      # Unit test validasi katalog, tanggal, & IPK
-│   ├── opportunity-screens-v2.js  # Komponen layar katalog, kalender, & detail
-│   ├── profile-screens.js         # Layar profil pengguna & form edit profil
-│   ├── auth-screens.js            # Layar simulasi autentikasi & verifikasi
-│   └── ui.js                      # Komponen UI global (AppShell, MainNav, Icons)
-│
-├── style/                         # Berkas CSS murni (Scoped per layar)
-│   ├── app-dashboard.css          # Gaya tampilan dashboard & mini kalender
-│   ├── app-peluang.css            # Gaya halaman katalog peluang & pencarian
-│   ├── app-peluang-detail.css     # Gaya halaman detail & floating sticky CTA
-│   ├── app-kalender.css           # Gaya kalender bulanan & chip agenda
-│   └── app-tersimpan.css          # Gaya halaman peluang tersimpan
-│
-├── asset/                         # Aset statis ikon SVG, logo, dan gambar
-├── PRD-NAVIKA.md                  # Dokumen Product Requirements (Markdown)
-├── PRD-NAVIKA.pdf                 # Dokumen Product Requirements (Format PDF)
-├── package.json                   # Konfigurasi dependensi dan skrip proyek
-└── README.md                      # Dokumentasi utama proyek
+  app/                 # Halaman, layout, dan API Next.js
+  src/
+    components/        # Komponen dan layar React
+    data/              # Katalog bawaan
+    lib/               # Logika bersama dan klien Supabase
+    services/          # Layanan data, email, push, dan scraper
+  scripts/             # Perintah CLI
+  tests/               # Tes Node.js
+  style/               # CSS aplikasi
+  supabase/            # Skema, seed, dan migrasi database
+  public/asset/        # Gambar dan ikon yang dipakai aplikasi
+  export/              # PNG acuan desain dalam PRD
+  package.json
 ```
 
 ---

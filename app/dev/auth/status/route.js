@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/src/lib/supabase/server";
 
 export async function GET() {
   if (process.env.NODE_ENV !== "development") {

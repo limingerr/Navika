@@ -272,7 +272,7 @@ AI pada fase lanjut hanya dipertimbangkan jika pengujian menunjukkan aturan tida
 ## 4. Technical Specifications
 
 ### 4.1 Architecture Overview
-Stack dikonfirmasi: Next.js + JavaScript + CSS biasa. Implementasi memakai App Router dengan halaman dan layout di `app/`, modul JavaScript di `script/`, serta CSS terpisah dan dibatasi per halaman di `style/`. Komponen dipisah saat dipakai ulang atau halaman sulit dibaca. Tailwind dan TypeScript tidak digunakan. Penyedia hosting, database, dan autentikasi ditetapkan saat kickoff.
+Stack dikonfirmasi: Next.js + JavaScript + CSS biasa. Implementasi memakai App Router dengan halaman dan layout di `app/`, modul JavaScript di `src/`, serta CSS terpisah dan dibatasi per halaman di `style/`. Komponen dipisah saat dipakai ulang atau halaman sulit dibaca. Tailwind dan TypeScript tidak digunakan. Penyedia hosting, database, dan autentikasi ditetapkan saat kickoff.
 
 Aliran data: Browser -> halaman/komponen Next.js -> lapisan server yang memeriksa sesi dan validasi -> database -> layanan Match -> respons UI. Situs penyelenggara diakses melalui tautan resmi. Layanan email dipanggil dari server; pengingat P1 dijalankan oleh scheduler.
 

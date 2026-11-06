@@ -1,0 +1,718 @@
+"use client";
+import { createContext, useContext, useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { isProtectedPage } from "@/src/lib/protected-routes";
+import { resolveTheme, translate } from "@/src/lib/i18n";
+import { calendarFilters, opportunities as initialOpportunities } from "@/src/data/opportunities";
+import { adminEmailForIdentifier } from "@/src/lib/admin-identity";
+import {
+    isSupabaseConfigured,
+    signInUser,
+    fetchCurrentAccount,
+    signOutUser,
+    fetchUserProfile,
+    saveUserProfile,
+    saveEmailAlertPreference,
+    saveDeadlineAlertPreference,
+    fetchOpportunitiesFromDb,
+    fetchSavedOpportunityIds,
+    toggleBookmarkInDb,
+    adminSaveOpportunityToDb,
+    adminArchiveOpportunityInDb
+} from "@/src/services/supabase-service";
+export const defaultProfile = {
+    name: "Mahasiswa",
+    email: "",
+    university: "",
+    major: "",
+    semester: "",
+    gpa: "",
+    interest: "",
+};
+export const demoProfile = defaultProfile;
+
+import { BookmarkNotification } from "@/src/components/bookmark-notification";
+import { InAppToast } from "@/src/components/in-app-toast";
+import { createClient } from "@/src/lib/supabase/client";
+import {
+  SECRET_ADMIN_TOKEN,
+  adminProfile,
+  isAdminIdentifier
+} from "@/src/lib/admin-auth";
+
+export {
+  SECRET_ADMIN_TOKEN,
+  adminProfile,
+  isAdminIdentifier
+};
+
+const AppContext = createContext(null);
+const storageKey = "navika-demo-v1";
+const oppsStorageKey = "navika-opportunities-custom-v1";
+const adminStorageKey = "navika-admin-session-v1";
+
+export function AppProvider({ children }) {
+    const pathname = usePathname();
+    const router = useRouter();
+    const [profile, setProfile] = useState(demoProfile);
+    const [saved, setSaved] = useState([]);
+    const [authenticated, setAuthenticated] = useState(false);
+    const [locale, setLocale] = useState("id");
+    const [theme, setTheme] = useState("light");
+    const [deadlineAlerts, setDeadlineAlerts] = useState(true);
+    const [emailAlerts, setEmailAlerts] = useState(false);
+    const [emailConsentDecided, setEmailConsentDecided] = useState(false);
+    const [calendarFilter, setCalendarFilter] = useState("Semua");
+    const [opportunities, setOpportunities] = useState(initialOpportunities);
+    const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+    const [bookmarkNotice, setBookmarkNotice] = useState(null);
+    const [notifications, setNotifications] = useState([]);
+    const [notificationToast, setNotificationToast] = useState(null);
+    const [ready, setReady] = useState(false);
+    useEffect(() => {
+        if (!ready || !authenticated || isAdminLoggedIn || !profile?.id) {
+            setNotifications([]);
+            return;
+        }
+        const client = createClient();
+        if (!client) return;
+        let active = true;
+        let loaded = false;
+        let foregroundAt = Date.now();
+        const knownIds = new Set();
+        const load = async () => {
+            const { data, error } = await client.from("in_app_notifications")
+                .select("id, kind, title, body, href, created_at, read_at")
+                .eq("user_id", profile.id).order("created_at", { ascending: false }).limit(100);
+            if (!active || error) return;
+            const fresh = loaded && document.visibilityState === "visible"
+                ? (data || []).find((item) => !knownIds.has(item.id) && new Date(item.created_at).getTime() >= foregroundAt)
+                : null;
+            for (const item of data || []) knownIds.add(item.id);
+            loaded = true;
+            setNotifications(data || []);
+            if (fresh) setNotificationToast(fresh);
+        };
+        const channel = client.channel(`notifikasi-${profile.id}`)
+            .on("postgres_changes", { event: "INSERT", schema: "public", table: "in_app_notifications", filter: `user_id=eq.${profile.id}` }, ({ new: item }) => {
+                if (!active) return;
+                knownIds.add(item.id);
+                setNotifications((items) => [item, ...items.filter((old) => old.id !== item.id)].slice(0, 100));
+                if (document.visibilityState === "visible") setNotificationToast(item);
+            })
+            .subscribe((status) => { if (status === "SUBSCRIBED") load(); });
+        const onFocus = () => { foregroundAt = Date.now(); load(); };
+        const interval = window.setInterval(() => { if (document.visibilityState === "visible") load(); }, 15000);
+        window.addEventListener("focus", onFocus);
+        return () => { active = false; window.clearInterval(interval); window.removeEventListener("focus", onFocus); client.removeChannel(channel); };
+    }, [ready, authenticated, isAdminLoggedIn, profile?.id]);
+
+    useEffect(() => {
+        if (!notificationToast) return;
+        const timer = window.setTimeout(() => setNotificationToast(null), 6000);
+        return () => window.clearTimeout(timer);
+    }, [notificationToast]);
+
+    const markNotificationsRead = async () => {
+        const response = await fetch("/api/notify/read", { method: "POST" });
+        if (!response.ok) return;
+        const readAt = new Date().toISOString();
+        setNotifications((items) => items.map((item) => item.read_at ? item : { ...item, read_at: readAt }));
+    };
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem(storageKey);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (!isSupabaseConfigured() && parsed.profile && typeof parsed.profile === "object")
+                    setProfile({ ...demoProfile, ...parsed.profile });
+                if (!isSupabaseConfigured() && Array.isArray(parsed.saved))
+                    setSaved(parsed.saved.filter((id) => typeof id === "string"));
+                if (parsed.locale === "id" || parsed.locale === "en")
+                    setLocale(parsed.locale);
+                if (["light", "dark", "system"].includes(parsed.theme))
+                    setTheme(parsed.theme);
+                if (typeof parsed.deadlineAlerts === "boolean")
+                    setDeadlineAlerts(parsed.deadlineAlerts);
+                if (typeof parsed.emailAlerts === "boolean")
+                    setEmailAlerts(parsed.emailAlerts);
+                if (typeof parsed.emailConsentDecided === "boolean")
+                    setEmailConsentDecided(parsed.emailConsentDecided);
+                if (calendarFilters.includes(parsed.calendarFilter))
+                    setCalendarFilter(parsed.calendarFilter);
+            }
+            let localOpps = initialOpportunities;
+            const oppRaw = localStorage.getItem(oppsStorageKey);
+            if (oppRaw) {
+                const parsedOpps = JSON.parse(oppRaw);
+                if (Array.isArray(parsedOpps) && parsedOpps.length > 0) {
+                    localOpps = parsedOpps;
+                    setOpportunities(parsedOpps);
+                }
+            }
+            // Jika Supabase terkonfigurasi, sinkronkan data langsung dari database dengan smart merge
+            if (isSupabaseConfigured()) {
+                fetchOpportunitiesFromDb().then((dbOpps) => {
+                    if (dbOpps && dbOpps.length > 0) {
+                        // Pertahankan peluang buatan kustom yang belum ada di database Supabase
+                        const customCreated = localOpps.filter(
+                            (localItem) => !dbOpps.some((dbItem) => dbItem.id === localItem.id)
+                        );
+                        const merged = [...customCreated, ...dbOpps];
+                        setOpportunities(merged);
+                        try {
+                            localStorage.setItem(oppsStorageKey, JSON.stringify(merged));
+                        } catch {}
+                    }
+                }).catch(() => {});
+
+                const adminRaw = localStorage.getItem(adminStorageKey);
+                if (adminRaw === "true") {
+                    setIsAdminLoggedIn(true);
+                    setProfile(adminProfile);
+                }
+
+                fetchCurrentAccount().then((account) => {
+                    if (account) {
+                        setAuthenticated(true);
+                        setSaved([]);
+                        setIsAdminLoggedIn(Boolean(account.isAdmin));
+                        setProfile(account.isAdmin ? adminProfile : account.profile || defaultProfile);
+                        setEmailAlerts(account.isAdmin ? false : account.profile?.emailAlerts === true);
+                        if (!account.isAdmin) setDeadlineAlerts(account.profile?.deadlineAlerts !== false);
+                        if (account.isAdmin) {
+                            try { localStorage.setItem(adminStorageKey, "true"); } catch {}
+                        } else {
+                            try { localStorage.removeItem(adminStorageKey); } catch {}
+                            window.OneSignalDeferred = window.OneSignalDeferred || [];
+                            window.OneSignalDeferred.push(async (OneSignal) => {
+                                try { await OneSignal.login(account.profile.id); } catch {}
+                            });
+                            // Sinkronkan daftar bookmark milik akun mahasiswa ini dari Supabase
+                            fetchSavedOpportunityIds().then((savedIds) => {
+                                if (savedIds && Array.isArray(savedIds)) {
+                                    setSaved(savedIds);
+                                }
+                            }).catch(() => {});
+                        }
+                    } else if (adminRaw !== "true") {
+                        setAuthenticated(false);
+                        setIsAdminLoggedIn(false);
+                        setProfile(defaultProfile);
+                        setEmailAlerts(false);
+                    }
+                }).catch(() => {
+                    if (adminRaw !== "true") {
+                        setAuthenticated(false);
+                        setIsAdminLoggedIn(false);
+                        setProfile(defaultProfile);
+                        setEmailAlerts(false);
+                    }
+                }).finally(() => setReady(true));
+            }
+        }
+        catch {
+            // Data demo yang rusak tidak boleh menghalangi aplikasi dibuka.
+            setReady(true);
+        }
+        if (!isSupabaseConfigured()) setReady(true);
+    }, []);
+    useEffect(() => {
+        if (ready && isProtectedPage(pathname) && !authenticated) {
+            const destination = `${pathname}${window.location.search}`;
+            router.replace(`/masuk?redirect=${encodeURIComponent(destination)}`);
+        }
+    }, [ready, authenticated, pathname, router]);
+    useEffect(() => {
+        if (!ready)
+            return;
+        try {
+            localStorage.setItem(storageKey, JSON.stringify({ profile, saved, locale, theme, deadlineAlerts, emailAlerts, emailConsentDecided, calendarFilter }));
+        }
+        catch {
+            // Penyimpanan browser mungkin nonaktif; sesi saat ini tetap berjalan.
+        }
+    }, [profile, saved, locale, theme, deadlineAlerts, emailAlerts, emailConsentDecided, calendarFilter, ready]);
+
+    const saveOpportunitiesState = (updatedList) => {
+        setOpportunities(updatedList);
+        try {
+            localStorage.setItem(oppsStorageKey, JSON.stringify(updatedList));
+        } catch {}
+    };
+
+    const addOpportunity = async (newOpp) => {
+        const id = newOpp.id || ("opp-" + Date.now());
+        const itemWithDefaults = {
+            id,
+            status: "Terbit",
+            requirementsEn: [],
+            benefitsEn: [],
+            summaryEn: newOpp.summary || "",
+            ...newOpp,
+            requirements: Array.isArray(newOpp.requirements) ? newOpp.requirements : [],
+            benefits: Array.isArray(newOpp.benefits) ? newOpp.benefits : [],
+        };
+
+        // Ambil data terbaru dari localStorage atau state agar tidak tertimpa
+        let latestOpps = opportunities;
+        try {
+            const raw = localStorage.getItem(oppsStorageKey);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    latestOpps = parsed;
+                }
+            }
+        } catch {}
+
+        const updated = [itemWithDefaults, ...latestOpps.filter((item) => item.id !== id)];
+        saveOpportunitiesState(updated);
+        if (isSupabaseConfigured()) {
+            adminSaveOpportunityToDb(itemWithDefaults).catch(() => {});
+        }
+        if (itemWithDefaults.status === "Terbit" && typeof window !== "undefined") {
+            try {
+                await fetch("/api/notify/new-opportunity", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        title: itemWithDefaults.title,
+                        organization: itemWithDefaults.organization,
+                        category: itemWithDefaults.category,
+                        field: itemWithDefaults.field || "Umum",
+                        slug: itemWithDefaults.id,
+                    }),
+                    keepalive: true,
+                });
+            } catch (err) {
+                console.warn("Gagal menembak notifikasi baru:", err);
+            }
+        }
+        return itemWithDefaults;
+    };
+
+    const updateOpportunity = async (id, fields) => {
+        let latestOpps = opportunities;
+        try {
+            const raw = localStorage.getItem(oppsStorageKey);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    latestOpps = parsed;
+                }
+            }
+        } catch {}
+
+        let updatedOpp = null;
+        const previous = latestOpps.find((item) => item.id === id);
+        const updated = latestOpps.map((item) => {
+            if (item.id === id) {
+                updatedOpp = { ...item, ...fields };
+                return updatedOpp;
+            }
+            return item;
+        });
+        saveOpportunitiesState(updated);
+        if (isSupabaseConfigured() && updatedOpp) {
+            adminSaveOpportunityToDb(updatedOpp).catch(() => {});
+        }
+        if (fields.status === "Terbit" && previous && previous.status !== "Terbit" && typeof window !== "undefined") {
+            try {
+                await fetch("/api/notify/new-opportunity", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        title: updatedOpp.title,
+                        organization: updatedOpp.organization,
+                        category: updatedOpp.category,
+                        field: updatedOpp.field || "Umum",
+                        slug: updatedOpp.id,
+                    }),
+                    keepalive: true,
+                });
+            } catch (err) {
+                console.warn("Gagal menembak notifikasi update:", err);
+            }
+        }
+    };
+
+    const deleteOpportunity = (id) => {
+        let latestOpps = opportunities;
+        try {
+            const raw = localStorage.getItem(oppsStorageKey);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    latestOpps = parsed;
+                }
+            }
+        } catch {}
+        const updated = latestOpps.filter((item) => item.id !== id);
+        saveOpportunitiesState(updated);
+        if (isSupabaseConfigured()) {
+            adminArchiveOpportunityInDb(id).catch(() => {});
+        }
+    };
+
+    const resetOpportunities = () => {
+        setOpportunities(initialOpportunities);
+        try {
+            localStorage.removeItem(oppsStorageKey);
+        } catch {}
+    };
+
+    const loginAdmin = async (identifier, password) => {
+        try {
+            const res = await fetch("/api/admin/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ identifier, password: (password || "").trim() })
+            });
+            const data = await res.json();
+            if (data.success && data.role === "admin") {
+                setIsAdminLoggedIn(true);
+                try {
+                    localStorage.setItem(adminStorageKey, "true");
+                } catch {}
+                setProfile(adminProfile);
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify({
+                        profile: adminProfile,
+                        saved: [],
+                        locale: locale || "id",
+                        theme: theme || "light",
+                        deadlineAlerts: true,
+                        calendarFilter: "Semua"
+                    }));
+                } catch {}
+                return { success: true, role: "admin" };
+            }
+            return {
+                success: false,
+                error: data.error || "Email/token atau kata sandi pengelola tidak valid."
+            };
+        } catch {
+            return {
+                success: false,
+                error: "Kendala komunikasi dengan server login admin."
+            };
+        }
+    };
+
+    const login = async (identifier, password) => {
+        const cleanPass = (password || "").trim();
+
+        // 1. Jika pengguna memasukkan format token atau email admin, proses langsung lewat endpoint admin API
+        if (isAdminIdentifier(identifier)) {
+            try {
+                const res = await fetch("/api/admin/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ identifier, password: cleanPass })
+                });
+                const data = await res.json();
+                if (data.success && data.role === "admin") {
+                    setIsAdminLoggedIn(true);
+                    try { localStorage.setItem(adminStorageKey, "true"); } catch {}
+                    setProfile(adminProfile);
+                    try {
+                        localStorage.setItem(storageKey, JSON.stringify({
+                            profile: adminProfile,
+                            saved: [],
+                            locale: locale || "id",
+                            theme: theme || "light",
+                            deadlineAlerts: true,
+                            calendarFilter: "Semua"
+                        }));
+                    } catch {}
+                    return { role: "admin" };
+                } else {
+                    return { error: data.error || "Email/token atau kata sandi pengelola tidak valid." };
+                }
+            } catch {
+                return { error: "Kendala komunikasi dengan server login admin." };
+            }
+        }
+
+        const targetIdentifier = adminEmailForIdentifier(identifier) || identifier;
+
+        if (isSupabaseConfigured()) {
+            const res = await signInUser(targetIdentifier, cleanPass);
+            if (!res.success) {
+                return { error: res.error || "Email/ID atau kata sandi tidak valid." };
+            }
+            if (res.role === "admin") {
+                setAuthenticated(true);
+                setIsAdminLoggedIn(true);
+                try { localStorage.setItem(adminStorageKey, "true"); } catch {}
+                setProfile(adminProfile);
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify({
+                        profile: adminProfile,
+                        saved: [],
+                        locale: locale || "id",
+                        theme: theme || "light",
+                        deadlineAlerts: true,
+                        calendarFilter: "Semua"
+                    }));
+                } catch {}
+                return { role: "admin" };
+            } else {
+                setAuthenticated(true);
+                setIsAdminLoggedIn(false);
+                setSaved([]);
+                try { localStorage.removeItem(adminStorageKey); } catch {}
+                const account = await fetchCurrentAccount();
+                setProfile(account?.profile || { ...defaultProfile, id: res.user?.id, email: res.user?.email || identifier.trim() });
+                setEmailAlerts(account?.profile?.emailAlerts === true);
+                setDeadlineAlerts(account?.profile?.deadlineAlerts !== false);
+                if (typeof window !== "undefined" && window.OneSignalDeferred) {
+                    window.OneSignalDeferred.push(async function(OneSignal) {
+                        try {
+                            if (res.user?.id || res.user?.email) {
+                                await OneSignal.login(res.user.id || res.user.email);
+                            }
+                        } catch {}
+                    });
+                }
+                try {
+                    const savedFromDb = await fetchSavedOpportunityIds();
+                    setSaved(savedFromDb || []);
+                } catch {}
+                return { role: "mahasiswa" };
+            }
+        }
+
+        // Mode fallback lokal (tanpa Supabase)
+        if (isAdminIdentifier(identifier)) {
+            return { error: "Kata sandi admin tidak valid." };
+        } else {
+            setAuthenticated(true);
+            setIsAdminLoggedIn(false);
+            try {
+                localStorage.removeItem(adminStorageKey);
+            } catch {}
+            const studentEmail = identifier.trim();
+            const formattedName = profile.name === "Mahasiswa" || profile.name === "Pengguna Demo" || profile.name === "Pengelola Navika"
+                ? (studentEmail.includes("@") ? studentEmail.split("@")[0].replace(/[._-]/g, " ") : studentEmail)
+                : profile.name;
+            const updated = {
+                ...demoProfile,
+                email: studentEmail.includes("@") ? studentEmail : `${studentEmail}@mahasiswa.id`,
+                name: formattedName.charAt(0).toUpperCase() + formattedName.slice(1)
+            };
+            setProfile(updated);
+            try {
+                localStorage.setItem(storageKey, JSON.stringify({
+                    profile: updated,
+                    saved: saved || [],
+                    locale: locale || "id",
+                    theme: theme || "light",
+                    deadlineAlerts: true,
+                    calendarFilter: "Semua"
+                }));
+            } catch {}
+            return { role: "mahasiswa" };
+        }
+    };
+
+    const logoutAdmin = () => {
+        setIsAdminLoggedIn(false);
+        try {
+            localStorage.removeItem(adminStorageKey);
+        } catch {}
+        setProfile(demoProfile);
+        try {
+            localStorage.setItem(storageKey, JSON.stringify({
+                profile: demoProfile,
+                saved: [],
+                locale: locale || "id",
+                theme: theme || "light",
+                deadlineAlerts: true,
+                calendarFilter: "Semua"
+            }));
+        } catch {}
+        if (isSupabaseConfigured()) {
+            signOutUser().catch(() => {});
+        }
+    };
+    const clearAdminSession = () => {
+        setIsAdminLoggedIn(false);
+        try { localStorage.removeItem(adminStorageKey); } catch {}
+    };
+    useEffect(() => {
+        document.documentElement.lang = locale;
+        document.title = locale === "en" ? "NAVIKA — Find Your Opportunity" : "NAVIKA — Temukan peluangmu";
+    }, [locale]);
+    useEffect(() => {
+        const media = window.matchMedia("(prefers-color-scheme: dark)");
+        const apply = () => { document.documentElement.dataset.theme = resolveTheme(theme, media.matches); };
+        apply();
+        media.addEventListener("change", apply);
+        return () => media.removeEventListener("change", apply);
+    }, [theme]);
+    // Sinkronisasi data identitas dan peran user ke Microsoft Clarity
+    useEffect(() => {
+        if (typeof window !== "undefined" && typeof window.clarity === "function") {
+            try {
+                if (isAdminLoggedIn) {
+                    window.clarity("set", "user_role", "pengelola");
+                    window.clarity("identify", "admin-navika", "", "", "Pengelola Navika");
+                    window.clarity("upgrade", "admin_session");
+                } else if (profile?.email) {
+                    window.clarity("set", "user_role", "mahasiswa");
+                    window.clarity("identify", profile.email, "", "", profile.name || profile.email);
+                    if (profile.university) window.clarity("set", "university", profile.university);
+                    if (profile.major) window.clarity("set", "major", profile.major);
+                    if (profile.semester) window.clarity("set", "semester", String(profile.semester));
+                    if (profile.gpa) window.clarity("set", "gpa", String(profile.gpa));
+                    window.clarity("upgrade", "student_session");
+                }
+            } catch {}
+        }
+    }, [profile, isAdminLoggedIn]);
+    const toggleSaved = (id) => {
+        const isCurrentlySaved = saved.includes(id);
+        const willBeSaved = !isCurrentlySaved;
+        setSaved((current) => isCurrentlySaved ? current.filter((item) => item !== id) : [...current, id]);
+
+        const noticeMsg = willBeSaved
+            ? (locale === "en" ? "Opportunity saved to Bookmarks" : "Peluang berhasil disimpan ke Bookmark")
+            : (locale === "en" ? "Opportunity removed from Bookmarks" : "Peluang dihapus dari Bookmark");
+
+        setBookmarkNotice({
+            id: Date.now(),
+            message: noticeMsg,
+            type: willBeSaved ? "save" : "remove",
+        });
+
+        if (typeof window !== "undefined" && typeof window.clarity === "function") {
+            try {
+                window.clarity("event", isCurrentlySaved ? "unfavorite_opportunity" : "favorite_opportunity");
+                window.clarity("set", "last_opportunity", id);
+            } catch {}
+        }
+        if (isSupabaseConfigured()) {
+            toggleBookmarkInDb(id, isCurrentlySaved).then((result) => {
+                if (result?.success) return;
+                setSaved((current) => willBeSaved ? current.filter((item) => item !== id) : [...new Set([...current, id])]);
+                setBookmarkNotice({ id: Date.now(), message: "Bookmark gagal disimpan. Coba lagi.", type: "error" });
+            }).catch(() => {
+                setSaved((current) => willBeSaved ? current.filter((item) => item !== id) : [...new Set([...current, id])]);
+                setBookmarkNotice({ id: Date.now(), message: "Bookmark gagal disimpan. Coba lagi.", type: "error" });
+            });
+        }
+    };
+    const updateProfile = (newProfile) => {
+        setProfile(newProfile);
+        if (isSupabaseConfigured()) {
+            saveUserProfile(newProfile).catch(() => {});
+        }
+    };
+    const changeEmailAlerts = async (enabled) => {
+        if (isSupabaseConfigured()) await saveEmailAlertPreference(enabled);
+        setEmailAlerts(enabled);
+        setProfile((current) => ({ ...current, emailAlerts: enabled }));
+    };
+    const changeDeadlineAlerts = async (enabled) => {
+        if (isSupabaseConfigured()) await saveDeadlineAlertPreference(enabled);
+        setDeadlineAlerts(enabled);
+        setProfile((current) => ({ ...current, deadlineAlerts: enabled }));
+    };
+    const setRegistrationProfile = (newProfile) => setProfile(newProfile);
+    const logoutUser = async () => {
+        setAuthenticated(false);
+        setIsAdminLoggedIn(false);
+        setNotifications([]);
+        setNotificationToast(null);
+        try { localStorage.removeItem(adminStorageKey); } catch {}
+        if (typeof window !== "undefined" && window.OneSignalDeferred) {
+            window.OneSignalDeferred.push(async (OneSignal) => { try { await OneSignal.logout(); } catch {} });
+        }
+        if (isSupabaseConfigured()) {
+            try { await signOutUser(); } catch {}
+        }
+        setProfile(demoProfile);
+        setEmailAlerts(false);
+        setSaved([]);
+        try {
+            localStorage.setItem(storageKey, JSON.stringify({
+                profile: demoProfile,
+                saved: [],
+                locale: locale || "id",
+                theme: theme || "light",
+                deadlineAlerts: true,
+                calendarFilter: "Semua"
+            }));
+        } catch {}
+    };
+
+    const clearDemo = () => {
+        setAuthenticated(false);
+        setProfile(demoProfile);
+        setEmailAlerts(false);
+        setSaved([]);
+        setLocale("id");
+        setTheme("light");
+        setDeadlineAlerts(true);
+        setCalendarFilter("Semua");
+        setIsAdminLoggedIn(false);
+        try {
+            localStorage.removeItem(adminStorageKey);
+            localStorage.setItem(storageKey, JSON.stringify({ profile: demoProfile, saved: [], locale: "id", theme: "light", deadlineAlerts: true, calendarFilter: "Semua" }));
+        }
+        catch { }
+    };
+    return (<AppContext.Provider value={{
+      ready,
+      profile,
+      updateProfile,
+      setRegistrationProfile,
+      saved,
+      toggleSaved,
+      bookmarkNotice,
+      notifications,
+      markNotificationsRead,
+      setBookmarkNotice,
+      locale,
+      setLocale,
+      theme,
+      setTheme,
+      deadlineAlerts,
+      setDeadlineAlerts,
+      changeDeadlineAlerts,
+      emailAlerts,
+      changeEmailAlerts,
+      emailConsentDecided,
+      setEmailConsentDecided,
+      calendarFilter,
+      setCalendarFilter,
+      clearDemo,
+      logoutUser,
+      opportunities,
+      addOpportunity,
+      updateOpportunity,
+      deleteOpportunity,
+      resetOpportunities,
+      isAdminLoggedIn,
+      login,
+      loginAdmin,
+      logoutAdmin,
+      clearAdminSession,
+    }}>
+      {isProtectedPage(pathname) && (!ready || !authenticated) ? null : children}
+      <BookmarkNotification notice={bookmarkNotice} onDismiss={() => setBookmarkNotice(null)} />
+      <InAppToast notification={notificationToast} onDismiss={() => setNotificationToast(null)} />
+    </AppContext.Provider>);
+}
+export function useApp() {
+    const context = useContext(AppContext);
+    if (!context)
+        throw new Error("AppProvider tidak tersedia");
+    return context;
+}
+export function useTr() {
+    const { locale } = useApp();
+    return (id, en) => translate(locale, id, en);
+}

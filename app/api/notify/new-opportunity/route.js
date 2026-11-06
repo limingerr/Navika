@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { sendNewOpportunityEmail } from "@/script/email-service";
-import { getNotificationRecipients } from "@/lib/supabase/admin";
-import { isAuthorizedAdmin } from "@/lib/supabase/require-admin";
-import { getStudentIds, storeNotifications } from "@/script/in-app-service";
-import { sendPushToUsers } from "@/script/push-service";
+import { sendNewOpportunityEmail } from "@/src/services/email-service";
+import { getNotificationRecipients } from "@/src/lib/supabase/admin";
+import { isAuthorizedAdmin } from "@/src/lib/supabase/require-admin";
+import { getStudentIds, storeNotifications } from "@/src/services/in-app-service";
+import { sendPushToUsers } from "@/src/services/push-service";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";

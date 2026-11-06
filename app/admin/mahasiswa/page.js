@@ -1,4 +1,4 @@
-import { AdminMahasiswaTable } from "@/script/admin-screens";
+import { AdminMahasiswaTable } from "@/src/components/admin/admin-student-table";
 
 export const metadata = {
   title: "Kelola Mahasiswa — Panel Admin NAVIKA",

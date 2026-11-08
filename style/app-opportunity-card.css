@@ -162,10 +162,16 @@
 
 .opportunity-card .badge-studi-independen,
 .opportunity-card .kat-studi-independen,
+.opportunity-card .badge-stupen,
+.opportunity-card .kat-stupen,
 .kartu-peluang .badge-studi-independen,
 .kartu-peluang .kat-studi-independen,
+.kartu-peluang .badge-stupen,
+.kartu-peluang .kat-stupen,
 .kartu-agenda .badge-studi-independen,
-.kartu-agenda .kat-studi-independen {
+.kartu-agenda .kat-studi-independen,
+.kartu-agenda .badge-stupen,
+.kartu-agenda .kat-stupen {
   background: #4338ca !important;
   border: 0 !important;
 }
@@ -182,10 +188,22 @@
 
 .opportunity-card .badge-seminar-webinar,
 .opportunity-card .kat-seminar-webinar,
+.opportunity-card .badge-webinar,
+.opportunity-card .kat-webinar,
+.opportunity-card .badge-seminar,
+.opportunity-card .kat-seminar,
 .kartu-peluang .badge-seminar-webinar,
 .kartu-peluang .kat-seminar-webinar,
+.kartu-peluang .badge-webinar,
+.kartu-peluang .kat-webinar,
+.kartu-peluang .badge-seminar,
+.kartu-peluang .kat-seminar,
 .kartu-agenda .badge-seminar-webinar,
-.kartu-agenda .kat-seminar-webinar {
+.kartu-agenda .kat-seminar-webinar,
+.kartu-agenda .badge-webinar,
+.kartu-agenda .kat-webinar,
+.kartu-agenda .badge-seminar,
+.kartu-agenda .kat-seminar {
   background: #475569 !important;
   border: 0 !important;
 }

@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useApp, useTr } from "@/src/components/app-provider";
-import { AppShell, DeadlineLabel, DemoNote, Icon, OpportunityCard, OpportunityList } from "@/src/components/ui";
+import { AppShell, DeadlineLabel, DemoNote, getOpportunityBadgeLabel, Icon, OpportunityCard, OpportunityList } from "@/src/components/ui";
 import { EmailConsentModal } from "@/src/components/email-consent-modal";
 import { getProfileDisplayName, getProfileInitials } from "@/src/lib/profile";
 import { calendarFilterLabel, calendarFilters, categories, categoryLabel, demoDeadline, demoReminders, fieldLabel, filterCalendarOpportunities, formatDate, hasCategory, isOpportunityRecommended, isOpportunityVisibleForStudent, opportunities as staticOpportunities } from "@/src/data/opportunities";
@@ -663,7 +663,7 @@ export function CalendarScreen() {
                                                         <path d="M12 2.5c.6 4.7 4.8 8.9 9.5 9.5-4.7.6-8.9 4.8-9.5 9.5-.6-4.7-4.8-8.9-9.5-9.5Z" />
                                                     </svg> {tr("REKOMENDASI", "FEATURED")}
                                                 </span>
-                                                <span className={`badge kat-${item.warna} badge-${item.warna}`}>{AGENDA_KATEGORI[item.warna] || item.kategori || "Umum"}</span>
+                                                <span className={`badge kat-${item.warna} badge-${item.warna}`}>{getOpportunityBadgeLabel(item.kategori || AGENDA_KATEGORI[item.warna] || "Umum", item.judul, locale)}</span>
                                                 <span className="badge badge-tenggat badge-time">
                                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                                                         <circle cx="12" cy="12" r="9" /><path d="M12 7.5v4.5l3 2" />

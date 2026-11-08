@@ -78,7 +78,7 @@ html {
 
 .page-pengaturan .settings-page {
   min-height: 100vh;
-  padding: 38px 16px 60px;
+  padding: 38px 16px 96px;
   background: var(--page,#fff);
 }
 
@@ -151,10 +151,11 @@ html {
   width: 62px;
   height: 62px;
   border-radius: 50%;
-  background: #111;
+  background: linear-gradient(135deg, #00A6E0, #0065A3);
   color: #fff;
   font-weight: 700;
   font-size: 1.3rem;
+  box-shadow: 0 4px 12px rgba(0, 166, 224, 0.2);
 }
 
 .page-pengaturan .settings-user strong,
@@ -434,8 +435,10 @@ html {
 }
 
 :root[data-theme=dark] .page-pengaturan .settings-avatar {
-  background: #fff;
-  color: #000;
+  background: #1E3A5F;
+  color: #38BDF8;
+  border: 1px solid #334155;
+  box-shadow: none;
 }
 
 @media (max-width: 699px) {

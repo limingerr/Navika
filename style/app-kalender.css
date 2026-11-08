@@ -333,7 +333,7 @@
 .page-kalender .titik-pink,   .page-kalender .titik-bootcamp, .page-kalender .dot-bootcamp { background: var(--pink); }
 .page-kalender .titik-oranye, .page-kalender .titik-magang, .page-kalender .dot-magang { background: var(--oranye); }
 .page-kalender .titik-ungu,   .page-kalender .titik-disimpan, .page-kalender .dot-disimpan { background: var(--ungu); }
-.page-kalender .titik-hitam,  .page-kalender .titik-umum, .page-kalender .dot-umum { background: var(--hitam-pekat); }
+.page-kalender .titik-hitam,  .page-kalender .dot-hitam,  .page-kalender .titik-umum, .page-kalender .dot-umum { background: var(--hitam-pekat); }
 .page-kalender .titik-studi-independen, .page-kalender .dot-studi-independen { background: #0284c7; }
 .page-kalender .titik-workshop, .page-kalender .dot-workshop { background: #b45309; }
 .page-kalender .titik-seminar-webinar, .page-kalender .dot-seminar-webinar { background: #4f46e5; }
@@ -777,6 +777,13 @@
 :root[data-theme=dark] .page-kalender .kat-beasiswa,
 :root[data-theme=dark] .page-kalender .badge-beasiswa {
   background: #1f8d5d;
+}
+
+:root[data-theme=dark] .page-kalender .titik-hitam,
+:root[data-theme=dark] .page-kalender .dot-hitam,
+:root[data-theme=dark] .page-kalender .titik-umum,
+:root[data-theme=dark] .page-kalender .dot-umum {
+  background: #F8FAFC;
 }
 
 :root[data-theme=dark] .page-kalender .chip-aktif,

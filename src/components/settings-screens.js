@@ -3,12 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { DashboardDots, LogOut } from "iconoir-react";
 import { useApp, useTr } from "@/src/components/app-provider";
-import { DemoNote, Icon } from "@/src/components/ui";
+import { AppShell, DemoNote, Icon } from "@/src/components/ui";
+import { getProfileDisplayName, getProfileInitials, getProfileRoleLabel } from "@/src/lib/profile";
 import { demoDeadline, demoReminders, formatDate, opportunities as staticOpportunities } from "@/src/data/opportunities";
 import { enableWebPush, getWebPushStatus } from "@/src/services/onesignal-push";
 function SettingsLayout({ title, subtitle, children, back = "/pengaturan" }) {
     const tr = useTr();
-    return <main className="settings-page"><div className="settings-inner"><Link className="settings-back" href={back}><span className="settings-back-btn" aria-hidden="true"><svg width="18" height="14" viewBox="0 0 20 15" fill="currentColor" aria-hidden="true"><path d="M7.91901 1.94806C8.02954 1.84507 8.11819 1.72087 8.17968 1.58287C8.24117 1.44487 8.27423 1.2959 8.2769 1.14485C8.27956 0.993792 8.25178 0.843748 8.19519 0.703666C8.13861 0.563583 8.05439 0.436333 7.94757 0.329505C7.84074 0.222676 7.71349 0.13846 7.57341 0.081878C7.43332 0.0252965 7.28328 -0.00249009 7.13223 0.000175084C6.98117 0.00284026 6.8322 0.0359026 6.6942 0.0973905C6.5562 0.158878 6.432 0.247532 6.32901 0.358062L0.32901 6.35806C0.118334 6.569 0 6.85494 0 7.15306C0 7.45119 0.118334 7.73712 0.32901 7.94806L6.32901 13.9481C6.432 14.0586 6.5562 14.1472 6.6942 14.2087C6.8322 14.2702 6.98117 14.3033 7.13223 14.3059C7.28328 14.3086 7.43332 14.2808 7.57341 14.2242C7.71349 14.1677 7.84074 14.0834 7.94757 13.9766C8.05439 13.8698 8.13861 13.7425 8.19519 13.6025C8.25178 13.4624 8.27956 13.3123 8.2769 13.1613C8.27423 13.0102 8.24117 12.8613 8.17968 12.7233C8.11819 12.5853 8.02954 12.4611 7.91901 12.3581L3.83901 8.27806H18.374C18.6724 8.27806 18.9585 8.15954 19.1695 7.94856C19.3805 7.73758 19.499 7.45143 19.499 7.15306C19.499 6.85469 19.3805 6.56855 19.1695 6.35757C18.9585 6.14659 18.6724 6.02806 18.374 6.02806H3.83901L7.91901 1.94806Z"/></svg></span>{tr("Kembali", "Back")}</Link><header className="settings-heading"><h1>{title}</h1><p>{subtitle}</p></header>{children}</div></main>;
+    return <AppShell><main className="settings-page"><div className="settings-inner"><Link className="settings-back" href={back}><span className="settings-back-btn" aria-hidden="true"><svg width="18" height="14" viewBox="0 0 20 15" fill="currentColor" aria-hidden="true"><path d="M7.91901 1.94806C8.02954 1.84507 8.11819 1.72087 8.17968 1.58287C8.24117 1.44487 8.27423 1.2959 8.2769 1.14485C8.27956 0.993792 8.25178 0.843748 8.19519 0.703666C8.13861 0.563583 8.05439 0.436333 7.94757 0.329505C7.84074 0.222676 7.71349 0.13846 7.57341 0.081878C7.43332 0.0252965 7.28328 -0.00249009 7.13223 0.000175084C6.98117 0.00284026 6.8322 0.0359026 6.6942 0.0973905C6.5562 0.158878 6.432 0.247532 6.32901 0.358062L0.32901 6.35806C0.118334 6.569 0 6.85494 0 7.15306C0 7.45119 0.118334 7.73712 0.32901 7.94806L6.32901 13.9481C6.432 14.0586 6.5562 14.1472 6.6942 14.2087C6.8322 14.2702 6.98117 14.3033 7.13223 14.3059C7.28328 14.3086 7.43332 14.2808 7.57341 14.2242C7.71349 14.1677 7.84074 14.0834 7.94757 13.9766C8.05439 13.8698 8.13861 13.7425 8.19519 13.6025C8.25178 13.4624 8.27956 13.3123 8.2769 13.1613C8.27423 13.0102 8.24117 12.8613 8.17968 12.7233C8.11819 12.5853 8.02954 12.4611 7.91901 12.3581L3.83901 8.27806H18.374C18.6724 8.27806 18.9585 8.15954 19.1695 7.94856C19.3805 7.73758 19.499 7.45143 19.499 7.15306C19.499 6.85469 19.3805 6.56855 19.1695 6.35757C18.9585 6.14659 18.6724 6.02806 18.374 6.02806H3.83901L7.91901 1.94806Z"/></svg></span>{tr("Kembali", "Back")}</Link><header className="settings-heading"><h1>{title}</h1><p>{subtitle}</p></header>{children}</div></main></AppShell>;
 }
 function SettingsRow({ href, icon, title, detail, danger = false }) {
     return <Link href={href} className={`settings-row ${danger ? "danger" : ""}`}><span className="settings-icon">{typeof icon === "string" ? <Icon name={icon}/> : icon}</span><span className="settings-row-copy"><strong>{title}</strong>{detail && <small>{detail}</small>}</span><span className="settings-chevron" aria-hidden="true">›</span></Link>;
@@ -19,12 +20,9 @@ export function SettingsScreen() {
     const [logoutError, setLogoutError] = useState("");
     const { profile, locale, theme, clearDemo, logoutUser, isAdminLoggedIn } = useApp();
     const tr = useTr();
-    const displayName = isAdminLoggedIn
-        ? tr("Pengelola Navika", "Navika Administrator")
-        : (profile.name === "Pengguna Demo" || !profile.name ? tr("Mahasiswa", "Student") : profile.name);
-    const initials = isAdminLoggedIn
-        ? "AD"
-        : (profile.name || "M").split(" ").filter(Boolean).slice(0, 3).map((word) => word[0].toUpperCase()).join("");
+    const displayName = getProfileDisplayName(profile, isAdminLoggedIn, tr);
+    const initials = getProfileInitials(profile, isAdminLoggedIn);
+    const roleLabel = getProfileRoleLabel(isAdminLoggedIn, tr);
     const handleLogout = async () => {
         setLoggingOut(true);
         setLogoutError("");
@@ -45,7 +43,7 @@ export function SettingsScreen() {
             <div className="settings-avatar">{initials}</div>
             <div>
                 <strong>{displayName}</strong>
-                <span>{isAdminLoggedIn ? tr("Akun Pengelola (Admin)", "Administrator Account") : tr("Akun Mahasiswa Aktif", "Active Student Account")}</span>
+                <span>{roleLabel}</span>
             </div>
         </div>
         <div className="settings-list">

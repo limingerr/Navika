@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useApp, useTr } from "@/src/components/app-provider";
 import { AppShell, DeadlineLabel, DemoNote, Icon, OpportunityCard, OpportunityList } from "@/src/components/ui";
 import { EmailConsentModal } from "@/src/components/email-consent-modal";
+import { getProfileDisplayName, getProfileInitials } from "@/src/lib/profile";
 import { calendarFilterLabel, calendarFilters, categories, categoryLabel, demoDeadline, demoReminders, fieldLabel, filterCalendarOpportunities, formatDate, hasCategory, isOpportunityRecommended, isOpportunityVisibleForStudent, opportunities as staticOpportunities } from "@/src/data/opportunities";
 const AGENDA_DATA = {
     "2026-09-08": [
@@ -170,6 +171,9 @@ function getDayAgenda(date, filter = "Semua", saved = [], profile = null, oppLis
 
 function getDayDots(date, filter = "Semua", saved = [], profile = null, oppList = staticOpportunities) {
     const items = getDayAgenda(date, filter, saved, profile, oppList);
+    if (items.length > 3) {
+        return [{ warna: "hitam", kategori: "Semua", judul: "Semua" }];
+    }
     const seen = new Set();
     const dots = [];
     for (const it of items) {
@@ -178,6 +182,9 @@ function getDayDots(date, filter = "Semua", saved = [], profile = null, oppList 
             seen.add(dotColor);
             dots.push(it);
         }
+    }
+    if (dots.length > 3) {
+        return [{ warna: "hitam", kategori: "Semua", judul: "Semua" }];
     }
     return dots;
 }
@@ -211,7 +218,7 @@ function CategoryTabs({ selected, onSelect }) {
     return <div className="category-tabs" role="group" aria-label={tr("Kategori peluang", "Opportunity categories")}>{categories.map((item) => <button key={item} type="button" className={selected === item ? "selected" : ""} aria-pressed={selected === item} onClick={() => onSelect(item)}>{categoryLabel(item, locale)}</button>)}</div>;
 }
 export function DashboardScreen() {
-    const { profile, saved, locale, calendarFilter, setCalendarFilter, deadlineAlerts, notifications, opportunities = staticOpportunities } = useApp();
+    const { profile, saved, locale, calendarFilter, setCalendarFilter, deadlineAlerts, notifications, isAdminLoggedIn, opportunities = staticOpportunities } = useApp();
     const unreadNotifications = notifications.filter((item) => !item.read_at).length;
     const tr = useTr();
     const today = useMemo(() => new Date(), []);
@@ -219,7 +226,8 @@ export function DashboardScreen() {
     const [selected, setSelected] = useState(() => new Date(today.getFullYear(), today.getMonth(), today.getDate()));
     const selectedDayRef = useRef(null);
     const reminders = deadlineAlerts ? demoReminders(saved) : [];
-    const displayName = profile.name === "Pengguna Demo" || profile.name === "Mahasiswa" || !profile.name ? tr("Mahasiswa", "Student") : profile.name.split(" ")[0];
+    const displayName = getProfileDisplayName(profile, isAdminLoggedIn, tr);
+    const initials = getProfileInitials(profile, isAdminLoggedIn);
 
     const currentYear = viewMonth.getFullYear();
     const currentMonth = viewMonth.getMonth();
@@ -268,7 +276,7 @@ export function DashboardScreen() {
     return <AppShell>
     <EmailConsentModal />
     <header className="kepala top-header dashboard-header">
-      <span className="avatar avatar-small" aria-hidden="true">{displayName.slice(0, 1).toUpperCase()}</span>
+      <span className="avatar avatar-small" aria-hidden="true">{initials}</span>
       <div className="identitas greeting">
         <p className="hai"><span>{tr("Hai,", "Hi,")}</span></p>
         <h1 className="nama">{displayName}</h1>

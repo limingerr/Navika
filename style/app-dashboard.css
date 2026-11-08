@@ -145,15 +145,14 @@
   flex: none;
   width: 52px;
   height: 52px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, var(--biru-lembut), var(--biru-muda));
-  border: 2px solid #fff;
-  box-shadow: 0 4px 10px rgba(0, 103, 166, 0.12);
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00A6E0, #0065A3);
+  box-shadow: 0 4px 10px rgba(0, 103, 166, 0.18);
   display: grid;
   place-items: center;
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  color: var(--biru-aksi);
+  color: #fff;
 }
 
 .page-dashboard .identitas,
@@ -477,6 +476,7 @@
 .page-dashboard .titik-disimpan,
 .page-dashboard .dot-disimpan { background: #2511c2; }
 .page-dashboard .titik-hitam,
+.page-dashboard .dot-hitam,
 .page-dashboard .titik-umum,
 .page-dashboard .dot-umum { background: #080808; }
 .page-dashboard .titik-studi-independen,
@@ -1030,6 +1030,13 @@
 :root[data-theme=dark] .page-dashboard .badge-beasiswa,
 :root[data-theme=dark] .page-dashboard .kat-beasiswa {
   background: #1f8d5d;
+}
+
+:root[data-theme=dark] .page-dashboard .titik-hitam,
+:root[data-theme=dark] .page-dashboard .dot-hitam,
+:root[data-theme=dark] .page-dashboard .titik-umum,
+:root[data-theme=dark] .page-dashboard .dot-umum {
+  background: #F8FAFC;
 }
 
 :root[data-theme=dark] .page-dashboard .chip.terpilih,

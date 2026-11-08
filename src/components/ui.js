@@ -44,6 +44,17 @@ export function MainNav() {
             ),
         },
         {
+            href: "/peluang",
+            label: tr("Peluang", "Opportunities"),
+            icon: "search",
+            svg: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="m20 20-3.8-3.8" />
+                </svg>
+            ),
+        },
+        {
             href: "/tersimpan",
             label: tr("Tersimpan", "Saved"),
             icon: "bookmark",
@@ -64,9 +75,31 @@ export function MainNav() {
                 </svg>
             ),
         },
+        {
+            href: "/pengaturan",
+            label: tr("Pengaturan", "Settings"),
+            icon: "settings",
+            svg: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            ),
+        },
     ];
     return <nav className="main-nav" aria-label={tr("Navigasi utama", "Main navigation")}>{items.map((item) => {
-            const active = pathname === item.href || (item.href === "/dashboard" && (pathname.startsWith("/peluang") || pathname === "/kalender")) || (item.href === "/profil" && (pathname.startsWith("/profil/") || pathname.startsWith("/pengaturan")));
+            const active =
+                item.href === "/dashboard"
+                    ? pathname === "/dashboard" || pathname === "/kalender"
+                    : item.href === "/peluang"
+                    ? pathname.startsWith("/peluang")
+                    : item.href === "/tersimpan"
+                    ? pathname === "/tersimpan"
+                    : item.href === "/profil"
+                    ? pathname === "/profil" || pathname.startsWith("/profil/")
+                    : item.href === "/pengaturan"
+                    ? pathname.startsWith("/pengaturan")
+                    : pathname === item.href;
             return <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={active ? "active" : ""}><span className={`nav-icon nav-icon-${item.icon}`} aria-hidden="true">{item.svg}</span><span>{item.label}</span></Link>;
         })}</nav>;
 }
@@ -90,9 +123,11 @@ export function OpportunityCard({ opportunity, displayCategory }) {
 
     const titleLength = (opportunity.title || "").length;
     let titleSizeClass = "judul-md";
-    if (titleLength <= 26) {
+    if (titleLength <= 20) {
+        titleSizeClass = "judul-xl";
+    } else if (titleLength <= 32) {
         titleSizeClass = "judul-lg";
-    } else if (titleLength > 42) {
+    } else if (titleLength > 44) {
         titleSizeClass = "judul-sm";
     }
 

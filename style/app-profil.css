@@ -176,10 +176,13 @@ html {
   width: 90px;
   height: 90px;
   margin: auto auto 18px;
-  border-radius: 28px;
-  background: #38baf0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  border: 2.5px solid rgba(255, 255, 255, 0.5);
   font-size: 2rem;
   font-weight: 800;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .page-profil .profile-hero h2 {
@@ -457,16 +460,22 @@ html {
 }
 
 :root[data-theme=dark] .page-profil .profile-hero {
-  background: #00a5e0;
+  background: #1E293B;
+  border: 1px solid #334155;
+  color: #F8FAFC;
 }
 
 :root[data-theme=dark] .page-profil .profile-avatar {
-  background: #123140;
+  background: #1E3A5F;
+  color: #38BDF8;
+  border: 2px solid #334155;
+  border-radius: 50%;
 }
 
 :root[data-theme=dark] .page-profil .profile-hero span {
-  background: #123140;
-  color: #fff;
+  background: #0F172A;
+  color: #38BDF8;
+  border: 1px solid #334155;
 }
 
 :root[data-theme=dark] .page-profil .academic-icon {

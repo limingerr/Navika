@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useApp, useTr } from "@/src/components/app-provider";
 import { AppShell, DemoNote, Icon } from "@/src/components/ui";
-import { normalizeGpa } from "@/src/lib/profile";
+import { getProfileDisplayName, getProfileInitials, getProfileRoleLabel, normalizeGpa } from "@/src/lib/profile";
 const academicFields = [
     { key: "university", label: "Universitas", icon: "univ-profile.svg" },
     { key: "major", label: "Jurusan", icon: "jurusan-profile.svg" },
@@ -12,12 +12,13 @@ const academicFields = [
     { key: "gpa", label: "IPK", icon: "ipk-profile.svg" },
 ];
 export function ProfileScreen() {
-    const { profile, locale } = useApp();
+    const { profile, locale, isAdminLoggedIn } = useApp();
     const tr = useTr();
-    const displayName = profile.name === "Pengguna Demo" || !profile.name ? tr("Mahasiswa", "Student") : profile.name;
-    const initials = (profile.name || "M").split(" ").filter(Boolean).slice(0, 3).map((word) => word[0].toUpperCase()).join("");
+    const displayName = getProfileDisplayName(profile, isAdminLoggedIn, tr);
+    const initials = getProfileInitials(profile, isAdminLoggedIn);
+    const roleLabel = getProfileRoleLabel(isAdminLoggedIn, tr);
     const fieldNames = { name: tr("Nama", "Name"), email: "Email", university: tr("Universitas", "University"), major: tr("Jurusan", "Major"), semester: tr("Semester", "Semester"), gpa: tr("IPK", "GPA") };
-    return <AppShell><main className="profile-screen screen-main"><div className="profile-heading"><div><p>{tr("AKUN", "PROFILE")}</p><h1>{tr("Profil", "Profile")}</h1></div><Link className="outline-icon" href="/pengaturan" aria-label={tr("Pengaturan", "Settings")}><Icon name="setting-gerigi.svg" size={40}/></Link></div><DemoNote /><section className="profile-hero"><div className="profile-avatar">{initials}</div><h2>{displayName}</h2><p>{profile.email}</p><span>{tr("Akun Mahasiswa", "Student Account")}</span></section><h2 className="subheading">{tr("Informasi Akademik", "Academic Information")}</h2><div className="academic-list">{academicFields.map((field) => <div className="academic-item" key={field.key}><div className="academic-icon"><Icon name={field.icon}/></div><div><span>{fieldNames[field.key]}</span><strong>{field.key === "gpa" && profile.gpa ? new Intl.NumberFormat(locale === "en" ? "en-US" : "id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(profile.gpa)) : profile[field.key] || tr("Belum diisi", "Not provided")}</strong></div></div>)}</div><Link href="/profil/edit" className="primary-button edit-profile-link">{tr("Edit Profil", "Edit Profile")}</Link></main></AppShell>;
+    return <AppShell><main className="profile-screen screen-main"><div className="profile-heading"><div><p>{tr("AKUN", "PROFILE")}</p><h1>{tr("Profil", "Profile")}</h1></div><Link className="outline-icon" href="/pengaturan" aria-label={tr("Pengaturan", "Settings")}><Icon name="setting-gerigi.svg" size={40}/></Link></div><DemoNote /><section className="profile-hero"><div className="profile-avatar">{initials}</div><h2>{displayName}</h2><p>{profile.email}</p><span>{roleLabel}</span></section><h2 className="subheading">{tr("Informasi Akademik", "Academic Information")}</h2><div className="academic-list">{academicFields.map((field) => <div className="academic-item" key={field.key}><div className="academic-icon"><Icon name={field.icon}/></div><div><span>{fieldNames[field.key]}</span><strong>{field.key === "gpa" && profile.gpa ? new Intl.NumberFormat(locale === "en" ? "en-US" : "id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(profile.gpa)) : profile[field.key] || tr("Belum diisi", "Not provided")}</strong></div></div>)}</div><Link href="/profil/edit" className="primary-button edit-profile-link">{tr("Edit Profil", "Edit Profile")}</Link></main></AppShell>;
 }
 function EditProfileForm() {
     const router = useRouter();
